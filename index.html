@@ -80,6 +80,7 @@ footer.foot{border-top:.5px solid var(--line);background:var(--card);margin-top:
 .zb{justify-content:center;gap:8px;margin-bottom:12px}.zb .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 12px}.zb .btn.pri{color:#fff}#zl{min-width:52px;text-align:center;font-weight:600;font-size:.9rem}
 @media (max-width:540px){#tabs{width:100%}}
 .pvw.crop{cursor:crosshair;touch-action:none}.pvw.bg{cursor:copy}
+.selbox i{position:absolute;width:14px;height:14px;box-sizing:border-box;background:#fff;border:2px solid var(--brand);border-radius:50%}
 .selbox{position:absolute;border:2px solid var(--brand);box-shadow:0 0 0 9999px rgba(0,0,0,.45);display:none;pointer-events:none}
 .pcard{text-align:center}
 input[type=range]{accent-color:var(--brand);width:180px}
@@ -227,7 +228,7 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 </style>
 </head>
 <body>
-<header class="nav" id="hdr"><div class="nav-in"><a class="logo" href="#/" aria-label="Eve Sandbox home"><svg class="lm" width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0a84ff"/><stop offset="1" stop-color="#bf5af2"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#lg)"/><path d="M16 7l2.2 6.3L24.5 16l-6.3 2.7L16 25l-2.2-6.3L7.5 16l6.3-2.7z" fill="#fff"/></svg><span class="lt">Eve <span>Sandbox</span></span></a><nav class="menu" aria-label="Main"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a><a class="link" data-r="terms" href="#/terms">Terms of Service</a></nav><button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mpanel"><i></i><i></i><i></i></button></div><nav class="mpanel" id="mpanel" aria-label="Mobile menu"><div class="mlist"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a><a class="link" data-r="terms" href="#/terms">Terms of Service</a></div></nav></header>
+<header class="nav" id="hdr"><div class="nav-in"><a class="logo" href="#/" aria-label="Eve Sandbox home"><svg class="lm" width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0a84ff"/><stop offset="1" stop-color="#bf5af2"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#lg)"/><path d="M16 7l2.2 6.3L24.5 16l-6.3 2.7L16 25l-2.2-6.3L7.5 16l6.3-2.7z" fill="#fff"/></svg><span class="lt">Eve <span>Sandbox</span></span></a><nav class="menu" aria-label="Main"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></nav><button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mpanel"><i></i><i></i><i></i></button></div><nav class="mpanel" id="mpanel" aria-label="Mobile menu"><div class="mlist"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></div></nav></header>
 <main id="app"></main>
 <footer class="foot"><div class="foot-in">
  <div><b>Eve <span>Sandbox</span></b><p>Simple tools to help students stay on top of their daily requirements.</p></div>
@@ -433,7 +434,7 @@ function loadImg(file){
 function workspace(){
  var T=[['compress','Compress'],['resize','Resize'],['crop','Crop'],['bg','Remove BG']];
  $$('ws').innerHTML='<div class="seg" id="tabs" style="margin:16px 0">'+T.map(function(t){return '<a data-tab="'+t[0]+'" href="javascript:void 0">'+t[1]+'</a>';}).join('')+'</div>'+
- '<div class="card pcard"><div class="row zb" id="zb"><button class="btn" id="zout" aria-label="Zoom out">'+ico('minus',16,2.5)+'</button><span id="zl">100%</span><button class="btn" id="zin" aria-label="Zoom in">'+ico('plus',16,2.5)+'</button><button class="btn" id="zfit">'+ico('fit',16)+' Fit</button><button class="btn" id="z100">100%</button><button class="btn" id="zpan" aria-label="Move image">'+ico('hand',16)+' Move</button></div><div class="pvw" id="pw"><div id="pin"><canvas id="pv"></canvas><div class="selbox" id="sb"></div></div></div><p class="hint" id="info" style="margin:8px 0 0"></p></div>'+
+ '<div class="card pcard"><div class="row zb" id="zb"><button class="btn" id="zout" aria-label="Zoom out">'+ico('minus',16,2.5)+'</button><span id="zl">100%</span><button class="btn" id="zin" aria-label="Zoom in">'+ico('plus',16,2.5)+'</button><button class="btn" id="zfit">'+ico('fit',16)+' Fit</button><button class="btn" id="z100">100%</button><button class="btn" id="zpan" aria-label="Move image">'+ico('hand',16)+' Move</button></div><div class="pvw" id="pw"><div id="pin"><canvas id="pv"></canvas><div class="selbox" id="sb"><i style="left:-7px;top:-7px"></i><i style="right:-7px;top:-7px"></i><i style="left:-7px;bottom:-7px"></i><i style="right:-7px;bottom:-7px"></i></div></div></div><p class="hint" id="info" style="margin:8px 0 0"></p></div>'+
  '<div class="card" id="ctl" style="margin-top:14px"></div>'+
  '<div class="bar"><button class="btn" id="undo">Undo</button><button class="btn" id="reset">Reset</button><span class="sp"></span><button class="btn pri" id="save">Download</button></div>';
  $$('tabs').onclick=function(e){var t=e.target.dataset.tab;if(!t)return;I.tab=t;I.sel=null;tabs();ctl();sel();};
@@ -444,13 +445,19 @@ function workspace(){
  var pw=$$('pw');
  function pt(e){var r=$$('pv').getBoundingClientRect(),c=I.cur;return {x:cl((e.clientX-r.left)/r.width*c.width,0,c.width),y:cl((e.clientY-r.top)/r.height*c.height,0,c.height)};}
  pw.onpointerdown=function(e){if(I.pan){I.pd={x:e.clientX,y:e.clientY,l:pw.scrollLeft,t:pw.scrollTop};pw.setPointerCapture(e.pointerId);return;}var p=pt(e);
-  if(I.tab==='crop'){I.drag=p;I.sel={x:p.x,y:p.y,w:0,h:0};pw.setPointerCapture(e.pointerId);sel();}
+  if(I.tab==='crop'){var ht=cropHit(p);pw.setPointerCapture(e.pointerId);
+   if(ht&&ht.k==='move'){I.mv={dx:p.x-I.sel.x,dy:p.y-I.sel.y};}
+   else if(ht){I.drag=ht.anchor;}
+   else{I.drag=p;I.sel={x:p.x,y:p.y,w:0,h:0};}
+   sel();}
   else if(I.tab==='bg'&&I.bgm==='plain'){var d=I.cur.getContext('2d').getImageData(Math.floor(p.x),Math.floor(p.y),1,1).data;I.bgc=[d[0],d[1],d[2]];ctl();}
   else if(I.tab==='bg'){startBrush();I.paint=1;I.last=p;pw.setPointerCapture(e.pointerId);stroke(p);}};
- pw.onpointermove=function(e){if(I.pd){pw.scrollLeft=I.pd.l-(e.clientX-I.pd.x);pw.scrollTop=I.pd.t-(e.clientY-I.pd.y);return;}if(I.paint){stroke(pt(e));return;}if(!I.drag)return;var p=pt(e),a=I.drag,c=I.cur,w=p.x-a.x,h=p.y-a.y,aw=Math.abs(w),ah=Math.abs(h);
+ pw.onpointermove=function(e){if(I.pd){pw.scrollLeft=I.pd.l-(e.clientX-I.pd.x);pw.scrollTop=I.pd.t-(e.clientY-I.pd.y);return;}if(I.paint){stroke(pt(e));return;}
+  if(I.mv){var q=pt(e),s0=I.sel,c0=I.cur;I.sel={x:cl(q.x-I.mv.dx,0,c0.width-s0.w),y:cl(q.y-I.mv.dy,0,c0.height-s0.h),w:s0.w,h:s0.h};sel();return;}
+  if(!I.drag){if(I.tab==='crop'&&!I.pan){var hh0=cropHit(pt(e));pw.style.cursor=!hh0?'':hh0.k==='move'?'move':(hh0.k==='nw'||hh0.k==='se')?'nwse-resize':'nesw-resize';}return;}var p=pt(e),a=I.drag,c=I.cur,w=p.x-a.x,h=p.y-a.y,aw=Math.abs(w),ah=Math.abs(h);
   if(I.ratio){aw=Math.min(aw,(w>=0?c.width-a.x:a.x),(h>=0?c.height-a.y:a.y)*I.ratio);ah=aw/I.ratio;}
   I.sel={x:w>=0?a.x:a.x-aw,y:h>=0?a.y:a.y-ah,w:aw,h:ah};sel();};
- pw.onpointerup=function(){I.pd=null;I.drag=null;if(I.paint){I.paint=null;est();}};
+ pw.onpointerup=pw.onpointercancel=function(){I.pd=null;I.drag=null;I.mv=null;if(I.paint){I.paint=null;est();}};
  $$('zin').onclick=function(){zoom(1.25);};$$('zout').onclick=function(){zoom(.8);};
  $$('zfit').onclick=function(){I.z=1;zapply();pw.scrollLeft=pw.scrollTop=0;};
  $$('z100').onclick=function(){setZ(1/fitS());};
@@ -459,6 +466,11 @@ function workspace(){
  window.addEventListener('resize',function(){if(I&&$$('pv'))zapply();});
  tabs();paint();ctl();zpanUI();
 }
+function cropHit(p){var s=I.sel,pv=$$('pv');if(!s||s.w<4||s.h<4||!pv)return null;
+ var k=I.cur.width/(pv.getBoundingClientRect().width||1),tol=16*k,cs=[['nw',s.x,s.y,s.x+s.w,s.y+s.h],['ne',s.x+s.w,s.y,s.x,s.y+s.h],['sw',s.x,s.y+s.h,s.x+s.w,s.y],['se',s.x+s.w,s.y+s.h,s.x,s.y]];
+ for(var i=0;i<4;i++){var c=cs[i];if(Math.abs(p.x-c[1])<=tol&&Math.abs(p.y-c[2])<=tol)return {k:c[0],anchor:{x:c[3],y:c[4]}};}
+ if(p.x>=s.x&&p.x<=s.x+s.w&&p.y>=s.y&&p.y<=s.y+s.h)return {k:'move'};
+ return null;}
 function fitS(){var c=I.cur,box=$$('pw').parentNode,mw=Math.max(200,Math.min(920,(box.clientWidth||600)-36)),mh=Math.max(240,window.innerHeight*.6);return Math.min(1,mw/c.width,mh/c.height);}
 function zapply(){var c=I.cur,pv=$$('pv');if(!pv)return;var f=fitS(),sc=f*I.z;pv.style.width=Math.round(c.width*sc)+'px';pv.style.height=Math.round(c.height*sc)+'px';$$('zl').textContent=Math.round(sc*100)+'%';}
 function setZ(z){var pw=$$('pw'),pv=$$('pv'),ow=pv.offsetWidth||1,oh=pv.offsetHeight||1,cx=(pw.scrollLeft+pw.clientWidth/2)/ow,cy=(pw.scrollTop+pw.clientHeight/2)/oh;
@@ -490,7 +502,7 @@ function ctl(){
   h='<div class="row"><label>Width <input type="number" id="rw" min="1" max="8000" value="'+c.width+'" style="width:100px"></label><label>Height <input type="number" id="rh" min="1" max="8000" value="'+c.height+'" style="width:100px"></label><label class="hint"><input type="checkbox" id="lk" checked> Lock ratio</label></div>'+
   '<div class="row" style="margin-top:12px"><button class="btn" data-p="75">75%</button><button class="btn" data-p="50">50%</button><button class="btn" data-p="25">25%</button><span class="sp"></span><button class="btn pri" id="ap">Apply resize</button></div>';
  }else if(t==='crop'){
-  h='<p class="hint" style="margin-top:0">Drag on the image to choose the area to keep.</p><div class="row">'+[['Free',0],['1:1',1],['4:3',4/3],['16:9',16/9]].map(function(r){return '<button class="btn'+(I.ratio===r[1]?' pri':'')+'" data-ra="'+r[1]+'">'+r[0]+'</button>';}).join('')+'<span class="sp"></span><button class="btn pri" id="ap">Apply crop</button></div>';
+  h='<p class="hint" style="margin-top:0">Drag on the image to choose the area to keep. Then drag inside the box to move it, or drag a corner to resize it.</p><div class="row">'+[['Free',0],['1:1',1],['4:3',4/3],['16:9',16/9]].map(function(r){return '<button class="btn'+(I.ratio===r[1]?' pri':'')+'" data-ra="'+r[1]+'">'+r[0]+'</button>';}).join('')+'<span class="sp"></span><button class="btn pri" id="ap">Apply crop</button></div>';
  }else if(brush){
   h=modeH+'<p class="hint" style="margin-top:0">Rub over the background to erase it. Switch to Restore to bring back anything removed by mistake. Use a smaller brush near edges.</p>'+
    '<div class="row"><button class="btn'+(I.tool==='erase'?' pri':'')+'" data-tool="erase">Erase</button><button class="btn'+(I.tool==='restore'?' pri':'')+'" data-tool="restore">Restore</button><label>Brush size <input type="range" id="bs" min="1" max="20" value="'+I.bs+'"></label></div>';
@@ -879,7 +891,7 @@ var TL=[
  {r:'pdf',c:'i3',ic:'pdf',n:'PDF Tool',d:'Make, merge, split and compress PDFs, and add or remove passwords.'},
  {r:'virus',c:'i4',ic:'shield',n:'Virus Checker',d:'Check whether a website or link looks safe before you open it.'},
  {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
- {r:'isearch',c:'i6',ic:'search',n:'Image Search',d:'Advanced image search with filters, free image libraries and reverse search, and a local visual match that finds look-alikes in your own pictures.'}];
+ {r:'isearch',c:'i6',ic:'search',n:'Image Search',d:'Search by words or with a picture, using our own independent image index.'}];
 function toolsGrid(){return '<div class="grid">'+TL.map(function(t){return '<a class="card tool" href="#/'+t.r+'"><span class="ic '+t.c+'">'+ico(t.ic,24)+'</span><h3>'+t.n+'</h3><p>'+t.d+'</p></a>';}).join('')+'<div class="card soon"><span class="tag">Coming soon</span><h3>More tools</h3><p>New features are on the way.</p></div></div>';}
 function blobs(){return '<span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>';}
 function banner(tag,title,sub){return '<section class="hero sm">'+blobs()+'<div class="hin"><span class="pill">'+tag+'</span><h1>'+title+'</h1><p class="lead">'+sub+'</p></div></section>';}
@@ -1079,368 +1091,62 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')menu(false);
 document.addEventListener('visibilitychange',function(){document.documentElement.classList.toggle('bgpause',document.hidden);});
 window.addEventListener('resize',function(){if(window.innerWidth>820)menu(false);});
 var FULL={tools:toolsPage,about:aboutPage,contact:contactPage,donate:donatePage,terms:termsPage,privacy:privacyPage};
-/* ===== Image Search ===== */
-var IKEY='eve-sandbox:isearch:v1',EC=encodeURIComponent;
-var IS={tab:'rev',adv:false,q:'',ru:'',f:{phrase:'',any:'',not:'',site:'',ext:'',size:'',color:'',type:'',aspect:'',time:'',lic:'',minw:'',safe:false},hist:[],res:[],page:1,more:false,st:'idle',src:'',R:null};
-try{var iraw=localStorage.getItem(IKEY);if(iraw){var ip=JSON.parse(iraw);
- if(ip&&ip.f&&typeof ip.f==='object'){for(var ik in IS.f){if(typeof ip.f[ik]===typeof IS.f[ik])IS.f[ik]=ip.f[ik];}}
- if(ip&&Array.isArray(ip.hist))IS.hist=ip.hist.filter(function(x){return typeof x==='string';}).slice(0,8);}}catch(e){}
-function iSave(){try{localStorage.setItem(IKEY,JSON.stringify({f:IS.f,hist:IS.hist}));}catch(e){}}
-var IO={
- ext:[['','Any'],['jpg','JPG'],['png','PNG'],['gif','GIF'],['webp','WebP'],['svg','SVG']],
- size:[['','Any size'],['large','Large'],['medium','Medium'],['small','Small']],
- color:[['','Any color'],['bw','Black & white'],['trans','Transparent'],['red','Red'],['orange','Orange'],['yellow','Yellow'],['green','Green'],['teal','Teal'],['blue','Blue'],['purple','Purple'],['pink','Pink'],['white','White'],['gray','Gray'],['black','Black'],['brown','Brown']],
- type:[['','Any type'],['photo','Photo'],['clip','Clip art'],['line','Line drawing'],['gif','Animated GIF'],['face','Faces']],
- aspect:[['','Any shape'],['wide','Wide'],['tall','Tall'],['square','Square']],
- time:[['','Any time'],['d','Past 24 hours'],['w','Past week'],['m','Past month'],['y','Past year']],
- lic:[['','Any license'],['cc','Creative Commons'],['com','Free for commercial use'],['mod','Commercial + modify']]
-};
-var ILAB={ext:'File type',size:'Size',color:'Color',type:'Type',aspect:'Shape',time:'Date',lic:'License'};
-function iWords(s){return String(s||'').trim().split(/\s+/).filter(Boolean);}
-function iSite(){return IS.f.site.trim().replace(/^https?:\/\//i,'').replace(/\/.*$/,'');}
-function iQ(mode){
- var f=IS.f,p=[IS.q.trim()],a=iWords(f.any),ph=f.phrase.trim().replace(/"/g,'');
- if(ph)p.push(mode==='plain'?ph:'"'+ph+'"');
- if(a.length)p.push(mode==='full'?'('+a.join(' OR ')+')':a.join(' '));
- if(mode!=='plain'){iWords(f.not).forEach(function(w){p.push('-'+w.replace(/^-+/,''));});}
- if(mode==='full'&&iSite())p.push('site:'+iSite());
- return p.filter(Boolean).join(' ');
-}
-function iEngines(){
- var f=IS.f,q=iQ('full'),pq=iQ('plain'),oq=iQ('ov');
- var c=f.color,s=f.size,t=f.type,a=f.aspect,tm=f.time,l=f.lic,x=f.ext,mw=parseInt(f.minw,10)||0;
- var cap=function(v){return v.charAt(0).toUpperCase()+v.slice(1);};
- function join(arr){return arr.length?arr.join('&'):'';}
- /* Google */
- var g=[];if(s)g.push('isz:'+{large:'l',medium:'m',small:'i'}[s]);
- if(c)g.push(c==='bw'?'ic:gray':c==='trans'?'ic:trans':'ic:specific,isc:'+c);
- if(t)g.push('itp:'+{photo:'photo',clip:'clipart',line:'lineart',gif:'animated',face:'face'}[t]);
- if(a)g.push('iar:'+{tall:'t',square:'s',wide:'w'}[a]);
- if(tm)g.push('qdr:'+tm);if(x)g.push('ift:'+x);
- if(l)g.push('sur:'+{cc:'cl',com:'fc',mod:'fmc'}[l]);
- var google='https://www.google.com/search?tbm=isch&q='+EC(q)+(g.length?'&tbs='+EC(g.join(',')):'')+(f.safe?'&safe=active':'');
- /* Bing */
- var b=[];if(s)b.push('imagesize-'+s);
- if(c==='bw')b.push('color2-bw');else if(c&&c!=='trans')b.push('color2-FGcls_'+c.toUpperCase());
- var bt=c==='trans'?'photo-transparent':(t?{photo:'photo-photo',clip:'photo-clipart',line:'photo-linedrawing',gif:'photo-animatedgif',face:'face-face'}[t]:'');
- if(bt)b.push(bt);if(a)b.push('aspect-'+a);
- if(tm)b.push('age-lt'+{d:1440,w:10080,m:43200,y:525600}[tm]);
- if(l)b.push('licenseType-'+{cc:'Any',com:'ShareCommercially',mod:'ModifyCommercially'}[l]);
- var bing='https://www.bing.com/images/search?q='+EC(q+(x?' filetype:'+x:''))+(b.length?'&qft='+b.map(function(v){return '+filterui:'+v;}).join(''):'')+(f.safe?'&adlt=strict':'');
- /* DuckDuckGo */
- var d=[];if(s)d.push('size:'+cap(s));
- if(c&&c!=='trans')d.push('color:'+(c==='bw'?'Monochrome':cap(c)));
- var dt=c==='trans'?'transparent':(t&&{photo:'photo',clip:'clipart',line:'line',gif:'gif'}[t]);if(dt)d.push('type:'+dt);
- if(a)d.push('layout:'+cap(a));
- if(l==='com')d.push('license:ShareCommercially');if(l==='mod')d.push('license:ModifyCommercially');
- var ddg='https://duckduckgo.com/?q='+EC(q)+'&iax=images&ia=images'+(d.length?'&iaf='+EC(d.join(',')):'')+(f.safe?'&kp=1':'');
- /* Yandex */
- var y=[];if(s)y.push('isize='+s);
- if(a)y.push('iorient='+{wide:'horizontal',tall:'vertical',square:'square'}[a]);
- var yt=t&&{photo:'photo',clip:'clipart',line:'lineart',face:'face'}[t];if(yt)y.push('type='+yt);
- var yc=c&&({bw:'gray',red:'red',orange:'orange',yellow:'yellow',green:'green',teal:'cyan',blue:'blue',purple:'violet',white:'white',black:'black'})[c];if(yc)y.push('color='+yc);
- if(x==='jpg'||x==='png')y.push('itype='+x);if(x==='gif')y.push('itype=gifan');
- var yan='https://yandex.com/images/search?text='+EC(q)+(y.length?'&'+y.join('&'):'');
- var brave='https://search.brave.com/images?q='+EC(q)+(f.safe?'&safesearch=strict':'');
- /* Free libraries (plain words only) */
- var uns='https://unsplash.com/s/photos/'+EC(pq.toLowerCase().replace(/\s+/g,'-'));
- var up=[];if(a)up.push('orientation='+{wide:'landscape',tall:'portrait',square:'squarish'}[a]);
- var uc=c&&({bw:'black_and_white',black:'black',white:'white',yellow:'yellow',orange:'orange',red:'red',purple:'purple',pink:'magenta',green:'green',teal:'teal',blue:'blue'})[c];if(uc)up.push('color='+uc);
- var px='https://www.pexels.com/search/'+EC(pq)+'/';var pp=[];
- if(a)pp.push('orientation='+{wide:'landscape',tall:'portrait',square:'square'}[a]);
- if(s)pp.push('size='+s);
- var pc=c&&({red:'red',orange:'orange',yellow:'yellow',green:'green',teal:'turquoise',blue:'blue',purple:'violet',pink:'pink',white:'white',gray:'gray',black:'black',brown:'brown'})[c];if(pc)pp.push('color='+pc);
- var pb='https://pixabay.com/images/search/'+EC(pq)+'/';var bp=[];
- if(a==='wide'||a==='tall')bp.push('orientation='+(a==='wide'?'horizontal':'vertical'));
- if(t==='photo')bp.push('image_type=photo');if(t==='clip')bp.push('image_type=illustration');
- var bc=c&&({bw:'grayscale',trans:'transparent',red:'red',orange:'orange',yellow:'yellow',green:'green',teal:'turquoise',blue:'blue',purple:'lilac',pink:'pink',white:'white',gray:'gray',black:'black',brown:'brown'})[c];if(bc)bp.push('colors='+bc);
- if(mw)bp.push('min_width='+mw);
- var ov=[];if(s)ov.push('size='+s);if(a)ov.push('aspect_ratio='+a);
- if(x==='jpg'||x==='png'||x==='gif'||x==='svg')ov.push('extension='+x);
- if(t==='photo')ov.push('category=photograph');if(t==='clip')ov.push('category=illustration');
- if(l)ov.push('license_type='+{cc:'all-cc',com:'commercial',mod:'commercial,modification'}[l]);
- var fl='https://www.flickr.com/search/?text='+EC(pq);var fp=[];
- if(a)fp.push('orientation='+{wide:'landscape',tall:'portrait',square:'square'}[a]);
- if(l)fp.push('license='+{cc:'2,3,4,5,6,9,10',com:'4,5,6,9,10',mod:'4,5,9,10'}[l]);
- return {web:[
-  {n:'Google Images',u:google,d:'Operators and every filter'},
-  {n:'Bing Images',u:bing,d:'Operators and every filter'},
-  {n:'DuckDuckGo',u:ddg,d:'Operators, size, color, type, shape, license'},
-  {n:'Yandex Images',u:yan,d:'Operators, size, shape, type, color'},
-  {n:'Brave Images',u:brave,d:'Operators and safe search'}],
- lib:[
-  {n:'Unsplash',u:uns+(up.length?'?'+up.join('&'):''),d:'Free photos. Shape and color'},
-  {n:'Pexels',u:px+(pp.length?'?'+pp.join('&'):''),d:'Free photos. Shape, size, color'},
-  {n:'Pixabay',u:pb+(bp.length?'?'+bp.join('&'):''),d:'Free images. Shape, type, color, min width'},
-  {n:'Openverse',u:'https://openverse.org/search/image?q='+EC(oq)+(ov.length?'&'+ov.join('&'):''),d:'Open licensed. Size, shape, type, license'},
-  {n:'Wikimedia Commons',u:'https://commons.wikimedia.org/w/index.php?search='+EC(pq)+'&title=Special:MediaSearch&type=image',d:'Free media. Words only'},
-  {n:'Flickr',u:fl+(fp.length?'&'+fp.join('&'):''),d:'Photos. Shape and license'},
-  {n:'Pinterest',u:'https://www.pinterest.com/search/pins/?q='+EC(pq),d:'Ideas and inspiration. Words only'}]};
-}
-function iFetch(url){var ac=new AbortController(),tm=setTimeout(function(){ac.abort();},8000);
- return fetch(url,{signal:ac.signal}).then(function(r){clearTimeout(tm);if(!r.ok)throw new Error('http');return r.json();},function(e){clearTimeout(tm);throw e;});}
-function iOV(page){var f=IS.f,p=['q='+EC(iQ('ov')),'page_size=24','page='+page];
- if(f.size)p.push('size='+f.size);if(f.aspect)p.push('aspect_ratio='+f.aspect);
- if(/^(jpg|png|gif|svg)$/.test(f.ext))p.push('extension='+f.ext);
- if(f.type==='photo')p.push('category=photograph');if(f.type==='clip')p.push('category=illustration');
- if(f.lic)p.push('license_type='+{cc:'all-cc',com:'commercial',mod:'commercial,modification'}[f.lic]);
- return iFetch('https://api.openverse.org/v1/images/?'+p.join('&')).then(function(d){
-  if(!d||!Array.isArray(d.results))throw new Error('bad');
-  return {src:'Openverse',more:page<(d.page_count||0),items:d.results.map(function(x){return {t:x.title||'Untitled',th:x.thumbnail||x.url,u:x.url,w:x.width||0,h:x.height||0,by:x.creator||'',lic:((x.license||'')+' '+(x.license_version||'')).trim().toUpperCase(),pg:x.foreign_landing_url||x.url,att:x.attribution||''};}).filter(function(x){return x.u;})};});}
-function iWM(page){var q=iQ('plain')+' filetype:bitmap';
- return iFetch('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=24&gsroffset='+((page-1)*24)+'&gsrsearch='+EC(q)+'&prop=imageinfo&iiprop=url|size|extmetadata&iiurlwidth=400').then(function(d){
-  var pg=(d&&d.query&&d.query.pages)||{};
-  var list=Object.keys(pg).map(function(k){return pg[k];}).sort(function(a,b){return (a.index||0)-(b.index||0);});
-  return {src:'Wikimedia Commons',more:!!(d&&d.continue),items:list.filter(function(p){return p.imageinfo&&p.imageinfo[0];}).map(function(p){var i=p.imageinfo[0],m=i.extmetadata||{};
-   var by=m.Artist?String(m.Artist.value).replace(/<[^>]*>/g,'').trim():'';
-   return {t:String(p.title||'').replace(/^File:/,''),th:i.thumburl||i.url,u:i.url,w:i.width||0,h:i.height||0,by:by,lic:m.LicenseShortName?m.LicenseShortName.value:'',pg:i.descriptionurl||i.url,att:''};})};});}
-function iOwn(){return fetch(CFG.lensApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:iQ('plain')})}).then(function(r){if(!r.ok)throw new Error('http');return r.json();}).then(function(d){
- var all=(d.similar||[]).concat(d.exact||[]).filter(function(x){return safeU(x.u);});
- return {src:'Your own index',more:false,items:all.map(function(x){return {t:IS.q,th:x.u,u:x.u,w:0,h:0,by:'',lic:'',pg:safeU(x.p)||x.u,att:''};})};});}
-function iRun(page){
- if(!IS.q.trim()){toast('Type something to search for');return;}
- IS.st='load';IS.page=page;if(page===1)IS.res=[];iRes();
- var mine=IS.q+'|'+JSON.stringify(IS.f);IS.tok=mine;
- (CFG.lensApi&&page===1?iOwn().then(function(r){if(!r.items.length)throw new Error('none');return r;}):Promise.reject()).catch(function(){return iOV(page);}).catch(function(){return iWM(page);}).then(function(r){
-  if(IS.tok!==mine)return;IS.res=IS.res.concat(r.items);IS.src=r.src;IS.more=r.more;IS.st=IS.res.length?'ok':'empty';iRes();
- },function(){if(IS.tok!==mine)return;IS.st='fail';iRes();});
-}
-function iGo(){var q=IS.q.trim();if(!q){toast('Type something to search for');return;}
- IS.hist=[q].concat(IS.hist.filter(function(h){return h!==q;})).slice(0,8);iSave();iHist();iEng();iRun(1);}
-function iHist(){var el=$$('ihist');if(!el)return;
- el.innerHTML=IS.hist.length?'<span class="hint">Recent</span>'+IS.hist.map(function(h,i){return '<button class="btn" data-h="'+i+'" style="padding:5px 12px;font-size:.85rem">'+esc(h)+'</button>';}).join('')+'<button class="btn" data-h="clear" style="padding:5px 12px;font-size:.85rem;color:var(--mute)">Clear</button>':'';}
-function iEng(){var el=$$('ieng');if(!el)return;var E=iEngines(),has=!!IS.q.trim();
- function card(e){return '<a class="ecard" href="'+(has?esc(e.u):'javascript:void 0')+'"'+(has?' target="_blank" rel="noopener noreferrer"':' data-dis="1"')+'><span class="ecn"><b>'+esc(e.n)+'</b>'+ico('ext',15)+'</span><span class="hint">'+esc(e.d)+'</span></a>';}
- el.innerHTML='<h3 class="ish">Search engines</h3><div class="egrid">'+E.web.map(card).join('')+'</div><h3 class="ish">Free image libraries</h3><div class="egrid">'+E.lib.map(card).join('')+'</div>';
- var pv=$$('iprev');if(pv){var full=iQ('full'),n=0;for(var k in IS.f){if(k!=='safe'&&String(IS.f[k]).trim())n++;}
-  pv.innerHTML=has?'<span class="hint">Your search</span> <code>'+esc(full)+'</code>'+(n?' <span class="pl2">'+n+' filter'+(n>1?'s':'')+'</span>':''):'<span class="hint">Type a search and your advanced query appears here.</span>';}
-}
-function iRes(){var el=$$('ires');if(!el)return;var h='';
- if(IS.st==='load'&&!IS.res.length)h='<div class="card ihint">Searching free image libraries...</div>';
- else if(IS.st==='fail')h='<div class="card ihint"><b>Live results are not available here</b><p class="hint" style="margin:6px 0 0">This preview blocks outside connections, so images cannot load on this page. The search engines below open your exact search with all filters applied.</p></div>';
- else if(IS.st==='empty')h='<div class="card ihint"><b>No images found</b><p class="hint" style="margin:6px 0 0">Try fewer filters or simpler words.</p></div>';
- else if(IS.st==='ok'||IS.res.length){var mw=parseInt(IS.f.minw,10)||0,list=IS.res.filter(function(r){return !mw||r.w>=mw;});
-  h='<div class="row" style="margin:6px 0 0"><h3 class="ish" style="margin:0">Results</h3><span class="pl2">'+esc(IS.src)+'</span><span class="sp"></span><span class="hint">'+list.length+' shown'+(mw?' (min width '+mw+'px)':'')+'</span></div>'+
-   (list.length?'<div class="irs">'+list.map(function(r){var i=IS.res.indexOf(r);return '<button class="ir" data-i="'+i+'" aria-label="'+esc(r.t)+'"><img loading="lazy" referrerpolicy="no-referrer" alt="'+esc(r.t)+'" src="'+esc(r.th)+'" onerror="var b=this.parentNode;b.parentNode&&b.parentNode.removeChild(b)">'+(r.w?'<span>'+r.w+'×'+r.h+'</span>':'')+'</button>';}).join('')+'</div>':'<div class="card ihint">Nothing matches the minimum width.</div>')+
-   (IS.more?'<div style="text-align:center;margin-top:10px"><button class="btn" id="imore">'+(IS.st==='load'?'Loading...':'Load more')+'</button></div>':'');}
- el.innerHTML=h;}
-function iLB(i){var r=IS.res[i];if(!r)return;var m=$$('ilb');
- if(!m){m=document.createElement('div');m.className='modal';m.id='ilb';document.body.appendChild(m);
-  m.onclick=function(e){var t=e.target;if(t===m||t.closest('[data-x]')){m.classList.remove('show');return;}
-   var a=t.closest('[data-a]');if(!a)return;var rr=IS.res[m.dataset.i];if(!rr)return;
-   if(a.dataset.a==='link'){iCopy(rr.u,'Image link copied');}
-   else if(a.dataset.a==='cred'){iCopy((rr.att||(rr.t+(rr.by?' by '+rr.by:'')+(rr.lic?' ('+rr.lic+')':'')))+' - '+rr.pg,'Credit copied');}
-   else if(a.dataset.a==='sim'){m.classList.remove('show');IS.tab='rev';IS.ru=rr.u;isearchPage();}};
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')m.classList.remove('show');});}
- m.dataset.i=i;
- m.innerHTML='<div class="box" style="max-width:760px;width:100%"><div class="row"><b style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+esc(r.t)+'</b><button class="btn" data-x="1" aria-label="Close">'+ico('x',14,2.5)+'</button></div>'+
-  '<img alt="'+esc(r.t)+'" referrerpolicy="no-referrer" src="'+esc(r.u)+'" onerror="this.onerror=null;this.src=\''+esc(r.th).replace(/'/g,'')+'\'">'+
-  '<p class="hint" style="margin:0 0 10px">'+(r.w?r.w+' × '+r.h+' px · ':'')+(r.lic?esc(r.lic)+' · ':'')+(r.by?'By '+esc(r.by)+' · ':'')+esc(IS.src)+'</p>'+
-  '<div class="row" style="gap:8px"><a class="btn pri" href="'+esc(r.u)+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Open full image</a><a class="btn" href="'+esc(r.pg)+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none">Source page</a><button class="btn" data-a="link">Copy link</button><button class="btn" data-a="cred">Copy credit</button><button class="btn" data-a="sim">Find on other sites</button></div></div>';
- m.classList.add('show');}
-function iCopy(t,msg){try{navigator.clipboard.writeText(t).then(function(){toast(msg);},function(){toast('Copy is blocked here');});}catch(e){toast('Copy is blocked here');}}
-function sel(k,id){return '<label class="hint">'+ILAB[k]+'<br><select class="sel" data-k="'+k+'" style="width:100%;text-align:left">'+IO[k].map(function(o){return '<option value="'+o[0]+'"'+(IS.f[k]===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label>';}
-function txt(k,l,ph,type){return '<label class="hint">'+l+'<br><input type="'+(type||'text')+'" data-k="'+k+'" value="'+esc(IS.f[k])+'" placeholder="'+ph+'" style="width:100%"></label>';}
-function iWeb(){
- $$('ibody').innerHTML=
- '<div class="card"><div class="row" style="flex-wrap:nowrap"><input type="text" id="iq" value="'+esc(IS.q)+'" placeholder="Search for images, for example: human heart diagram" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off"><button class="btn pri" id="igo" style="display:inline-flex;align-items:center;gap:6px">'+ico('search',17,2.4)+'Search</button></div>'+
- '<div class="row" style="margin-top:12px"><button class="btn" id="iadv">'+(IS.adv?'Hide':'Show')+' advanced filters</button><span class="sp"></span><label class="hint" style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" data-k="safe"'+(IS.f.safe?' checked':'')+'> Safe search</label></div>'+
- '<div id="iadvp" style="display:'+(IS.adv?'block':'none')+';margin-top:14px"><div class="isg">'+
-  txt('phrase','Exact phrase','"photosynthesis diagram"')+txt('any','Any of these words','chart graph map')+txt('not','Leave out words','cartoon watermark')+txt('site','Only from site','wikipedia.org')+txt('minw','Minimum width (px)','1200','number')+
-  sel('ext')+sel('size')+sel('color')+sel('type')+sel('aspect')+sel('time')+sel('lic')+
- '</div><div class="row" style="margin-top:12px"><button class="btn" id="irst">Reset filters</button><span class="hint">Filters work on the engines that support them. Each engine card says which.</span></div></div>'+
- '<div id="iprev" style="margin-top:12px"></div><div class="chips" id="ihist" style="margin-top:10px"></div></div>'+
- '<div id="ires" style="margin-top:14px"></div><div id="ieng"></div>';
- iHist();iEng();iRes();
- var b=$$('ibody');
- b.oninput=b.onchange=function(e){var t=e.target;if(t.id==='iq'){IS.q=t.value;iEng();return;}var k=t.dataset.k;if(!k)return;IS.f[k]=t.type==='checkbox'?t.checked:t.value;iSave();iEng();if(k==='minw')iRes();};
- b.onkeydown=function(e){if(e.key==='Enter'&&e.target.tagName==='INPUT'&&e.target.type!=='checkbox')iGo();};
- b.onclick=function(e){var t=e.target.closest('button,a,.ir');if(!t)return;
-  if(t.id==='igo')iGo();
-  else if(t.id==='iadv'){IS.adv=!IS.adv;$$('iadvp').style.display=IS.adv?'block':'none';t.textContent=(IS.adv?'Hide':'Show')+' advanced filters';}
-  else if(t.id==='irst'){var sf=IS.f.safe;for(var k in IS.f)IS.f[k]=typeof IS.f[k]==='boolean'?sf:'';iSave();iWeb();}
-  else if(t.id==='imore'){if(IS.st!=='load')iRun(IS.page+1);}
-  else if(t.dataset.h!==undefined){if(t.dataset.h==='clear'){IS.hist=[];iSave();iHist();}else{IS.q=IS.hist[+t.dataset.h]||'';$$('iq').value=IS.q;iGo();}}
-  else if(t.dataset.i!==undefined)iLB(+t.dataset.i);
-  else if(t.dataset.dis){e.preventDefault();toast('Type something to search for');}};
-}
-/* reverse search */
-var RENG=[['Google Lens','https://lens.google.com/','https://lens.google.com/uploadbyurl?url='],['Bing Visual Search','https://www.bing.com/visualsearch','https://www.bing.com/images/search?view=detailv2&iss=sbi&q=imgurl:'],['TinEye','https://tineye.com/','https://tineye.com/search?url='],['Yandex Images','https://yandex.com/images/','https://yandex.com/images/search?rpt=imageview&url=']];
-function rHex(v){return '#'+v.map(function(n){return ('0'+n.toString(16)).slice(-2);}).join('');}
-function rPal(im){var w=48,h=Math.max(1,Math.round(48*im.naturalHeight/im.naturalWidth)),c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d');x.drawImage(im,0,0,w,h);var d;
- try{d=x.getImageData(0,0,w,h).data;}catch(e){return [];}
- var m={};for(var i=0;i<d.length;i+=4){if(d[i+3]<128)continue;var k=((d[i]>>4)<<8)|((d[i+1]>>4)<<4)|(d[i+2]>>4);m[k]=(m[k]||0)+1;}
- var out=[];Object.keys(m).sort(function(a,b){return m[b]-m[a];}).forEach(function(k){k=+k;var r=((k>>8)&15)*16+8,g=((k>>4)&15)*16+8,b=(k&15)*16+8;
-  if(out.length<6&&out.every(function(o){return Math.abs(o[0]-r)+Math.abs(o[1]-g)+Math.abs(o[2]-b)>90;}))out.push([r,g,b]);});
- return out.map(rHex);}
-function rLoad(file){if(!file||!/^image\//.test(file.type)){toast('Please choose an image file');return;}
- if(file.size>30*1024*1024){toast('That image is over 30 MB');return;}
- if(IS.R)URL.revokeObjectURL(IS.R.url);
- IS.R={url:URL.createObjectURL(file),name:file.name||'image',size:file.size,type:file.type};rView();}
-function rSize(n){return n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';}
-function rUrlEng(){var el=$$('rue');if(!el)return;var u=($$('rurl')||{}).value||'';u=u.trim();var ok=/^https?:\/\/\S+$/i.test(u);
- el.innerHTML=RENG.map(function(e){return '<a class="btn" style="text-decoration:none'+(ok?'':';opacity:.45')+'" '+(ok?'href="'+esc(e[2]+EC(u))+'" target="_blank" rel="noopener noreferrer"':'data-dis="1" href="javascript:void 0"')+'>'+e[0]+'</a>';}).join('');}
-/* ===== Lens: web-wide matches through a lens service ===== */
+/* ===== Image Search: one page, your own independent engine ===== */
+var EC=encodeURIComponent,IS={img:null};
 function safeU(u){return /^https?:\/\/[^\s"'<>]+$/i.test(String(u||''))?String(u):'';}
 function rHost(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch(e){return u;}}
 function rB64(im){var k=Math.min(1,1280/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.naturalWidth*k));c.height=Math.max(1,Math.round(im.naturalHeight*k));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.85).split(',')[1];}
-function rLens(payload,id){var el=$$(id||'rlres');if(!el)return;
- el.innerHTML='<div class="card ihint">Searching the web for matches...</div>';
+function iNote(t,p){var el=$$('ires');if(el)el.innerHTML='<div class="card ihint"><b>'+t+'</b>'+(p?'<p class="hint" style="margin:6px 0 0">'+p+'</p>':'')+'</div>';}
+function iSend(payload){
+ if(!CFG.lensApi){iNote('The search engine is not connected yet','This page searches your own independent image index. Connect your engine by setting lensApi in the site settings.');return;}
+ iNote('Searching...');
  var ac=new AbortController(),tm=setTimeout(function(){ac.abort();},30000);
  fetch(CFG.lensApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ac.signal})
- .then(function(r){clearTimeout(tm);if(!r.ok)throw new Error('http '+r.status);return r.json();})
- .then(function(d){rLensView(d,id);},function(){clearTimeout(tm);el.innerHTML='<div class="card ihint"><b>The lens service did not answer</b><p class="hint" style="margin:6px 0 0">Check your connection and try again. You can still use the search engine buttons below.</p></div>';});}
-function rLensView(d,id){var el=$$(id||'rlres');if(!el)return;d=d||{};
+ .then(function(r){clearTimeout(tm);if(r.status===429)throw new Error('rate');if(!r.ok)throw new Error('http');return r.json();})
+ .then(iShow,function(e){clearTimeout(tm);iNote(e&&e.message==='rate'?'Too many searches':'The search engine did not answer',e&&e.message==='rate'?'Please wait a minute and try again.':'Check your connection and try again in a moment.');});}
+function iShow(d){var el=$$('ires');if(!el)return;d=d||{};
  var sim=(d.similar||[]).map(function(x){return {u:safeU(x.u),p:safeU(x.p)};}).filter(function(x){return x.u;}),
- pages=(d.pages||[]).map(function(x){return {u:safeU(x.u),t:String(x.t||''),i:(x.i||[]).map(safeU).filter(Boolean)};}).filter(function(x){return x.u;}),
- exact=(d.exact||[]).map(function(x){return safeU(x.u);}).filter(Boolean),
- ent=(d.entities||[]).filter(function(x){return x&&x.d;}).slice(0,10),guess=(d.guess||[]).slice(0,3),h='';
- if(!sim.length&&!pages.length&&!exact.length&&!ent.length){el.innerHTML='<div class="card ihint"><b>No matches found</b><p class="hint" style="margin:6px 0 0">Try a clearer or larger picture, or crop to the main object.</p></div>';return;}
- if(guess.length||ent.length)h+='<h3 class="ish">What this looks like</h3><div class="chips">'+guess.map(function(g){return '<a class="pl2" style="background:var(--brand);color:#fff;text-decoration:none;padding:6px 14px;font-size:.9rem" target="_blank" rel="noopener noreferrer" href="https://www.google.com/search?q='+EC(g)+'">'+esc(g)+'</a>';}).join('')+ent.map(function(x){return '<a class="pl2" style="text-decoration:none;padding:6px 12px" target="_blank" rel="noopener noreferrer" href="https://www.google.com/search?q='+EC(x.d)+'">'+esc(x.d)+'</a>';}).join('')+'</div>';
- if(sim.length)h+='<h3 class="ish">Visually similar images</h3><div class="irs">'+sim.map(function(x){return '<a class="ir" href="'+esc(x.p||x.u)+'" target="_blank" rel="noopener noreferrer" style="display:block"><img loading="lazy" referrerpolicy="no-referrer" alt="Similar image" src="'+esc(x.u)+'" onerror="var b=this.parentNode;b.parentNode&&b.parentNode.removeChild(b)"><span>'+esc(rHost(x.p||x.u))+'</span></a>';}).join('')+'</div>';
- if(exact.length)h+='<h3 class="ish">Same image elsewhere</h3><div class="irs">'+exact.map(function(u){return '<a class="ir" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer" style="display:block"><img loading="lazy" referrerpolicy="no-referrer" alt="Matching image" src="'+esc(u)+'" onerror="var b=this.parentNode;b.parentNode&&b.parentNode.removeChild(b)"><span>'+esc(rHost(u))+'</span></a>';}).join('')+'</div>';
- if(pages.length)h+='<h3 class="ish">Pages with this image</h3>'+pages.map(function(p){return '<a class="ecard" style="margin-bottom:8px" href="'+esc(p.u)+'" target="_blank" rel="noopener noreferrer"><span class="ecn"><b style="min-width:0;overflow:hidden;text-overflow:ellipsis">'+esc(p.t||rHost(p.u))+'</b>'+ico('ext',15)+'</span><span class="hint" style="word-break:break-all">'+esc(rHost(p.u))+'</span></a>';}).join('');
+ exact=(d.exact||[]).map(function(x){return {u:safeU(x.u),p:safeU(x.p)};}).filter(function(x){return x.u;}),
+ pages=(d.pages||[]).map(function(x){return {u:safeU(x.u),t:String(x.t||'')};}).filter(function(x){return x.u;}),
+ tags=(d.guess||[]).concat((d.entities||[]).map(function(x){return x.d;})).filter(Boolean).slice(0,8),h='';
+ if(!sim.length&&!exact.length&&!pages.length){iNote('No matches found','Try other words, a clearer picture, or crop to the main object. The index only contains what has been collected so far.');return;}
+ function grid(a){return '<div class="irs">'+a.map(function(x){return '<a class="ir" href="'+esc(x.p||x.u)+'" target="_blank" rel="noopener noreferrer" style="display:block"><img loading="lazy" referrerpolicy="no-referrer" alt="Result" src="'+esc(x.u)+'" onerror="var b=this.parentNode;b.parentNode&&b.parentNode.removeChild(b)"><span>'+esc(rHost(x.p||x.u))+'</span></a>';}).join('')+'</div>';}
+ if(tags.length)h+='<div class="chips" style="margin-bottom:6px">'+tags.map(function(t){return '<button class="pl2" data-s="'+esc(t)+'" style="border:0;cursor:pointer;padding:6px 12px;font-size:.88rem;color:var(--brand)">'+esc(t)+'</button>';}).join('')+'</div>';
+ if(exact.length)h+='<h3 class="ish">Same picture</h3>'+grid(exact);
+ if(sim.length)h+='<h3 class="ish">'+(exact.length?'Similar pictures':'Results')+'</h3>'+grid(sim);
+ if(pages.length)h+='<h3 class="ish">Pages with these pictures</h3>'+pages.map(function(p){return '<a class="ecard" style="margin-bottom:8px" href="'+esc(p.u)+'" target="_blank" rel="noopener noreferrer"><span class="ecn"><b style="min-width:0;overflow:hidden;text-overflow:ellipsis">'+esc(p.t||rHost(p.u))+'</b>'+ico('ext',15)+'</span><span class="hint" style="word-break:break-all">'+esc(rHost(p.u))+'</span></a>';}).join('');
  el.innerHTML=h;}
-function rView(){var R=IS.R,b=$$('ibody');
- b.innerHTML='<div class="card"><b>Lens</b><p class="hint" style="margin:4px 0 0">Find where a picture came from, similar images, and pages that use it. The image is only sent when you press a search button.</p>'+
-  '<label class="drop card" id="rdrop" style="margin-top:12px">'+ico('upload',28)+'<b>Choose, drop or paste an image</b><span class="hint">Press Ctrl+V (or ⌘+V) to paste a screenshot</span><input type="file" id="rfile" accept="image/*" hidden></label></div>'+
-  (R?'<div class="card" style="margin-top:14px"><div class="row" style="align-items:flex-start"><img id="rimg" alt="Your image" src="'+esc(R.url)+'" style="max-width:min(100%,320px);max-height:260px;border-radius:12px;display:block"><div style="flex:1;min-width:200px"><b style="word-break:break-all">'+esc(R.name)+'</b><p class="hint" id="rmeta" style="margin:4px 0 10px">'+rSize(R.size)+'</p><div class="hint">Main colors (tap to copy)</div><div class="row" id="rpal" style="gap:8px;margin:6px 0 0"></div></div></div>'+
-   '<h3 class="ish" style="margin-top:18px">Find matches on the web</h3>'+(CFG.lensApi?'<button class="btn pri" id="rlens">Find similar images on the web</button><div id="rlres" style="margin-top:10px"></div>':'<p class="hint" style="margin:0">Web-wide matching is not connected on this site yet, so searches go through the engines below. See the setup notes to switch it on.</p>')+'<h3 class="ish">Or use a search engine. Step 1: copy your image</h3><div class="row" style="gap:8px"><button class="btn pri" id="rcopy">Copy image</button><a class="btn" id="rsave" download="'+esc(R.name)+'" href="'+esc(R.url)+'" style="text-decoration:none">Save a copy</a></div>'+
-   '<h3 class="ish">Step 2: open an engine and paste</h3><div class="row" style="gap:8px">'+RENG.map(function(e){return '<a class="btn" href="'+e[1]+'" target="_blank" rel="noopener noreferrer" style="text-decoration:none">'+e[0]+'</a>';}).join('')+'</div>'+
-   '<p class="hint" style="margin:10px 0 0">If pasting is blocked, use the upload button on the engine and pick the saved copy.</p></div>':'')+
-  '<div class="card" style="margin-top:14px"><b>Have an image link instead?</b><p class="hint" style="margin:4px 0 10px">Paste the web address of an image and open it directly in each engine.</p><input type="text" id="rurl" value="'+esc(IS.ru)+'" placeholder="https://example.com/photo.jpg" style="width:100%"><div class="row" id="rue" style="gap:8px;margin-top:10px"></div>'+(CFG.lensApi?'<div style="margin-top:10px"><button class="btn pri" id="rlensu">Find similar images on the web</button></div><div id="rlres2" style="margin-top:10px"></div>':'')+'</div>';
- rUrlEng();
- var inp=$$('rfile'),dz=$$('rdrop');
- inp.onchange=function(){rLoad(inp.files[0]);};
- dz.ondragover=function(e){e.preventDefault();};
- dz.ondrop=function(e){e.preventDefault();rLoad(e.dataTransfer.files[0]);};
- $$('rurl').oninput=function(){IS.ru=this.value;rUrlEng();};
- b.onclick=function(e){var t=e.target.closest('button,a,[data-c]');if(!t)return;
-  if(t.dataset.dis){e.preventDefault();toast('Paste a full image link first');}
-  else if(t.id==='rcopy')rCopy();
-  else if(t.id==='rlens'){var im0=$$('rimg');if(im0&&im0.naturalWidth)rLens({image:rB64(im0)});}
-  else if(t.id==='rlensu'){var uu=(($$('rurl')||{}).value||'').trim();if(/^https?:\/\/\S+$/i.test(uu))rLens({url:uu},'rlres2');else toast('Paste a full image link first');}
-  else if(t.dataset.c)iCopy(t.dataset.c,t.dataset.c+' copied');};
- b.oninput=b.onchange=null;b.onkeydown=null;
- var im=$$('rimg');if(im){var done=function(){$$('rmeta').textContent=im.naturalWidth+' × '+im.naturalHeight+' px · '+rSize(R.size)+' · '+(R.type||'image');
-  $$('rpal').innerHTML=rPal(im).map(function(h){return '<button class="sw" data-c="'+h+'" style="background:'+h+'" aria-label="Copy '+h+'" title="'+h+'"></button>';}).join('')||'<span class="hint">Not available for this image</span>';};
-  if(im.complete&&im.naturalWidth)done();else im.onload=done;}
-}
-function rCopy(){var im=$$('rimg');if(!im||!im.naturalWidth)return;var c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;c.getContext('2d').drawImage(im,0,0);
- c.toBlob(function(bl){if(!bl){toast('Could not copy this image');return;}
-  try{navigator.clipboard.write([new ClipboardItem({'image/png':bl})]).then(function(){toast('Image copied. Now paste it into the search engine');},function(){toast('Copy is blocked here. Use Save a copy instead');});}
-  catch(e){toast('Copy is blocked here. Use Save a copy instead');}},'image/png');}
-document.addEventListener('paste',function(e){if(location.hash!=='#/isearch'||(IS.tab!=='rev'&&IS.tab!=='vm'))return;var fl=e.clipboardData&&e.clipboardData.files;if(fl&&fl[0]&&/^image\//.test(fl[0].type)){e.preventDefault();if(IS.tab==='vm')vQFile(fl[0]);else rLoad(fl[0]);}});
-/* ===== Visual match: independent local image search ===== */
-var VM={lib:[],q:null,sel:{x:0,y:0,w:1,h:1},res:[],busy:false,db:null,loaded:false,dups:null,msg:''},VW=64,VMAX=400;
-var VWIN=(function(){var w=[[0,0,1,1]],o2=[0,.4],o3=[0,.3,.6],o4=[0,.24,.48,.72];o2.forEach(function(y){o2.forEach(function(x){w.push([x,y,.6,.6]);});});o3.forEach(function(y){o3.forEach(function(x){w.push([x,y,.4,.4]);});});o4.forEach(function(y){o4.forEach(function(x){w.push([x,y,.28,.28]);});});return w;})();
-function vDB(){return new Promise(function(ok){try{var r=indexedDB.open('eve-visual-match',1);r.onupgradeneeded=function(){r.result.createObjectStore('im',{keyPath:'id'});};r.onsuccess=function(){ok(r.result);};r.onerror=function(){ok(null);};}catch(e){ok(null);}});}
-function vLoad(){if(VM.loaded)return Promise.resolve();VM.loaded=true;
- return vDB().then(function(db){VM.db=db;if(!db)return;return new Promise(function(ok){try{var rq=db.transaction('im').objectStore('im').getAll();rq.onsuccess=function(){VM.lib=(rq.result||[]).filter(function(r){return r&&r.win&&r.th;});ok();};rq.onerror=function(){ok();};}catch(e){ok();}});});}
-function vPut(rec){if(!VM.db)return;try{VM.db.transaction('im','readwrite').objectStore('im').put(rec);}catch(e){}}
-function vDel(id){if(!VM.db)return;try{VM.db.transaction('im','readwrite').objectStore('im').delete(id);}catch(e){}}
-function vClearDB(){if(!VM.db)return;try{VM.db.transaction('im','readwrite').objectStore('im').clear();}catch(e){}}
-/* decode a picture into a working canvas, max 256 px on the long side */
-function vBase(src){return new Promise(function(ok,no){
- function fin(im,w,h){var k=Math.min(1,256/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.max(8,Math.round(w*k));c.height=Math.max(8,Math.round(h*k));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);ok(c);}
- var im=new Image();im.onload=function(){fin(im,im.naturalWidth,im.naturalHeight);};im.onerror=function(){no(new Error('decode'));};im.src=src;});}
-/* the feature vector: color histogram + color layout + edge orientations, each unit length */
-function vFeat(cv,sx,sy,sw,sh,flip){
- var c=vFeat.c||(vFeat.c=document.createElement('canvas'));c.width=c.height=VW;var x=c.getContext('2d',{willReadFrequently:true});
- x.save();if(flip){x.translate(VW,0);x.scale(-1,1);}x.drawImage(cv,sx,sy,Math.max(1,sw),Math.max(1,sh),0,0,VW,VW);x.restore();
- var d=x.getImageData(0,0,VW,VW).data,g=new Float32Array(VW*VW),hi=new Float32Array(72),la=new Float32Array(48),hg=new Float32Array(128),i,px,py;
- for(i=0;i<VW*VW;i++){var r=d[i*4],gg=d[i*4+1],b=d[i*4+2];g[i]=.299*r+.587*gg+.114*b;
-  var mx=Math.max(r,gg,b),mn=Math.min(r,gg,b),v=mx/255,s=mx?(mx-mn)/mx:0,h=0;
-  if(mx!==mn){var df=mx-mn;h=mx===r?((gg-b)/df)%6:mx===gg?(b-r)/df+2:(r-gg)/df+4;h*=60;if(h<0)h+=360;}
-  var hb=s<.12?0:Math.floor(h/45)%8,sb=s<.2?0:s<.55?1:2,vb=v<.3?0:v<.7?1:2;hi[(hb*3+sb)*3+vb]++;
-  px=i%VW;py=(i/VW)|0;var ci=((py>>4)*4+(px>>4))*3;la[ci]+=r/256;la[ci+1]+=gg/256;la[ci+2]+=b/256;}
- for(py=1;py<VW-1;py++)for(px=1;px<VW-1;px++){i=py*VW+px;var gx=g[i+1]-g[i-1],gy=g[i+VW]-g[i-VW],m=Math.sqrt(gx*gx+gy*gy);if(m<1)continue;
-  var a=Math.atan2(gy,gx);if(a<0)a+=Math.PI;if(a>=Math.PI)a=0;hg[((py>>4)*4+(px>>4))*8+Math.floor(a/Math.PI*8)%8]+=m;}
- var f=new Float32Array(248),k;
- for(k=0;k<72;k++)hi[k]=Math.sqrt(hi[k]);
- for(k=0;k<3;k++){var mean=0;for(i=0;i<16;i++)mean+=la[i*3+k];mean/=16;for(i=0;i<16;i++)la[i*3+k]-=mean;}
- for(k=0;k<128;k++)hg[k]=Math.sqrt(hg[k]);
- function put(src,off){var n=0,j;for(j=0;j<src.length;j++)n+=src[j]*src[j];n=Math.sqrt(n)||1;for(j=0;j<src.length;j++)f[off+j]=src[j]/n;}
- put(hi,0);put(la,72);put(hg,120);return f;}
-function vSim(a,b){var c=0,l=0,h=0,i;for(i=0;i<72;i++)c+=a[i]*b[i];for(;i<120;i++)l+=a[i]*b[i];for(;i<248;i++)h+=a[i]*b[i];return .35*c+.2*Math.max(0,l)+.45*h;}
-/* 64 bit difference hash for near duplicates */
-function vHash(cv){var c=document.createElement('canvas');c.width=9;c.height=8;var x=c.getContext('2d',{willReadFrequently:true});x.drawImage(cv,0,0,9,8);var d=x.getImageData(0,0,9,8).data,s='';
- for(var y=0;y<8;y++)for(var q=0;q<8;q++){var i=(y*9+q)*4,j=i+4;s+=(.299*d[i]+.587*d[i+1]+.114*d[i+2])>(.299*d[j]+.587*d[j+1]+.114*d[j+2])?'1':'0';}return s;}
-function vHam(a,b){var n=0;for(var i=0;i<a.length;i++)if(a[i]!==b[i])n++;return n;}
-async function vIndex(file,id){
- var url=URL.createObjectURL(file);
- try{var cv=await vBase(url),W=cv.width,H=cv.height,k=Math.min(1,200/Math.max(W,H)),t=document.createElement('canvas');
-  t.width=Math.max(1,Math.round(W*k));t.height=Math.max(1,Math.round(H*k));t.getContext('2d').drawImage(cv,0,0,t.width,t.height);
-  return {id:id,name:file.name||'image',th:t.toDataURL('image/jpeg',.72),ar:W/H,hash:vHash(cv),win:VWIN.map(function(w){return {r:w,f:vFeat(cv,w[0]*W,w[1]*H,w[2]*W,w[3]*H,false)};})};
- }finally{URL.revokeObjectURL(url);}}
-async function vAdd(files){
- if(VM.busy)return;files=Array.prototype.filter.call(files,function(f){return /^image\//.test(f.type)&&f.size<25*1024*1024;});
- if(!files.length){toast('No usable images found');return;}
- var room=VMAX-VM.lib.length;if(room<=0){toast('The library is full ('+VMAX+' images)');return;}
- if(files.length>room){files=files.slice(0,room);toast('Only the first '+room+' images were added');}
- VM.busy=true;var ok=0,bad=0,base=Date.now();
- for(var i=0;i<files.length;i++){var p=$$('vprog');if(p)p.textContent='Indexing '+(i+1)+' of '+files.length+'...';
-  try{var rec=await vIndex(files[i],base+'-'+i);VM.lib.push(rec);vPut(rec);ok++;}catch(e){bad++;}
-  await new Promise(function(r){setTimeout(r,0);});}
- VM.busy=false;VM.dups=null;VM.msg='Added '+ok+' image'+(ok===1?'':'s')+(bad?', skipped '+bad+' that could not be read':'')+'.';vStats();vDupView();
-}
-function vStats(){var e=$$('vstat');if(e)e.textContent=VM.lib.length+' image'+(VM.lib.length===1?'':'s')+' in your library';var p=$$('vprog');if(p)p.textContent=VM.msg||'';}
-async function vSetQuery(src,name){try{var cv=await vBase(src);if(VM.q&&VM.q.url&&VM.q.own)URL.revokeObjectURL(VM.q.url);VM.q={cv:cv,url:src,name:name||'image',own:/^blob:/.test(src)};VM.sel={x:0,y:0,w:1,h:1};VM.res=[];vView();}catch(e){toast('That image could not be opened');}}
-function vSearch(){
- if(!VM.q){toast('Choose an image to search with');return;}if(!VM.lib.length){toast('Add some images to your library first');return;}
- var s=VM.sel,cv=VM.q.cv,W=cv.width,H=cv.height,whole=s.w>.97&&s.h>.97;
- var fa=vFeat(cv,s.x*W,s.y*H,s.w*W,s.h*H,false),fb=vFeat(cv,s.x*W,s.y*H,s.w*W,s.h*H,true),qh=whole?vHash(cv):null;
- VM.res=VM.lib.map(function(rec){var best=0,bw=null,dup=false;
-  rec.win.forEach(function(w,wi){if(whole&&wi>0)return;var v=Math.max(vSim(fa,w.f),vSim(fb,w.f));if(v>best){best=v;bw=w.r;}});
-  if(whole){var hm=vHam(qh,rec.hash);if(hm<=6){dup=true;best=Math.max(best,.99-hm*.004);}}
-  return {rec:rec,score:best,box:whole?null:bw,dup:dup};}).sort(function(a,b){return b.score-a.score;}).slice(0,30);
- vResView();}
-function vLabel(r){return r.dup?'Near duplicate':r.score>=.9?'Very close':r.score>=.8?'Similar':r.score>=.7?'Loosely similar':'Weak match';}
-function vResView(){var el=$$('vres');if(!el)return;if(!VM.res.length){el.innerHTML='';return;}
- var reg=!(VM.sel.w>.97&&VM.sel.h>.97);
- el.innerHTML='<div class="row" style="margin-top:6px"><h3 class="ish" style="margin:0">Closest matches</h3><span class="sp"></span><span class="hint">'+(reg?'Region search: the green box shows where each match was found':'Whole image search')+'</span></div><div class="vgrid" style="margin-top:10px">'+
-  VM.res.map(function(r,i){var p=Math.max(0,Math.min(100,Math.round(r.score*100)));
-   return '<button class="vr" data-v="'+i+'"><span class="vth" style="display:block"><img alt="'+esc(r.rec.name)+'" src="'+r.rec.th+'" style="width:100%;height:auto;display:block">'+(r.box?'<span class="vhit" style="left:'+(r.box[0]*100)+'%;top:'+(r.box[1]*100)+'%;width:'+(r.box[2]*100)+'%;height:'+(r.box[3]*100)+'%"></span>':'')+'</span>'+
-   '<span style="display:block;padding:8px 10px"><span class="hint" style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(r.rec.name)+'</span><span style="display:flex;justify-content:space-between;font-size:.82rem;font-weight:600;margin:3px 0 5px"><span>'+vLabel(r)+'</span><span>'+p+'%</span></span><span class="vbar"><i style="width:'+p+'%"></i></span></span></button>';}).join('')+'</div>'+
-  '<p class="hint" style="margin-top:10px">Tap a match to search with it instead.</p>';}
-function vDupView(){var el=$$('vdup');if(!el)return;if(!VM.dups){el.innerHTML='';return;}
- el.innerHTML=VM.dups.length?'<div class="vgrid" style="margin-top:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">'+VM.dups.map(function(p){return '<div class="vr" style="display:flex;gap:8px;padding:8px;cursor:default"><img alt="" src="'+p[0].th+'" style="width:50%;height:90px;object-fit:cover;border-radius:8px"><img alt="" src="'+p[1].th+'" style="width:50%;height:90px;object-fit:cover;border-radius:8px"></div>';}).join('')+'</div><p class="hint" style="margin-top:8px">'+VM.dups.length+' similar pair'+(VM.dups.length>1?'s':'')+' found. These are the first two thumbnails of each pair.</p>':'<p class="hint" style="margin-top:10px">No duplicates found.</p>';}
-function vDups(){var out=[],L=VM.lib;for(var i=0;i<L.length&&out.length<40;i++)for(var j=i+1;j<L.length&&out.length<40;j++){if(vHam(L[i].hash,L[j].hash)<=5&&vSim(L[i].win[0].f,L[j].win[0].f)>.9)out.push([L[i],L[j]]);}VM.dups=out;vDupView();}
-function vSelDraw(){var e=$$('vsel'),s=VM.sel,whole=s.w>.97&&s.h>.97;if(!e)return;e.style.display=whole?'none':'block';e.style.left=s.x*100+'%';e.style.top=s.y*100+'%';e.style.width=s.w*100+'%';e.style.height=s.h*100+'%';
- var l=$$('vselt');if(l)l.textContent=whole?'Searching the whole image. Drag on the picture to search one object or area.':'Searching only the selected area.';}
-function vSelBind(){var box=$$('vqb');if(!box)return;var st=null;
- function pos(e){var r=box.getBoundingClientRect();return {x:Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),y:Math.max(0,Math.min(1,(e.clientY-r.top)/r.height))};}
- box.onpointerdown=function(e){st=pos(e);try{box.setPointerCapture(e.pointerId);}catch(x){}VM.sel={x:st.x,y:st.y,w:0,h:0};vSelDraw();e.preventDefault();};
- box.onpointermove=function(e){if(!st)return;var c=pos(e);VM.sel={x:Math.min(st.x,c.x),y:Math.min(st.y,c.y),w:Math.abs(c.x-st.x),h:Math.abs(c.y-st.y)};vSelDraw();};
- box.onpointerup=box.onpointercancel=function(){if(!st)return;st=null;if(VM.sel.w<.06||VM.sel.h<.06)VM.sel={x:0,y:0,w:1,h:1};VM.res=[];vResView();vSelDraw();};}
-function vView(){var b=$$('ibody');if(!b)return;
- b.innerHTML='<div class="card"><b>Visual match</b><p class="hint" style="margin:4px 0 0">An independent image search that runs entirely on this device. Add your own pictures to a library, then search it with any image or with just one object from an image. Nothing is uploaded anywhere.</p>'+
-  '<div class="row" style="margin-top:12px;gap:8px"><label class="btn pri" style="cursor:pointer">Add images<input type="file" id="vfiles" accept="image/*" multiple hidden></label><label class="btn" style="cursor:pointer">Add a folder<input type="file" id="vfolder" webkitdirectory multiple hidden></label><button class="btn" id="vdupb">Find duplicates</button><button class="btn" id="vclr" style="color:#ff3b30">Clear library</button><span class="sp"></span><span class="pl2" id="vstat"></span></div><p class="hint" id="vprog" style="margin:8px 0 0"></p><div id="vdup"></div></div>'+
-  '<div class="card" style="margin-top:14px"><b>Search with an image</b>'+
-  '<label class="drop card" id="vdrop" style="margin-top:12px">'+ico('upload',28)+'<b>'+(VM.q?'Choose a different image':'Choose, drop or paste an image')+'</b><span class="hint">Press Ctrl+V (or ⌘+V) to paste a screenshot</span><input type="file" id="vq" accept="image/*" hidden></label>'+
-  (VM.q?'<div style="margin-top:14px"><div class="vqb" id="vqb"><img alt="Query" src="'+esc(VM.q.url)+'" draggable="false"><span class="vsel" id="vsel"></span></div><p class="hint" id="vselt" style="margin:8px 0 0"></p><div class="row" style="margin-top:10px;gap:8px"><button class="btn pri" id="vgo">Find matches</button><button class="btn" id="vwhole">Whole image</button></div></div>':'')+
-  '<div id="vres"></div></div>'+
-  '<details class="card" style="margin-top:14px"><summary style="cursor:pointer;font-weight:600">How it works, and what it cannot do</summary><p class="hint" style="margin:10px 0 0">Every picture you add is shrunk and described by three numbers sets: a color histogram (what colors it contains), a coarse color layout (where those colors sit), and edge directions (the shapes). It also keeps a 64 bit fingerprint for spotting near copies, and describes 30 overlapping windows so a single object can be found inside a bigger photo. Searching compares your picture, and its mirror image, with every stored window and ranks the best fit.</p><p class="hint" style="margin:8px 0 0">This finds pictures that look alike inside your own library. It does not know what things are, so it cannot name a landmark or a product, and it cannot search the whole internet. Strong colors and clear shapes work best. Rotated or heavily zoomed objects may be missed.</p></details>';
- var f=function(id,fn){var e=$$(id);if(e)e.onchange=function(){fn(e.files);e.value='';};};
- f('vfiles',vAdd);f('vfolder',vAdd);f('vq',function(fl){if(fl[0])vQFile(fl[0]);});
- var dz=$$('vdrop');dz.ondragover=function(e){e.preventDefault();};dz.ondrop=function(e){e.preventDefault();if(e.dataTransfer.files[0])vQFile(e.dataTransfer.files[0]);};
- b.onclick=function(e){var t=e.target.closest('button');if(!t)return;
-  if(t.id==='vgo')vSearch();
-  else if(t.id==='vwhole'){VM.sel={x:0,y:0,w:1,h:1};VM.res=[];vSelDraw();vResView();}
-  else if(t.id==='vdupb'){if(VM.lib.length<2)toast('Add at least two images');else vDups();}
-  else if(t.id==='vclr'){if(!VM.lib.length)return;if(t.dataset.sure){VM.lib=[];VM.res=[];VM.dups=null;VM.msg='Library cleared.';vClearDB();vView();}else{t.dataset.sure='1';t.textContent='Tap again to confirm';setTimeout(function(){if(t){t.textContent='Clear library';delete t.dataset.sure;}},3000);}}
-  else if(t.dataset.v!==undefined){var r=VM.res[+t.dataset.v];if(r)vSetQuery(r.rec.th,r.rec.name).then(function(){window.scrollTo(0,0);});}};
- b.oninput=b.onchange=null;b.onkeydown=null;
- vStats();vSelBind();vSelDraw();vResView();vDupView();}
-function vQFile(file){if(!/^image\//.test(file.type)){toast('Please choose an image file');return;}vSetQuery(URL.createObjectURL(file),file.name);}
+function iPick(file){
+ if(!file||!/^image\//.test(file.type)){toast('Please choose an image file');return;}
+ if(file.size>30*1024*1024){toast('That image is over 30 MB');return;}
+ if(IS.img)URL.revokeObjectURL(IS.img.url);
+ IS.img={url:URL.createObjectURL(file),name:file.name||'image'};iThumb();iGo();}
+function iThumb(){var el=$$('ithumb');if(!el)return;
+ el.innerHTML=IS.img?'<div class="row" style="margin-top:12px;gap:10px"><img id="iimg" alt="Your picture" src="'+esc(IS.img.url)+'" style="height:64px;max-width:120px;object-fit:cover;border-radius:10px"><span class="hint" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(IS.img.name)+'</span><button class="btn" id="iclr" aria-label="Remove picture">'+ico('x',14,2.5)+'</button></div>':'';}
+function iGo(){
+ var q=($$('iq')||{}).value||'';q=q.trim();
+ if(IS.img){var im=$$('iimg');if(!im){return;}
+  var go=function(){iSend({image:rB64(im)});};
+  if(im.complete&&im.naturalWidth)go();else im.onload=go;return;}
+ if(!q){toast('Type something or add a picture');return;}
+ if(/^https?:\/\/\S+$/i.test(q))iSend({url:q});else iSend({text:q});}
 function isearchPage(){nav('isearch');
- app.innerHTML='<h1 style="font-size:2.2rem">Image Search</h1><p class="lead" style="font-size:1rem">Start from a picture to find similar images and matching pages on the web, or search by words with advanced filters.</p>'+
-  '<div class="seg" id="itabs" style="margin:16px 0"><a data-it="rev" href="javascript:void 0">Lens</a><a data-it="web" href="javascript:void 0">Search images</a><a data-it="vm" href="javascript:void 0">My library</a></div><div id="ibody"></div>';
- $$('itabs').onclick=function(e){var t=e.target.dataset.it;if(!t)return;IS.tab=t;isearchPage();};
- document.querySelectorAll('#itabs a').forEach(function(a){a.classList.toggle('on',a.dataset.it===IS.tab);});
- if(IS.tab==='rev')rView();else if(IS.tab==='vm'){vView();vLoad().then(function(){if(IS.tab==='vm'&&$$('vstat'))vStats();});}else iWeb();}
+ app.innerHTML='<h1 style="font-size:2.2rem">Image Search</h1><p class="lead" style="font-size:1rem">Search by words or with a picture. Results come from our own independent image index, not from another search engine.</p>'+
+  '<div class="card" id="idrop" style="margin-top:16px"><div class="row" style="flex-wrap:nowrap;gap:8px"><input type="text" id="iq" placeholder="Search by words, or paste an image link" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off"><label class="btn" style="cursor:pointer;display:inline-flex;align-items:center" title="Search with a picture">'+ico('image',18)+'<input type="file" id="ifile" accept="image/*" hidden></label><button class="btn pri" id="igo" style="display:inline-flex;align-items:center;gap:6px">'+ico('search',17,2.4)+'Search</button></div><div id="ithumb"></div><p class="hint" style="margin:10px 0 0">You can also drop or paste (Ctrl+V) a picture here to find similar ones.</p></div><div id="ires" style="margin-top:14px"></div>';
+ var q=$$('iq'),card=$$('idrop');
+ q.onkeydown=function(e){if(e.key==='Enter'){if(IS.img&&q.value.trim()){IS.img=null;iThumb();}iGo();}};
+ q.oninput=function(){if(IS.img&&q.value.trim()){IS.img=null;iThumb();}};
+ $$('igo').onclick=iGo;
+ $$('ifile').onchange=function(){iPick(this.files[0]);this.value='';};
+ card.ondragover=function(e){e.preventDefault();};card.ondrop=function(e){e.preventDefault();if(e.dataTransfer.files[0])iPick(e.dataTransfer.files[0]);};
+ app.onclick=function(e){var t=e.target.closest('button');if(!t)return;
+  if(t.id==='iclr'){IS.img=null;iThumb();}
+  else if(t.dataset.s){IS.img=null;iThumb();q.value=t.dataset.s;iGo();}};
+ iThumb();if(!CFG.lensApi)iNote('The search engine is not connected yet','This page searches your own independent image index. Connect your engine by setting lensApi in the site settings.');}
+document.addEventListener('paste',function(e){if(location.hash!=='#/isearch')return;var fl=e.clipboardData&&e.clipboardData.files;if(fl&&fl[0]&&/^image\//.test(fl[0].type)){e.preventDefault();iPick(fl[0]);}});
 
-function route(){var r=location.hash.replace('#/','');menu(false);
+
+function route(){var r=location.hash.replace('#/','');menu(false);app.onclick=null;
  app.classList.toggle('full',r===''||r==='home'||!!FULL[r]||(['planner','image','pdf','virus','calc','isearch'].indexOf(r)<0));
  if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='isearch')isearchPage();else if(FULL[r])FULL[r]();else home();window.scrollTo(0,0);}
 
