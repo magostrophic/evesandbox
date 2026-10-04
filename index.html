@@ -4,19 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Eve Sandbox</title>
+<link rel="icon" type="image/png" href="evesandbox.png">
+<link rel="apple-touch-icon" href="evesandbox.png">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
 :root{--bg:#f2f2f7;--card:#fff;--ink:#1c1c1e;--mute:#8e8e93;--line:#e5e5ea;--brand:#007aff;--fill:#e9e9ee;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#1c1c1e;--ink:#f2f2f7;--mute:#98989f;--line:#38383a;--brand:#0a84ff;--fill:#2c2c2e;}}
 :root[data-theme="dark"]{--bg:#000;--card:#1c1c1e;--ink:#f2f2f7;--mute:#98989f;--line:#38383a;--brand:#0a84ff;--fill:#2c2c2e;}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{--hh:54px;margin:0;background:var(--bg);color:var(--ink);font:17px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+button,input,select,textarea{font-family:inherit}
+a,button,[role=button],label,summary{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+a:focus:not(:focus-visible),button:focus:not(:focus-visible){outline:none}
+.logo:focus,.logo:active{outline:none;background:none}
+body{--hh:54px;margin:0;background:var(--bg);color:var(--ink);font:17px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column}
 header.nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--card);border-bottom:.5px solid var(--line);z-index:5}
 .nav-in{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 16px;min-height:var(--hh)}
 .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:1.05rem;color:var(--ink);text-decoration:none;letter-spacing:-.02em}
 .logo .lt>span{color:var(--brand)}
-.lm{display:block;flex:none}
+.lm{display:block;flex:none;width:30px;height:30px;border-radius:8px;object-fit:contain}
 svg.i{display:block;flex:none;pointer-events:none}
 .chip button{display:flex;align-items:center;justify-content:center;padding:0}
 .it button{display:inline-flex;align-items:center}
@@ -159,6 +168,10 @@ main.full{max-width:none;padding:0}
 .fld{display:flex;flex-direction:column;gap:6px;margin-top:14px;font-weight:600;font-size:.92rem}
 .fld input,.fld textarea,.fld select{font:inherit;font-weight:400;color:var(--ink);background:var(--fill);border:0;border-radius:12px;padding:12px 14px;width:100%;text-align:left;text-align-last:left}
 .fld textarea{min-height:140px;resize:vertical}
+@media (max-width:640px){.foot-in{display:grid;grid-template-columns:1fr 1fr;gap:22px 16px;padding:22px 20px}
+.foot-in>div:first-child{grid-column:1/-1}.foot p{max-width:none}
+.foot-in nav:nth-of-type(2){grid-column:1/-1}.foot-in nav:nth-of-type(2){display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}.foot-in nav:nth-of-type(2) h4{grid-column:1/-1}
+.foot-in nav:nth-of-type(3){order:2}.foot-in nav:nth-of-type(2){order:3}.foot-in .copy{order:4}.foot nav a{font-size:.88rem;padding:3px 0}.foot .copy{grid-column:1/-1}}
 .foot-in nav h4{margin:0 0 4px;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
 .hero.off .blob,.bgpause .blob{animation-play-state:paused}
 .hero.sm .blob{animation:none}
@@ -228,7 +241,7 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 </style>
 </head>
 <body>
-<header class="nav" id="hdr"><div class="nav-in"><a class="logo" href="#/" aria-label="Eve Sandbox home"><svg class="lm" width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0a84ff"/><stop offset="1" stop-color="#bf5af2"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#lg)"/><path d="M16 7l2.2 6.3L24.5 16l-6.3 2.7L16 25l-2.2-6.3L7.5 16l6.3-2.7z" fill="#fff"/></svg><span class="lt">Eve <span>Sandbox</span></span></a><nav class="menu" aria-label="Main"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></nav><button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mpanel"><i></i><i></i><i></i></button></div><nav class="mpanel" id="mpanel" aria-label="Mobile menu"><div class="mlist"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></div></nav></header>
+<header class="nav" id="hdr"><div class="nav-in"><a class="logo" href="#/" aria-label="Eve Sandbox home"><img class="lm" id="lgimg" src="evesandbox.png" width="30" height="30" alt="" onerror="this.style.display='none'"><span class="lt">Eve <span>Sandbox</span></span></a><nav class="menu" aria-label="Main"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></nav><button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mpanel"><i></i><i></i><i></i></button></div><nav class="mpanel" id="mpanel" aria-label="Mobile menu"><div class="mlist"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></div></nav></header>
 <main id="app"></main>
 <footer class="foot"><div class="foot-in">
  <div><b>Eve <span>Sandbox</span></b><p>Simple tools to help students stay on top of their daily requirements.</p></div>
@@ -1091,6 +1104,77 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')menu(false);
 document.addEventListener('visibilitychange',function(){document.documentElement.classList.toggle('bgpause',document.hidden);});
 window.addEventListener('resize',function(){if(window.innerWidth>820)menu(false);});
 var FULL={tools:toolsPage,about:aboutPage,contact:contactPage,donate:donatePage,terms:termsPage,privacy:privacyPage};
+/* ===== Browser side picture description (must match what the indexer stores) ===== */
+function vFeat(cv){
+ var VW=64,c=document.createElement('canvas');c.width=c.height=VW;var x=c.getContext('2d',{willReadFrequently:true});
+ x.drawImage(cv,0,0,cv.width,cv.height,0,0,VW,VW);
+ var d=x.getImageData(0,0,VW,VW).data,g=new Float32Array(VW*VW),hi=new Float32Array(72),la=new Float32Array(48),hg=new Float32Array(128),i,px,py;
+ for(i=0;i<VW*VW;i++){var r=d[i*4],gg=d[i*4+1],b=d[i*4+2];g[i]=.299*r+.587*gg+.114*b;
+  var mx=Math.max(r,gg,b),mn=Math.min(r,gg,b),v=mx/255,s=mx?(mx-mn)/mx:0,h=0;
+  if(mx!==mn){var df=mx-mn;h=mx===r?((gg-b)/df)%6:mx===gg?(b-r)/df+2:(r-gg)/df+4;h*=60;if(h<0)h+=360;}
+  var hb=s<.12?0:Math.floor(h/45)%8,sb=s<.2?0:s<.55?1:2,vb=v<.3?0:v<.7?1:2;hi[(hb*3+sb)*3+vb]++;
+  px=i%VW;py=(i/VW)|0;var ci=((py>>4)*4+(px>>4))*3;la[ci]+=r/256;la[ci+1]+=gg/256;la[ci+2]+=b/256;}
+ for(py=1;py<VW-1;py++)for(px=1;px<VW-1;px++){i=py*VW+px;var gx=g[i+1]-g[i-1],gy=g[i+VW]-g[i-VW],m=Math.sqrt(gx*gx+gy*gy);if(m<1)continue;
+  var a=Math.atan2(gy,gx);if(a<0)a+=Math.PI;if(a>=Math.PI)a=0;hg[((py>>4)*4+(px>>4))*8+Math.floor(a/Math.PI*8)%8]+=m;}
+ var f=new Array(248),k;
+ for(k=0;k<72;k++)hi[k]=Math.sqrt(hi[k]);
+ for(k=0;k<3;k++){var mean=0;for(i=0;i<16;i++)mean+=la[i*3+k];mean/=16;for(i=0;i<16;i++)la[i*3+k]-=mean;}
+ for(k=0;k<128;k++)hg[k]=Math.sqrt(hg[k]);
+ function put(src,off,w){var n=0,j;for(j=0;j<src.length;j++)n+=src[j]*src[j];n=Math.sqrt(n)||1;for(j=0;j<src.length;j++)f[off+j]=+(src[j]/n*Math.sqrt(w)).toFixed(5);}
+ put(hi,0,.35);put(la,72,.2);put(hg,120,.45);return f;}
+function imgVec(im){var k=Math.min(1,256/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=Math.max(8,Math.round(im.naturalWidth*k));c.height=Math.max(8,Math.round(im.naturalHeight*k));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);return vFeat(c);}
+function cfLoad(src,cors){return new Promise(function(ok,no){var im=new Image();if(cors)im.crossOrigin='anonymous';im.onload=function(){ok(im);};im.onerror=function(){no(new Error('load'));};im.src=src;});}
+/* ===== Hidden indexer page: fills the index from Wikimedia Commons, run in your browser ===== */
+var ADM={stop:false,run:false};
+function admLog(t){var e=$$('admlog');if(e){e.textContent+=t+'\n';e.scrollTop=e.scrollHeight;}}
+function admBase(){return (CFG.lensApi||'').replace(/\/search\/?$/,'').replace(/\/$/,'');}
+async function admStart(){
+ if(ADM.run)return;var base=($$('admurl').value||'').trim().replace(/\/$/,''),tok=$$('admtok').value.trim(),q=$$('admq').value.trim(),mode=$$('admmode').value,lim=Math.max(1,Math.min(5000,parseInt($$('admlim').value,10)||200));
+ if(!/^https:\/\/|^http:\/\/localhost[:\/]/.test(base)){toast('Enter your Worker address (https://...)');return;}
+ if(tok.length<12){toast('Enter your admin token');return;}
+ if(!q){toast('Enter a search or a category');return;}
+ ADM.run=true;ADM.stop=false;$$('admgo').disabled=true;$$('admlog').textContent='';
+ var seen=0,added=0,skipped=0,batch=[],cont=null;
+ async function flush(){if(!batch.length)return;var items=batch;batch=[];
+  try{var r=await fetch(base+'/admin/add',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},body:JSON.stringify({items:items})});
+   if(r.status===401){admLog('Wrong admin token. Stopping.');ADM.stop=true;return;}
+   if(!r.ok){admLog('Worker error '+r.status+'. Stopping.');ADM.stop=true;return;}
+   var d=await r.json();added+=d.added;skipped+=d.skipped;admLog('Saved '+d.added+' new, '+d.skipped+' already there. Total new: '+added);}
+  catch(e){admLog('Could not reach the Worker. Stopping.');ADM.stop=true;}}
+ try{
+  while(seen<lim&&!ADM.stop){
+   var p=new URLSearchParams({action:'query',format:'json',origin:'*',formatversion:'2',prop:'imageinfo',iiprop:'url|size|mime',iiurlwidth:'320'});
+   if(mode==='cat'){p.set('generator','categorymembers');p.set('gcmtitle',/^category:/i.test(q)?q:'Category:'+q);p.set('gcmtype','file');p.set('gcmlimit','30');}
+   else{p.set('generator','search');p.set('gsrsearch',q+' filetype:bitmap');p.set('gsrnamespace','6');p.set('gsrlimit','30');}
+   if(cont)Object.keys(cont).forEach(function(k){p.set(k,cont[k]);});
+   var d;try{var r=await fetch('https://commons.wikimedia.org/w/api.php?'+p.toString());d=await r.json();}catch(e){admLog('Could not reach Wikimedia Commons. Stopping.');break;}
+   var pages=((d.query&&d.query.pages)||[]).filter(function(pg){var ii=pg.imageinfo&&pg.imageinfo[0];return ii&&/^image\/(jpeg|png|webp|gif)$/.test(ii.mime||'')&&Math.min(ii.width||0,ii.height||0)>=80;});
+   for(var i=0;i<pages.length&&seen<lim&&!ADM.stop;i+=4){
+    var grp=pages.slice(i,i+4);
+    var res=await Promise.all(grp.map(async function(pg){var ii=pg.imageinfo[0];try{var im=await cfLoad(ii.thumburl||ii.url,true);
+     return {key:'c'+pg.pageid,image_url:ii.thumburl||ii.url,page_url:ii.descriptionurl,title:String(pg.title||'').replace(/^File:/i,'').replace(/\.[a-z0-9]{3,4}$/i,'').replace(/_/g,' '),source:'commons.wikimedia.org',vector:imgVec(im)};}catch(e){return null;}}));
+    res.forEach(function(it){if(it){batch.push(it);}seen++;});
+    if(batch.length>=25)await flush();
+    $$('admst').textContent='Checked '+seen+' of '+lim+' pictures, '+added+' new saved';
+   }
+   cont=d.continue||null;if(!cont)break;
+   await new Promise(function(r){setTimeout(r,400);});
+  }
+  await flush();
+ }finally{ADM.run=false;$$('admgo').disabled=false;admLog(ADM.stop?'Stopped.':'Done. '+added+' new pictures added, '+skipped+' were already in the index.');}
+}
+function indexAdminPage(){nav('isearch');
+ app.innerHTML='<h1 style="font-size:2rem">Index builder</h1><p class="lead" style="font-size:1rem">Adds pictures from Wikimedia Commons to your search index. It runs in this browser tab, so keep the tab open until it finishes.</p>'+
+ '<div class="card" style="margin-top:16px"><div class="isg" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">'+
+ '<label class="hint">Worker address<br><input type="text" id="admurl" value="'+esc(admBase())+'" placeholder="https://eve-search.yourname.workers.dev" style="width:100%"></label>'+
+ '<label class="hint">Admin token<br><input type="password" id="admtok" placeholder="your ADMIN_TOKEN" autocomplete="off" style="width:100%"></label>'+
+ '<label class="hint">Source<br><select class="sel" id="admmode" style="width:100%;text-align:left"><option value="search">Search words</option><option value="cat">Category name</option></select></label>'+
+ '<label class="hint">Search or category<br><input type="text" id="admq" placeholder="human heart diagram" style="width:100%"></label>'+
+ '<label class="hint">How many pictures<br><input type="number" id="admlim" value="200" min="1" max="5000" style="width:100%"></label></div>'+
+ '<div class="row" style="margin-top:14px"><button class="btn pri" id="admgo">Start</button><button class="btn" id="admstop">Stop</button><span class="hint" id="admst"></span></div>'+
+ '<pre id="admlog" style="margin:12px 0 0;max-height:260px;overflow:auto;background:var(--fill);border-radius:12px;padding:12px;font-size:.8rem;line-height:1.4;white-space:pre-wrap;user-select:text"></pre></div>';
+ $$('admgo').onclick=admStart;$$('admstop').onclick=function(){ADM.stop=true;};}
+
 /* ===== Image Search: one page, your own independent engine ===== */
 var EC=encodeURIComponent,IS={img:null};
 function safeU(u){return /^https?:\/\/[^\s"'<>]+$/i.test(String(u||''))?String(u):'';}
@@ -1098,12 +1182,12 @@ function rHost(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch(e){
 function rB64(im){var k=Math.min(1,1280/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.naturalWidth*k));c.height=Math.max(1,Math.round(im.naturalHeight*k));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.85).split(',')[1];}
 function iNote(t,p){var el=$$('ires');if(el)el.innerHTML='<div class="card ihint"><b>'+t+'</b>'+(p?'<p class="hint" style="margin:6px 0 0">'+p+'</p>':'')+'</div>';}
 function iSend(payload){
- if(!CFG.lensApi){iNote('The search engine is not connected yet','This page searches your own independent image index. Connect your engine by setting lensApi in the site settings.');return;}
+ if(!CFG.lensApi){iNote('The search engine is not connected yet','This page searches your own independent image index. Connect it by setting lensApi in the site settings.');return;}
  iNote('Searching...');
  var ac=new AbortController(),tm=setTimeout(function(){ac.abort();},30000);
  fetch(CFG.lensApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ac.signal})
- .then(function(r){clearTimeout(tm);if(r.status===429)throw new Error('rate');if(!r.ok)throw new Error('http');return r.json();})
- .then(iShow,function(e){clearTimeout(tm);iNote(e&&e.message==='rate'?'Too many searches':'The search engine did not answer',e&&e.message==='rate'?'Please wait a minute and try again.':'Check your connection and try again in a moment.');});}
+ .then(function(r){clearTimeout(tm);if(r.status===429)throw new Error('rate');if(r.status===400)throw new Error('bad');if(!r.ok)throw new Error('http');return r.json();})
+ .then(iShow,function(e){clearTimeout(tm);var m=e&&e.message;iNote(m==='rate'?'Too many searches':m==='bad'?'This search could not be run':'The search engine did not answer',m==='rate'?'Please wait a minute and try again.':m==='bad'?'Try adding a picture or pasting an image link. Some engines only search by picture.':'Check your connection and try again in a moment.');});}
 function iShow(d){var el=$$('ires');if(!el)return;d=d||{};
  var sim=(d.similar||[]).map(function(x){return {u:safeU(x.u),p:safeU(x.p)};}).filter(function(x){return x.u;}),
  exact=(d.exact||[]).map(function(x){return {u:safeU(x.u),p:safeU(x.p)};}).filter(function(x){return x.u;}),
@@ -1126,10 +1210,11 @@ function iThumb(){var el=$$('ithumb');if(!el)return;
 function iGo(){
  var q=($$('iq')||{}).value||'';q=q.trim();
  if(IS.img){var im=$$('iimg');if(!im){return;}
-  var go=function(){iSend({image:rB64(im)});};
+  var go=function(){var v;try{v=imgVec(im);}catch(e){iNote('This picture could not be read','Try a different picture.');return;}iSend({vector:v});};
   if(im.complete&&im.naturalWidth)go();else im.onload=go;return;}
  if(!q){toast('Type something or add a picture');return;}
- if(/^https?:\/\/\S+$/i.test(q))iSend({url:q});else iSend({text:q});}
+ if(/^https?:\/\/\S+$/i.test(q)){iNote('Reading the picture...');cfLoad(q,true).then(function(im){var v;try{v=imgVec(im);}catch(e){throw e;}iSend({vector:v});},function(){iNote('That link could not be read','Many sites block this. Save the picture and add it from your device instead.');});return;}
+ iSend({text:q});}
 function isearchPage(){nav('isearch');
  app.innerHTML='<h1 style="font-size:2.2rem">Image Search</h1><p class="lead" style="font-size:1rem">Search by words or with a picture. Results come from our own independent image index, not from another search engine.</p>'+
   '<div class="card" id="idrop" style="margin-top:16px"><div class="row" style="flex-wrap:nowrap;gap:8px"><input type="text" id="iq" placeholder="Search by words, or paste an image link" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off"><label class="btn" style="cursor:pointer;display:inline-flex;align-items:center" title="Search with a picture">'+ico('image',18)+'<input type="file" id="ifile" accept="image/*" hidden></label><button class="btn pri" id="igo" style="display:inline-flex;align-items:center;gap:6px">'+ico('search',17,2.4)+'Search</button></div><div id="ithumb"></div><p class="hint" style="margin:10px 0 0">You can also drop or paste (Ctrl+V) a picture here to find similar ones.</p></div><div id="ires" style="margin-top:14px"></div>';
@@ -1147,8 +1232,8 @@ document.addEventListener('paste',function(e){if(location.hash!=='#/isearch')ret
 
 
 function route(){var r=location.hash.replace('#/','');menu(false);app.onclick=null;
- app.classList.toggle('full',r===''||r==='home'||!!FULL[r]||(['planner','image','pdf','virus','calc','isearch'].indexOf(r)<0));
- if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='isearch')isearchPage();else if(FULL[r])FULL[r]();else home();window.scrollTo(0,0);}
+ app.classList.toggle('full',r===''||r==='home'||!!FULL[r]||(['planner','image','pdf','virus','calc','isearch','index-admin'].indexOf(r)<0));
+ if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='isearch')isearchPage();else if(r==='index-admin')indexAdminPage();else if(FULL[r])FULL[r]();else home();window.scrollTo(0,0);}
 
 document.getElementById('yr').textContent=new Date().getFullYear();window.addEventListener('hashchange',route);route();
 })();
