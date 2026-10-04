@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Eve Sandbox</title>
 <link rel="icon" type="image/png" href="evesandbox.png">
 <link rel="apple-touch-icon" href="evesandbox.png">
@@ -14,6 +14,8 @@
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#000;--card:#1c1c1e;--ink:#f2f2f7;--mute:#98989f;--line:#38383a;--brand:#0a84ff;--fill:#2c2c2e;}}
 :root[data-theme="dark"]{--bg:#000;--card:#1c1c1e;--ink:#f2f2f7;--mute:#98989f;--line:#38383a;--brand:#0a84ff;--fill:#2c2c2e;}
+html{touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+input,select,textarea{font-size:max(16px,1em)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 button,input,select,textarea{font-family:inherit}
@@ -25,7 +27,7 @@ header.nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--car
 .nav-in{max-width:1100px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 16px;min-height:var(--hh)}
 .logo{display:flex;align-items:center;gap:9px;font-weight:700;font-size:1.05rem;color:var(--ink);text-decoration:none;letter-spacing:-.02em}
 .logo .lt>span{color:var(--brand)}
-.lm{display:block;flex:none;width:30px;height:30px;border-radius:8px;object-fit:contain}
+.lm{display:none;flex:none;width:30px;height:30px;border-radius:8px;background:url(evesandbox.png) center/contain no-repeat;pointer-events:none;-webkit-user-drag:none;user-select:none}.lm.on{display:block}img{-webkit-user-drag:none}.logo,.logo *{-webkit-touch-callout:none;-webkit-user-drag:none}
 svg.i{display:block;flex:none;pointer-events:none}
 .chip button{display:flex;align-items:center;justify-content:center;padding:0}
 .it button{display:inline-flex;align-items:center}
@@ -213,6 +215,7 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
  html:root{--bg:#fff;--card:#fff;--ink:#000;--mute:#444;--line:#bbb;--fill:#eee;padding:0}
  body{color:#000}
 }
+.ic.i7{background:linear-gradient(135deg,#ff9f0a,#ff375f)}
 .ic.i6{background:linear-gradient(135deg,#64d2ff,#5e5ce6)}
 .isg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
 .isg input[type=text],.isg input[type=number]{box-sizing:border-box}
@@ -238,15 +241,20 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 .vth{position:relative;line-height:0;background:var(--fill)}
 .vhit{position:absolute;border:2px solid #30d158;box-shadow:0 0 0 1px rgba(0,0,0,.45);border-radius:3px}
 .vbar{display:block;height:5px;border-radius:9px;background:var(--fill);overflow:hidden}.vbar i{display:block;height:100%;background:var(--brand);border-radius:9px}
+.note{padding:12px 14px;border-radius:12px;background:var(--fill);font-size:.92rem;margin-top:12px;line-height:1.45}.note.bad{background:rgba(255,69,58,.14)}.note a{color:var(--brand)}
+.gbbar{height:8px;border-radius:99px;background:var(--fill);overflow:hidden;margin-top:12px}.gbbar i{display:block;height:100%;width:0;background:var(--brand);border-radius:99px;transition:width .15s}.gbbar i.ind{animation:gbi 1.1s ease-in-out infinite alternate}@keyframes gbi{from{margin-left:0;width:20%}to{margin-left:80%;width:20%}}
+.gbfound{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding-top:10px;border-top:.5px solid var(--line)}.gbfound .hint{display:block}
+.gbgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.gbit{display:flex;flex-direction:column;gap:3px;padding:12px}.gbth{height:130px;border-radius:12px;background:var(--fill);overflow:hidden;margin-bottom:6px}.gbth img{width:100%;height:100%;object-fit:cover;display:block}.gbtt{font-size:.95rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.gbit .hint{font-size:.8rem}
+.gbpv{display:block;max-width:100%;max-height:360px;border-radius:12px;margin-top:12px;background:#000;-webkit-touch-callout:none}
 </style>
 </head>
 <body>
-<header class="nav" id="hdr"><div class="nav-in"><a class="logo" href="#/" aria-label="Eve Sandbox home"><img class="lm" id="lgimg" src="evesandbox.png" width="30" height="30" alt="" onerror="this.style.display='none'"><span class="lt">Eve <span>Sandbox</span></span></a><nav class="menu" aria-label="Main"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></nav><button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mpanel"><i></i><i></i><i></i></button></div><nav class="mpanel" id="mpanel" aria-label="Mobile menu"><div class="mlist"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></div></nav></header>
+<header class="nav" id="hdr"><div class="nav-in"><a class="logo" href="#/" aria-label="Eve Sandbox home"><span class="lm" id="lgimg" role="presentation"></span><span class="lt">Eve <span>Sandbox</span></span></a><nav class="menu" aria-label="Main"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></nav><button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mpanel"><i></i><i></i><i></i></button></div><nav class="mpanel" id="mpanel" aria-label="Mobile menu"><div class="mlist"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></div></nav></header>
 <main id="app"></main>
 <footer class="foot"><div class="foot-in">
  <div><b>Eve <span>Sandbox</span></b><p>Simple tools to help students stay on top of their daily requirements.</p></div>
  <nav><h4>Pages</h4><a href="#/">Home</a><a href="#/tools">Tools</a><a href="#/about">About</a><a href="#/contact">Contact</a><a href="#/donate">Donate</a></nav>
- <nav><h4>Tools</h4><a href="#/planner">Study Planner</a><a href="#/image">Image Tool</a><a href="#/pdf">PDF Tool</a><a href="#/virus">Virus Checker</a><a href="#/calc">Complex Calculator</a><a href="#/isearch">Image Search</a></nav>
+ <nav><h4>Tools</h4><a href="#/planner">Study Planner</a><a href="#/image">Image Tool</a><a href="#/pdf">PDF Tool</a><a href="#/virus">Virus Checker</a><a href="#/calc">Complex Calculator</a><a href="#/isearch">Image Search</a><a href="#/grab">Grab Box</a></nav>
  <nav><h4>Legal</h4><a href="#/terms">Terms of Service</a><a href="#/privacy">Privacy</a></nav>
  <div class="copy">&copy; <span id="yr">2026</span> Eve Sandbox. All rights reserved.</div>
 </div></footer>
@@ -259,6 +267,12 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 <div class="toast" id="toast"></div>
 
 <script>
+(function(){var im=new Image();im.onload=function(){var e=document.getElementById('lgimg');if(e)e.classList.add('on');};im.src='evesandbox.png';
+['gesturestart','gesturechange','gestureend'].forEach(function(n){document.addEventListener(n,function(e){e.preventDefault();});});
+document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1&&!(e.target.closest&&e.target.closest('.pvw,.vqb')))e.preventDefault();},{passive:false});
+document.addEventListener('contextmenu',function(e){if(e.target.closest&&e.target.closest('.logo'))e.preventDefault();});
+document.addEventListener('dragstart',function(e){if(e.target.closest&&e.target.closest('.logo'))e.preventDefault();});})();
+
 (function(){
 var IC={
  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
@@ -282,6 +296,7 @@ var IC={
  minus:'<path d="M5 12h14"/>',
  fit:'<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>',
  hand:'<path d="M18 11V6a2 2 0 0 0-4 0M14 10V4a2 2 0 0 0-4 0v2M10 10.5V6a2 2 0 0 0-4 0v8M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>',
+ dlbox:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>'};
 function ico(n,z,w){z=z||20;return '<svg class="i" viewBox="0 0 24 24" width="'+z+'" height="'+z+'" fill="none" stroke="currentColor" stroke-width="'+(w||2)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>';}
 var COLORS=['#fde68a','#bfdbfe','#fbcfe8','#bbf7d0','#ddd6fe','#fed7aa','#a5f3fc','#fecaca','#d9f99d','#e9d5ff'];
@@ -298,7 +313,7 @@ function colorOf(n){for(var i=0;i<S.subjects.length;i++)if(S.subjects[i].n===n)r
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var app=document.getElementById('app');
 
-function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',isearch:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
+function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',isearch:'tools',grab:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
 
 function planner(){
  nav('planner');
@@ -358,7 +373,7 @@ function printPlan(){
  setTimeout(function(){window.removeEventListener('beforeprint',mark);if(!did)planPdf();},600);
 }
 async function planPdf(){
- toast('Printing is blocked in this view. Making a PDF you can print\u2026');
+ toast('Making a PDF you can print\u2026');
  var cv=render();
  try{
   await Promise.race([need('pdflib'),new Promise(function(_,j){setTimeout(function(){j(new Error('timeout'));},10000);})]);var L=PDFLib,doc=await L.PDFDocument.create();
@@ -400,12 +415,7 @@ function download(){
  var cv=render(),name=(S.title||'study-plan').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'study-plan';
  cv.toBlob(async function(blob){
   if(!blob){toast('Could not create the image');return;}
-  var dls=null;
-  try{dls=window.claude&&await window.claude.use('downloads');}catch(e){}
-  if(dls){
-   try{await dls.save({filename:name+'.png',data:blob});toast('Saved!');return;}
-   catch(e){if(e&&e.code==='declined')return;}
-  }
+  if(await fileSave(blob,name+'.png'))return;
   document.getElementById('prev').src=cv.toDataURL('image/png');
   document.getElementById('modal').classList.add('show');
  },'image/png');
@@ -418,10 +428,19 @@ function mk(w,h){var c=document.createElement('canvas');c.width=w;c.height=h;ret
 function fb(n){return n>1048576?(n/1048576).toFixed(2)+' MB':Math.max(1,Math.round(n/1024))+' KB';}
 function cl(v,a,b){return Math.max(a,Math.min(b,v));}
 var $$=function(i){return document.getElementById(i);};
-async function saveBlob(b,name){
+async function fileSave(b,name){
  var dls=null;try{dls=window.claude&&await window.claude.use('downloads');}catch(e){}
- if(dls){try{await dls.save({filename:name,data:b});toast('Saved!');return;}catch(e){if(e&&e.code==='declined')return;}}
- if(!/^image\//.test(b.type)){toast('Saving files is not available in this preview');return;}
+ if(dls){try{await dls.save({filename:name,data:b});toast('Saved!');return true;}catch(e){if(e&&e.code==='declined')return true;}}
+ try{
+  var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;a.rel='noopener';a.style.display='none';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){a.remove();URL.revokeObjectURL(u);},4000);
+  toast('Downloading '+name);return true;
+ }catch(e){return false;}
+}
+async function saveBlob(b,name){
+ if(await fileSave(b,name))return;
+ if(!/^image\//.test(b.type)){toast('This file could not be saved');return;}
  $$('prev').src=URL.createObjectURL(b);$$('modal').classList.add('show');
 }
 function imagetool(){
@@ -858,7 +877,7 @@ function vRun(inp){
  var P=vParse(inp);if(P.err){$$('vout').innerHTML='<div class="card" style="margin-top:16px">'+esc(P.err)+'</div>';V.a=null;return;}
  var A=vAnalyze(P);V.id++;var id=V.id;V.a={host:P.host,ip:P.ip,reg:A.reg};V.items=A.items.slice();V.reddit=null;V.live=false;V.pend=P.ip?0:3;
  vDraw();if(P.ip){V.reddit='skip';vDraw();return;}
- var fails=[],fin=function(name,ok){if(id!==V.id)return;if(!ok)fails.push(name);V.pend--;if(V.pend===0){if(fails.length===3)V.items.push({l:'info',t:'Live lookups unavailable here',d:'This page could not reach the online services (they may be blocked in this view or you are offline). Use the links below to check with trusted websites.',p:0});V.live=fails.length<3;}vDraw();};
+ var fails=[],fin=function(name,ok){if(id!==V.id)return;if(!ok)fails.push(name);V.pend--;if(V.pend===0){if(fails.length===3)V.items.push({l:'info',t:'Online checks unavailable',d:'We could not reach the online services. Check your connection, or use the links below to check with trusted websites.',p:0});V.live=fails.length<3;}vDraw();};
  var sec='https://security.cloudflare-dns.com/dns-query?type=A&name=',pl='https://cloudflare-dns.com/dns-query?type=A&name=';
  Promise.all([vjf(sec+encodeURIComponent(P.host)),vjf(pl+encodeURIComponent(P.host))]).then(function(r){if(id!==V.id)return;
   var ips=function(j){return (j.Answer||[]).filter(function(a){return a.type===1;}).map(function(a){return a.data;});},si=ips(r[0]),pi=ips(r[1]);
@@ -897,14 +916,15 @@ function vDraw(){
  o.innerHTML=h;
 }
 
-var CFG={email:'',donate:[],lensApi:''};
+var CFG={email:'',donate:[],lensApi:'',grabApi:''};
 var TL=[
  {r:'planner',c:'',ic:'calendar',n:'Study Planner',d:'Plan your week with subjects and time slots, then print it or save it as an image.'},
  {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop and remove plain backgrounds from images.'},
  {r:'pdf',c:'i3',ic:'pdf',n:'PDF Tool',d:'Make, merge, split and compress PDFs, and add or remove passwords.'},
  {r:'virus',c:'i4',ic:'shield',n:'Virus Checker',d:'Check whether a website or link looks safe before you open it.'},
  {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
- {r:'isearch',c:'i6',ic:'search',n:'Image Search',d:'Search by words or with a picture, using our own independent image index.'}];
+ {r:'isearch',c:'i6',ic:'search',n:'Image Search',d:'Search by words or with a picture, using our own independent image index.'},
+ {r:'grab',c:'i7',ic:'dlbox',n:'Grab Box',d:'Paste a link to a file or a page and download the video, audio or document on it.'}];
 function toolsGrid(){return '<div class="grid">'+TL.map(function(t){return '<a class="card tool" href="#/'+t.r+'"><span class="ic '+t.c+'">'+ico(t.ic,24)+'</span><h3>'+t.n+'</h3><p>'+t.d+'</p></a>';}).join('')+'<div class="card soon"><span class="tag">Coming soon</span><h3>More tools</h3><p>New features are on the way.</p></div></div>';}
 function blobs(){return '<span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>';}
 function banner(tag,title,sub){return '<section class="hero sm">'+blobs()+'<div class="hin"><span class="pill">'+tag+'</span><h1>'+title+'</h1><p class="lead">'+sub+'</p></div></section>';}
@@ -935,7 +955,7 @@ function contactPage(){nav('contact');
  '<label class="fld">Topic<select id="ct"><option>Question</option><option>Bug report</option><option>Tool idea</option><option>Other</option></select></label>'+
  '<label class="fld">Message<textarea id="cm" maxlength="3000"></textarea></label>'+
  '<div class="bar"><span class="sp"></span><button class="btn pri" type="submit">'+(CFG.email?'Send message':'Copy message')+'</button></div></form>'+
- (CFG.email?'<p class="hint" style="margin:0">Sending opens your email app with the message filled in.</p>':'<p class="hint" style="margin:0">Direct email is not connected yet, so this copies your message so you can paste it where you were asked to send feedback.</p>')+'</div></div>';
+ (CFG.email?'<p class="hint" style="margin:0">Sending opens your email app with the message filled in.</p>':'<p class="hint" style="margin:0">Your message is copied so you can send it to us.</p>')+'</div></div>';
  document.getElementById('cf').onsubmit=function(e){e.preventDefault();
   var n=document.getElementById('cn').value.trim(),em=document.getElementById('ce').value.trim(),t=document.getElementById('ct').value,m=document.getElementById('cm').value.trim();
   if(m.length<5){toast('Please write a short message first');return;}
@@ -1182,18 +1202,18 @@ function rHost(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch(e){
 function rB64(im){var k=Math.min(1,1280/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.naturalWidth*k));c.height=Math.max(1,Math.round(im.naturalHeight*k));var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.85).split(',')[1];}
 function iNote(t,p){var el=$$('ires');if(el)el.innerHTML='<div class="card ihint"><b>'+t+'</b>'+(p?'<p class="hint" style="margin:6px 0 0">'+p+'</p>':'')+'</div>';}
 function iSend(payload){
- if(!CFG.lensApi){iNote('The search engine is not connected yet','This page searches your own independent image index. Connect it by setting lensApi in the site settings.');return;}
+ if(!CFG.lensApi){iNote('Image Search is coming soon','We are still building our image collection. Please check back shortly.');return;}
  iNote('Searching...');
  var ac=new AbortController(),tm=setTimeout(function(){ac.abort();},30000);
  fetch(CFG.lensApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:ac.signal})
  .then(function(r){clearTimeout(tm);if(r.status===429)throw new Error('rate');if(r.status===400)throw new Error('bad');if(!r.ok)throw new Error('http');return r.json();})
- .then(iShow,function(e){clearTimeout(tm);var m=e&&e.message;iNote(m==='rate'?'Too many searches':m==='bad'?'This search could not be run':'The search engine did not answer',m==='rate'?'Please wait a minute and try again.':m==='bad'?'Try adding a picture or pasting an image link. Some engines only search by picture.':'Check your connection and try again in a moment.');});}
+ .then(iShow,function(e){clearTimeout(tm);var m=e&&e.message;iNote(m==='rate'?'Too many searches':m==='bad'?'This search could not be run':'Search is not responding',m==='rate'?'Please wait a minute and try again.':m==='bad'?'Try different words, or add a picture.':'Check your connection and try again in a moment.');});}
 function iShow(d){var el=$$('ires');if(!el)return;d=d||{};
  var sim=(d.similar||[]).map(function(x){return {u:safeU(x.u),p:safeU(x.p)};}).filter(function(x){return x.u;}),
  exact=(d.exact||[]).map(function(x){return {u:safeU(x.u),p:safeU(x.p)};}).filter(function(x){return x.u;}),
  pages=(d.pages||[]).map(function(x){return {u:safeU(x.u),t:String(x.t||'')};}).filter(function(x){return x.u;}),
  tags=(d.guess||[]).concat((d.entities||[]).map(function(x){return x.d;})).filter(Boolean).slice(0,8),h='';
- if(!sim.length&&!exact.length&&!pages.length){iNote('No matches found','Try other words, a clearer picture, or crop to the main object. The index only contains what has been collected so far.');return;}
+ if(!sim.length&&!exact.length&&!pages.length){iNote('No matches found','Try other words, a clearer picture, or crop to the main object. Our collection is still growing.');return;}
  function grid(a){return '<div class="irs">'+a.map(function(x){return '<a class="ir" href="'+esc(x.p||x.u)+'" target="_blank" rel="noopener noreferrer" style="display:block"><img loading="lazy" referrerpolicy="no-referrer" alt="Result" src="'+esc(x.u)+'" onerror="var b=this.parentNode;b.parentNode&&b.parentNode.removeChild(b)"><span>'+esc(rHost(x.p||x.u))+'</span></a>';}).join('')+'</div>';}
  if(tags.length)h+='<div class="chips" style="margin-bottom:6px">'+tags.map(function(t){return '<button class="pl2" data-s="'+esc(t)+'" style="border:0;cursor:pointer;padding:6px 12px;font-size:.88rem;color:var(--brand)">'+esc(t)+'</button>';}).join('')+'</div>';
  if(exact.length)h+='<h3 class="ish">Same picture</h3>'+grid(exact);
@@ -1215,6 +1235,106 @@ function iGo(){
  if(!q){toast('Type something or add a picture');return;}
  if(/^https?:\/\/\S+$/i.test(q)){iNote('Reading the picture...');cfLoad(q,true).then(function(im){var v;try{v=imgVec(im);}catch(e){throw e;}iSend({vector:v});},function(){iNote('That link could not be read','Many sites block this. Save the picture and add it from your device instead.');});return;}
  iSend({text:q});}
+
+/* ---------- Grab Box: direct file links ---------- */
+var GB={ab:null,blob:null,url:''};
+function gbName(u,ct){
+ var n='';try{n=decodeURIComponent(new URL(u).pathname.split('/').filter(Boolean).pop()||'');}catch(e){}
+ n=n.replace(/[^\w.\- ]+/g,'').trim();
+ var ext={'video/mp4':'mp4','video/webm':'webm','audio/mpeg':'mp3','audio/mp4':'m4a','audio/ogg':'ogg','audio/wav':'wav','image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif','image/svg+xml':'svg','application/pdf':'pdf','application/zip':'zip'}[(ct||'').split(';')[0]]||'';
+ if(!n)n='download';
+ if(!/\.[A-Za-z0-9]{2,5}$/.test(n)&&ext)n+='.'+ext;
+ return n;
+}
+function gbMsg(h,bad){var e=$$('gbmsg');e.className='note'+(bad?' bad':'');e.innerHTML=h;e.style.display='block';}
+function gbBlocked(h){return /(^|\.)(youtube\.com|youtu\.be|instagram\.com|facebook\.com|fb\.watch|fb\.com|twitter\.com|x\.com|t\.co)$/i.test(h);}
+async function gbFetch(href,sig){
+ var r=null;
+ try{r=await fetch(href,{signal:sig,credentials:'omit',referrerPolicy:'no-referrer'});}
+ catch(e){if(!CFG.grabApi||(e&&e.name==='AbortError'))throw e;}
+ if(r&&r.ok)return r;
+ if(!CFG.grabApi)return r||Promise.reject(new TypeError('blocked'));
+ return fetch(CFG.grabApi+(CFG.grabApi.indexOf('?')<0?'?':'&')+'url='+encodeURIComponent(href),{signal:sig,credentials:'omit'});
+}
+async function gbGo(direct){
+ var raw=($$('gbu').value||'').trim(),u;
+ $$('gbout').innerHTML='';$$('gbmsg').style.display='none';
+ if(!raw){gbMsg('Paste a direct link to a file first.',1);return;}
+ if(!/^[a-z][a-z0-9+.\-]*:/i.test(raw))raw='https://'+raw;
+ try{u=new URL(raw);}catch(e){gbMsg('That does not look like a valid link.',1);return;}
+ if(u.protocol!=='https:'&&u.protocol!=='http:'){gbMsg('Only http and https links work.',1);return;}
+ if(gbBlocked(u.hostname)){gbMsg('Links to video sites and social networks are not supported. Paste a direct file link (ending in .mp4, .mp3, .jpg, .pdf and so on) or a link to an ordinary web page that has the file on it.',1);return;}
+ if(location.protocol==='https:'&&u.protocol==='http:'){gbMsg('This site is secure, so the browser blocks plain http downloads. Try the https version of the link.',1);return;}
+ GB.blob=null;if(GB.ab)GB.ab.abort();GB.ab=new AbortController();
+ var go=$$('gbgo');go.disabled=true;
+ $$('gbout').innerHTML='<div class="card" style="margin-top:14px"><b id="gbt">Connecting...</b><div class="gbbar"><i id="gbp"></i></div><div class="row" style="justify-content:space-between;margin-top:8px"><span class="hint" id="gbs"></span><button class="btn" id="gbx">Cancel</button></div></div>';
+ $$('gbx').onclick=function(){if(GB.ab)GB.ab.abort();};
+ try{
+  var r=await gbFetch(u.href,GB.ab.signal);
+  if(!r.ok){if(r.status===415&&CFG.grabApi&&!direct){await gbScan(u);go.disabled=false;return;}throw {http:r.status};}
+  var ct=r.headers.get('content-type')||'',tot=+r.headers.get('content-length')||0;
+  if(/text\/html/i.test(ct)){if(direct)throw {page:1};await gbScan(u);go.disabled=false;return;}
+  if(tot>400*1048576){throw {big:1};}
+  var rd=r.body&&r.body.getReader?r.body.getReader():null,parts=[],got=0;
+  $$('gbt').textContent='Downloading...';
+  if(rd){
+   for(;;){var x=await rd.read();if(x.done)break;parts.push(x.value);got+=x.value.length;
+    if(got>400*1048576){GB.ab.abort();throw {big:1};}
+    $$('gbp').style.width=(tot?Math.min(100,got/tot*100):50)+'%';
+    if(!tot)$$('gbp').classList.add('ind');
+    $$('gbs').textContent=fb(got)+(tot?' of '+fb(tot):'');}
+  }else{var bb=await r.blob();parts=[bb];got=bb.size;}
+  var blob=new Blob(parts,{type:ct.split(';')[0]||'application/octet-stream'});
+  GB.blob=blob;var nm=gbName(u.href,ct);
+  var pv='',ou=URL.createObjectURL(blob);
+  if(/^video\//.test(blob.type))pv='<video controls playsinline preload="metadata" src="'+ou+'" class="gbpv"></video>';
+  else if(/^audio\//.test(blob.type))pv='<audio controls src="'+ou+'" style="width:100%;margin-top:12px"></audio>';
+  else if(/^image\//.test(blob.type))pv='<img src="'+ou+'" alt="Preview" class="gbpv" draggable="false">';
+  $$('gbout').innerHTML='<div class="card" style="margin-top:14px"><b>Ready</b><p class="hint" style="margin:.2em 0 0">'+esc(nm)+' &middot; '+fb(blob.size)+'</p>'+pv+'<div class="row" style="margin-top:12px"><button class="btn pri" id="gbdl">'+ico('dlbox',16,2.4)+' Download</button></div></div>';
+  $$('gbdl').onclick=function(){fileSave(GB.blob,nm);};
+ }catch(e){
+  $$('gbout').innerHTML='';
+  if(e&&e.name==='AbortError'){gbMsg('Download cancelled.');}
+  else if(e&&e.http)gbMsg('The site answered with an error ('+e.http+'). Check that the link still works.',1);
+  else if(e&&e.page)gbMsg('That link opens a web page, not a file. Right-click the file on that page and copy its link address, then paste it here.',1);
+  else if(e&&e.big)gbMsg('That file is larger than 400 MB, which is too big to download in the browser.',1);
+  else if(!direct&&!CFG.grabApi){gbMsg('That website does not let this link be downloaded here. <a href="'+esc(u.href)+'" target="_blank" rel="noopener noreferrer">Open the link directly</a> instead.',1);}
+  else gbMsg('The browser could not fetch that file. Most often the other website does not allow downloads from other sites. <a href="'+esc(u.href)+'" target="_blank" rel="noopener noreferrer">Open the link directly</a> instead.',1);
+ }
+ go.disabled=false;
+}
+function gbScanHtml(html,base){
+ var found=[],seen={},EXT=/\.(mp4|webm|m4v|mov|ogv|mp3|m4a|ogg|wav|flac)(\?|#|$)/i;
+ function add(x){if(!x||found.length>=12)return;try{var a=new URL(String(x).replace(/\\\//g,'/'),base);if(!/^https?:$/.test(a.protocol)||gbBlocked(a.hostname)||seen[a.href])return;seen[a.href]=1;found.push(a.href);}catch(e){}}
+ var d;try{d=new DOMParser().parseFromString(html,'text/html');}catch(e){return found;}
+ d.querySelectorAll('meta[property^="og:video"],meta[property^="og:audio"],meta[name="twitter:player:stream"]').forEach(function(m){var c=m.getAttribute('content');if(c&&(EXT.test(c)||/og:(video|audio)(:url|:secure_url)?$/.test(m.getAttribute('property')||'')))add(c);});
+ d.querySelectorAll('video[src],audio[src],source[src]').forEach(function(m){add(m.getAttribute('src'));});
+ d.querySelectorAll('a[href]').forEach(function(a){var h=a.getAttribute('href')||'';if(EXT.test(h))add(h);});
+ (html.replace(/\\\//g,'/').match(/https?:\/\/[^\s"'<>\\]+?\.(?:mp4|webm|m4v|mov|ogv|mp3|m4a|ogg|wav|flac)(?:\?[^\s"'<>\\]*)?/gi)||[]).forEach(add);
+ return found;
+}
+function gbShowFound(list,pageUrl){
+ $$('gbout').innerHTML='';
+ if(!list.length){gbMsg('No downloadable files were found on that page. Some sites hide their files or use streaming, which Grab Box cannot save. If you can see the file in your browser\'s Network tab, paste its link here instead.',1);return;}
+ $$('gbout').innerHTML='<div class="card" style="margin-top:14px"><b>Found '+list.length+' file'+(list.length>1?'s':'')+'</b><p class="hint" style="margin:.2em 0 0">on '+esc((function(){try{return new URL(pageUrl).hostname;}catch(e){return pageUrl;}})())+'</p>'+list.map(function(u,i){var n=gbName(u,'');var h='';try{h=new URL(u).hostname;}catch(e){}return '<div class="gbfound"><div style="min-width:0"><b class="gbtt" style="-webkit-line-clamp:1">'+esc(n)+'</b><span class="hint">'+esc(h)+'</span></div><button class="btn pri" data-i="'+i+'">Grab</button></div>';}).join('')+'</div>';
+ $$('gbout').querySelectorAll('button[data-i]').forEach(function(b){b.onclick=function(){$$('gbu').value=list[+b.dataset.i];gbGo(true);};});
+}
+async function gbScan(u){
+ $$('gbout').innerHTML='<div class="card" style="margin-top:14px"><b>Looking for files on that page...</b><div class="gbbar"><i class="ind"></i></div></div>';
+ var html=null;
+ try{var r=await fetch(u.href,{credentials:'omit',referrerPolicy:'no-referrer',signal:GB.ab&&GB.ab.signal});if(r.ok)html=await r.text();}catch(e){}
+ if(html===null&&CFG.grabApi){
+  try{var r2=await fetch(CFG.grabApi.replace(/\/fetch\/?$/,'')+'/page?url='+encodeURIComponent(u.href),{credentials:'omit'});if(r2.ok){var j=await r2.json();html=j.html;}}catch(e){}
+ }
+ if(html===null){$$('gbout').innerHTML='';gbMsg('Could not read that page. Try pasting the direct link to the file instead.',1);return;}
+ gbShowFound(gbScanHtml(html,u.href),u.href);
+}
+function grabPage(){nav('grab');
+ app.innerHTML='<h1 style="font-size:2.2rem">Grab Box</h1><p class="lead" style="font-size:1rem">Paste a link to a file, or to a page that has a video or audio file on it, and Grab Box finds it so you can download it.</p>'+
+ '<div class="card" style="margin-top:16px"><div class="row" style="flex-wrap:nowrap;gap:8px"><input type="text" id="gbu" inputmode="url" placeholder="Paste a link here" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn pri" id="gbgo">Grab</button></div>'+
+ '<p class="hint" style="margin:10px 0 0">Only download files you made or have permission to save. Video sites and social networks are not supported.</p></div><div class="note" id="gbmsg" style="display:none"></div><div id="gbout"></div>';
+ $$('gbgo').onclick=function(){gbGo();};$$('gbu').onkeydown=function(e){if(e.key==='Enter')gbGo();};
+}
 function isearchPage(){nav('isearch');
  app.innerHTML='<h1 style="font-size:2.2rem">Image Search</h1><p class="lead" style="font-size:1rem">Search by words or with a picture. Results come from our own independent image index, not from another search engine.</p>'+
   '<div class="card" id="idrop" style="margin-top:16px"><div class="row" style="flex-wrap:nowrap;gap:8px"><input type="text" id="iq" placeholder="Search by words, or paste an image link" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off"><label class="btn" style="cursor:pointer;display:inline-flex;align-items:center" title="Search with a picture">'+ico('image',18)+'<input type="file" id="ifile" accept="image/*" hidden></label><button class="btn pri" id="igo" style="display:inline-flex;align-items:center;gap:6px">'+ico('search',17,2.4)+'Search</button></div><div id="ithumb"></div><p class="hint" style="margin:10px 0 0">You can also drop or paste (Ctrl+V) a picture here to find similar ones.</p></div><div id="ires" style="margin-top:14px"></div>';
@@ -1227,13 +1347,13 @@ function isearchPage(){nav('isearch');
  app.onclick=function(e){var t=e.target.closest('button');if(!t)return;
   if(t.id==='iclr'){IS.img=null;iThumb();}
   else if(t.dataset.s){IS.img=null;iThumb();q.value=t.dataset.s;iGo();}};
- iThumb();if(!CFG.lensApi)iNote('The search engine is not connected yet','This page searches your own independent image index. Connect your engine by setting lensApi in the site settings.');}
+ iThumb();if(!CFG.lensApi)iNote('Image Search is coming soon','We are still building our image collection. Please check back shortly.');}
 document.addEventListener('paste',function(e){if(location.hash!=='#/isearch')return;var fl=e.clipboardData&&e.clipboardData.files;if(fl&&fl[0]&&/^image\//.test(fl[0].type)){e.preventDefault();iPick(fl[0]);}});
 
 
 function route(){var r=location.hash.replace('#/','');menu(false);app.onclick=null;
- app.classList.toggle('full',r===''||r==='home'||!!FULL[r]||(['planner','image','pdf','virus','calc','isearch','index-admin'].indexOf(r)<0));
- if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='isearch')isearchPage();else if(r==='index-admin')indexAdminPage();else if(FULL[r])FULL[r]();else home();window.scrollTo(0,0);}
+ app.classList.toggle('full',r===''||r==='home'||!!FULL[r]||(['planner','image','pdf','virus','calc','isearch','grab','index-admin'].indexOf(r)<0));
+ if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='isearch')isearchPage();else if(r==='grab')grabPage();else if(r==='index-admin')indexAdminPage();else if(FULL[r])FULL[r]();else home();window.scrollTo(0,0);}
 
 document.getElementById('yr').textContent=new Date().getFullYear();window.addEventListener('hashchange',route);route();
 })();
