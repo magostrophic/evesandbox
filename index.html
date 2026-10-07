@@ -189,6 +189,7 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 ::-webkit-scrollbar-thumb:hover{border-width:3px}
 ::-webkit-scrollbar-thumb:active{background-color:color-mix(in srgb,var(--brand) 75%,#fff)}
 @supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:var(--brand) transparent}}
+@media (hover:none) and (pointer:coarse){html,body{scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0}}
 .ic.i5{background:linear-gradient(135deg,#bf5af2,#ff375f)}
 .cr{display:grid;grid-template-columns:minmax(70px,1fr) 66px 86px 34px;gap:8px;align-items:center;margin-top:8px}
 .cr.cr3{grid-template-columns:minmax(70px,1fr) 78px 70px 34px}
@@ -597,7 +598,7 @@ document.getElementById('closeM').onclick=function(){document.getElementById('mo
 
 
 var I=null;
-function mk(w,h){var c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+function mk(w,h){var c=document.createElement('canvas');c.width=w;c.height=h;try{c.getContext('2d',{willReadFrequently:true});}catch(e){}return c;}
 function fb(n){return n>1048576?(n/1048576).toFixed(2)+' MB':Math.max(1,Math.round(n/1024))+' KB';}
 function cl(v,a,b){return Math.max(a,Math.min(b,v));}
 var $$=function(i){return document.getElementById(i);};
@@ -631,13 +632,36 @@ function imagetool(){
  d.ondrop=function(e){e.preventDefault();var f=e.dataTransfer.files[0];if(f)loadImg(f);};
  if(I)workspace();
 }
+function scaled(im){var w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,2500/Math.max(w,h)),c=mk(Math.round(w*k),Math.round(h*k));c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c;}
+function blobImg(b){return new Promise(function(res,rej){var u=URL.createObjectURL(b),im=new Image();im.onload=function(){URL.revokeObjectURL(u);res(im);};im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('decode'));};im.src=u;});}
+function cvBlank(c){try{var x=c.getContext('2d'),w=c.width,h=c.height;if(!w||!h)return true;for(var i=1;i<6;i++)for(var j=1;j<6;j++){if(x.getImageData(Math.min(w-1,Math.floor(w*i/6)),Math.min(h-1,Math.floor(h*j/6)),1,1).data[3]!==0)return false;}return true;}catch(e){return false;}}
+function snapSave(){clearTimeout(snapSave.k);var c=I&&I.cur;if(!c)return;snapSave.k=setTimeout(function(){if(!I||I.cur!==c)return;try{c.toBlob(function(b){if(b&&I&&I.cur===c)I.snap=b;},'image/png');}catch(e){}},500);}
+/* phones can throw away a canvas while the page sits in the background: put the picture back when the person returns */
+function itRestore(){
+ if(!I||!$$('pv')||document.hidden)return;
+ var pv=$$('pv');
+ if(!cvBlank(I.cur)){if(cvBlank(pv)&&pv.width===I.cur.width)paint();return;}
+ var src=I.snap||I.file;if(!src)return;
+ var tok=I.rt=(I.rt||0)+1,oldOrig=I.orig,oldCur=I.cur;
+ blobImg(src).then(function(im){
+  if(!I||I.rt!==tok||I.cur!==oldCur)return;
+  var m=I.snap?mk(im.naturalWidth,im.naturalHeight):scaled(im);if(I.snap)m.getContext('2d').drawImage(im,0,0);
+  var same=oldCur===oldOrig;I.cur=m;I.base=null;if(same)I.orig=m;
+  var fin=function(){
+   I.hist=I.hist.map(function(h){return h===oldOrig?I.orig:h;}).filter(function(h){return !cvBlank(h);});
+   paint();ctl();
+  };
+  if(!same&&cvBlank(I.orig)&&I.file){blobImg(I.file).then(function(o){var no=scaled(o);I.hist=I.hist.map(function(h){return h===oldOrig?no:h;});I.orig=no;fin();},fin);}
+  else fin();
+ },function(){});
+}
+if(!window.__itR){window.__itR=1;document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(itRestore,60);});window.addEventListener('pageshow',function(){setTimeout(itRestore,60);});window.addEventListener('focus',function(){setTimeout(itRestore,60);});}
 function loadImg(file){
  if(!/^image\//.test(file.type)){toast('Please choose an image file');return;}
  var u=URL.createObjectURL(file),im=new Image();
  im.onload=function(){
-  var w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,2500/Math.max(w,h)),c=mk(Math.round(w*k),Math.round(h*k));
-  c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);
-  I={orig:c,cur:c,hist:[],name:file.name.replace(/\.[^.]+$/,'')||'image',size:file.size,tab:'compress',fmt:file.type==='image/png'?'image/png':'image/jpeg',q:.8,tol:30,contig:true,soft:2,gaps:0,bgm:'brush',z:1,pan:false,pd:null,tool:'erase',bs:6,paint:null,last:null,base:null,bgc:null,sel:null,ratio:0,drag:null,est:0};
+  var c=scaled(im);URL.revokeObjectURL(u);
+  I={file:file,snap:null,vw:0,vh:0,orig:c,cur:c,hist:[],name:file.name.replace(/\.[^.]+$/,'')||'image',size:file.size,tab:'compress',fmt:file.type==='image/png'?'image/png':'image/jpeg',q:.8,tol:30,contig:true,soft:2,gaps:0,bgm:'brush',z:1,pan:false,pd:null,tool:'erase',bs:6,paint:null,last:null,base:null,bgc:null,sel:null,ratio:0,drag:null,est:0};
   workspace();
  };
  im.onerror=function(){toast("Couldn't read that image");};im.src=u;
@@ -668,7 +692,7 @@ function workspace(){
   if(!I.drag){if(I.tab==='crop'&&!I.pan){var hh0=cropHit(pt(e));pw.style.cursor=!hh0?'':hh0.k==='move'?'move':(hh0.k==='nw'||hh0.k==='se')?'nwse-resize':'nesw-resize';}return;}var p=pt(e),a=I.drag,c=I.cur,w=p.x-a.x,h=p.y-a.y,aw=Math.abs(w),ah=Math.abs(h);
   if(I.ratio){aw=Math.min(aw,(w>=0?c.width-a.x:a.x),(h>=0?c.height-a.y:a.y)*I.ratio);ah=aw/I.ratio;}
   I.sel={x:w>=0?a.x:a.x-aw,y:h>=0?a.y:a.y-ah,w:aw,h:ah};sel();};
- pw.onpointerup=pw.onpointercancel=function(){I.pd=null;I.drag=null;I.mv=null;if(I.paint){I.paint=null;est();}};
+ pw.onpointerup=pw.onpointercancel=function(){I.pd=null;I.drag=null;I.mv=null;if(I.paint){I.paint=null;est();snapSave();}};
  $$('zin').onclick=function(){zoom(1.25);};$$('zout').onclick=function(){zoom(.8);};
  $$('zfit').onclick=function(){I.z=1;zapply();pw.scrollLeft=pw.scrollTop=0;};
  $$('z100').onclick=function(){setZ(1/fitS());};
@@ -682,7 +706,12 @@ function cropHit(p){var s=I.sel,pv=$$('pv');if(!s||s.w<4||s.h<4||!pv)return null
  for(var i=0;i<4;i++){var c=cs[i];if(Math.abs(p.x-c[1])<=tol&&Math.abs(p.y-c[2])<=tol)return {k:c[0],anchor:{x:c[3],y:c[4]}};}
  if(p.x>=s.x&&p.x<=s.x+s.w&&p.y>=s.y&&p.y<=s.y+s.h)return {k:'move'};
  return null;}
-function fitS(){var c=I.cur,box=$$('pw').parentNode,mw=Math.max(200,Math.min(920,(box.clientWidth||600)-36)),mh=Math.max(240,window.innerHeight*.6);return Math.min(1,mw/c.width,mh/c.height);}
+function stableVh(){var w=window.innerWidth,h=window.innerHeight;
+ if(!(window.matchMedia&&matchMedia('(hover:none)').matches))return h;
+ /* on phones the address bar slides in and out and changes the window height; use the fixed screen size so the preview never changes size while scrolling */
+ var sw=(window.screen&&screen.width)||0,sh=(window.screen&&screen.height)||0;if(!sw||!sh)return h;
+ var v=w>h?Math.min(sw,sh):Math.max(sw,sh);return Math.max(h,Math.min(v,1400));}
+function fitS(){var c=I.cur,box=$$('pw').parentNode,mw=Math.max(200,Math.min(920,(box.clientWidth||600)-36)),mh=Math.max(240,stableVh()*.6);return Math.min(1,mw/c.width,mh/c.height);}
 function zapply(){var c=I.cur,pv=$$('pv');if(!pv)return;var f=fitS(),sc=f*I.z;pv.style.width=Math.round(c.width*sc)+'px';pv.style.height=Math.round(c.height*sc)+'px';$$('zl').textContent=Math.round(sc*100)+'%';}
 function setZ(z){var pw=$$('pw'),pv=$$('pv'),ow=pv.offsetWidth||1,oh=pv.offsetHeight||1,cx=(pw.scrollLeft+pw.clientWidth/2)/ow,cy=(pw.scrollTop+pw.clientHeight/2)/oh;
  I.z=cl(z,.25,12);zapply();pw.scrollLeft=cx*pv.offsetWidth-pw.clientWidth/2;pw.scrollTop=cy*pv.offsetHeight-pw.clientHeight/2;}
@@ -692,7 +721,7 @@ function tabs(){document.querySelectorAll('#tabs a').forEach(function(a){a.class
 function sel(){var b=$$('sb'),c=I.cur,s=I.sel;if(!b)return;
  if(I.tab!=='crop'||!s||s.w<1){b.style.display='none';return;}
  b.style.display='block';b.style.left=s.x/c.width*100+'%';b.style.top=s.y/c.height*100+'%';b.style.width=s.w/c.width*100+'%';b.style.height=s.h/c.height*100+'%';}
-function paint(){var c=I.cur,pv=$$('pv');pv.width=c.width;pv.height=c.height;pv.getContext('2d').drawImage(c,0,0);zapply();sel();info();est();}
+function paint(){var c=I.cur,pv=$$('pv');try{pv.getContext('2d',{willReadFrequently:true});}catch(e){}pv.width=c.width;pv.height=c.height;pv.getContext('2d').drawImage(c,0,0);zapply();sel();info();est();snapSave();}
 function info(){var c=I.cur,t=c.width+' \u00d7 '+c.height+' px'+(I.est?' \u00b7 about '+fb(I.est):'');$$('info').textContent=t;
  var cs=$$('cs');if(cs&&I.est){var p=Math.round((1-I.est/I.size)*100);cs.textContent='Original file: '+fb(I.size)+'  \u2192  New: about '+fb(I.est)+' ('+(p>=0?'\u2212'+p+'% smaller':'+'+(-p)+'% larger')+')';}}
 function blobOf(cb){var c=I.cur;
@@ -1828,24 +1857,68 @@ function convertPage(){nav('convert');
  fcRows();
 }
 /* ---------- Eve IDE ---------- */
-var PYBASE='https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
+var PYBASES=[].concat(/^https?:/.test(location.protocol)?[new URL('pyodide/',location.href).href]:[],['https://cdn.jsdelivr.net/pyodide/v0.27.7/full/','https://cdn.jsdelivr.net/npm/pyodide@0.27.7/','https://unpkg.com/pyodide@0.27.7/']);
 var IDEW=[
-"var py=null,stdin=[],si=0,ob=[],eb=[];",
+"var py=null,stdin=[],si=0,ob=[],eb=[],mem={},STALL=20000;",
+"var SZ={'pyodide.js':14913,'pyodide.asm.js':1255688,'pyodide-lock.json':112205,'python_stdlib.zip':2360737,'pyodide.asm.wasm':10105545},TOTAL=0;",
+"for(var k0 in SZ)TOTAL+=SZ[k0];",
+"var _fetch=self.fetch.bind(self),_imp=self.importScripts.bind(self);",
+"self.fetch=function(u,o){var s=typeof u==='string'?u:(u&&u.url)||String(u);if(mem.base&&s.indexOf(mem.base)===0){var n=s.slice(mem.base.length).split(/[?#]/)[0];if(mem[n])return Promise.resolve(new Response(mem[n].b.slice(0),{status:200,headers:{'Content-Type':mem[n].t}}));}return _fetch(u,o);};",
 "function fl(a,t){if(a.length){postMessage({t:t,s:new TextDecoder().decode(new Uint8Array(a))});a.length=0;}}",
 "function clean(m){var L=String(m).split('\\n'),o=[];for(var i=0;i<L.length;i++){var l=L[i];if(/^\\s+File \"(\\/lib\\/python|\\/home\\/pyodide|<exec>|<console>)/.test(l)&&!/<exec>/.test(l)){i++;continue;}o.push(l.replace(/File \"<exec>\"/,'File \"main.py\"'));}return o.join('\\n').replace(/\\s+$/,'');}",
-"onmessage=async function(e){var m=e.data;",
+"function host(u){try{return new URL(u).host+(/\\/npm\\//.test(u)?' (npm)':'');}catch(e){return String(u);}}",
+"async function grab(url,onb){",
+" var ac=new AbortController(),tm=0;",
+" function arm(){clearTimeout(tm);tm=setTimeout(function(){ac.abort();},STALL);}",
+" arm();",
 " try{",
-"  if(!py){postMessage({t:'status',s:'Loading Python (about 10 MB, only the first time)...'});importScripts(m.base+'pyodide.js');py=await loadPyodide({indexURL:m.base});",
+"  var r=await _fetch(url,{signal:ac.signal});",
+"  if(!r.ok)throw new Error(r.status===404?'file not found':'error '+r.status);",
+"  if(/text\\/html/i.test(r.headers.get('content-type')||''))throw new Error('file not found');",
+"  if(!r.body||!r.body.getReader){var ab=await r.arrayBuffer();onb(ab.byteLength);return ab;}",
+"  var rd=r.body.getReader(),parts=[],n=0;",
+"  for(;;){var x=await rd.read();if(x.done)break;parts.push(x.value);n+=x.value.length;onb(x.value.length);arm();}",
+"  var out=new Uint8Array(n),o=0;for(var i=0;i<parts.length;i++){out.set(parts[i],o);o+=parts[i].length;}",
+"  return out.buffer;",
+" }catch(e){if(e&&e.name==='AbortError')throw new Error('no data for '+Math.round(STALL/1000)+' seconds');throw e;}",
+" finally{clearTimeout(tm);}",
+"}",
+"async function boot(bases){",
+" var why=[];",
+" for(var i=0;i<bases.length;i++){",
+"  var base=bases[i],done=0,last=-1;",
+"  var prog=function(n){done+=n;var p=Math.min(99,Math.floor(done*100/TOTAL));if(p!==last){last=p;postMessage({t:'prog',p:p});}};",
+"  mem={base:base};",
+"  try{",
+"   postMessage({t:'prog',p:0});",
+"   await grab(base+'pyodide.js',prog);",
+"   await grab(base+'pyodide.asm.js',prog);",
+"   mem['pyodide-lock.json']={b:await grab(base+'pyodide-lock.json',prog),t:'application/json'};",
+"   mem['python_stdlib.zip']={b:await grab(base+'python_stdlib.zip',prog),t:'application/zip'};",
+"   mem['pyodide.asm.wasm']={b:await grab(base+'pyodide.asm.wasm',prog),t:'application/wasm'};",
+"   postMessage({t:'status',s:'Starting Python...'});",
+"   _imp(base+'pyodide.js');",
+"   var p=await loadPyodide({indexURL:base});",
+"   mem={};return p;",
+"  }catch(e){mem={};why.push(host(base)+': '+((e&&e.message)||e));}",
+" }",
+" var err=new Error('Could not load the Python engine.\\n'+why.join('\\n'));err.load=1;throw err;",
+"}",
+"onmessage=async function(e){var m=e.data;",
+" if(m.stall)STALL=m.stall;",
+" try{",
+"  if(!py){postMessage({t:'status',s:'Loading Python...'});py=await boot(m.bases);",
 "   py.setStdout({raw:function(b){ob.push(b&255);if(b===10||ob.length>=512)fl(ob,'out');}});",
 "   py.setStderr({raw:function(b){eb.push(b&255);if(b===10||eb.length>=512)fl(eb,'err');}});",
-"   py.setStdin({stdin:function(){return si<stdin.length?stdin[si++]:undefined;}});}",
+"   py.setStdin({stdin:function(){return si<stdin.length?stdin[si++]:undefined;}});",
+"   postMessage({t:'ready'});}",
 "  stdin=String(m.stdin||'').replace(/\\r\\n?/g,'\\n').split('\\n');if(stdin.length&&stdin[stdin.length-1]==='')stdin.pop();si=0;",
 "  postMessage({t:'status',s:'Running...'});",
 "  try{await py.loadPackagesFromImports(m.code);}catch(x){}",
 "  var g=py.globals.get('dict')();g.set('__name__','__main__');",
 "  try{await py.runPythonAsync(m.code,{globals:g});}finally{g.destroy();fl(ob,'out');fl(eb,'err');}",
 "  postMessage({t:'done',ok:true});",
-" }catch(x){fl(ob,'out');fl(eb,'err');postMessage({t:'err',s:clean((x&&x.message)||x)+'\\n'});postMessage({t:'done',ok:false});}",
+" }catch(x){fl(ob,'out');fl(eb,'err');postMessage({t:'err',s:clean((x&&x.message)||x)+'\\n'});postMessage({t:'done',ok:false,load:x&&x.load?1:0});}",
 "};"
 ].join('\n');
 var IDET={
@@ -1883,13 +1956,21 @@ function ideSync(){
  $$('idehl').scrollTop=t.scrollTop;$$('idehl').scrollLeft=t.scrollLeft;$$('idegut').scrollTop=t.scrollTop;
 }
 function ideBusy(b){IDE.busy=b;var r=$$('iderun'),s=$$('idestop');if(r){r.disabled=b;r.classList.toggle('busy',b);}if(s)s.style.display=b?'':'none';}
+function ideWd(on){clearTimeout(IDE.wd);IDE.wd=0;if(!on)return;IDE.wd=setTimeout(function(){IDE.wd=0;if(!IDE.busy||IDE.wReady)return;try{IDE.w.terminate();}catch(x){}IDE.w=null;ideOut('\nThe Python engine did not start in time. Check your connection and try again.\n','ide-e');ideStatus('');ideBusy(false);},60000);}
 function ideWorker(){
  if(IDE.w)return IDE.w;
  var w=new Worker(URL.createObjectURL(new Blob([IDEW],{type:'text/javascript'})));
  w.onmessage=function(e){var m=e.data;
-  if(m.t==='out')ideOut(m.s);else if(m.t==='err')ideOut(m.s,'ide-e');else if(m.t==='status')ideStatus(m.s);
-  else if(m.t==='done'){IDE.wReady=true;var ms=Math.round(performance.now()-IDE.t0);ideOut('\n'+(m.ok?'Finished':'Stopped by an error')+' in '+(ms>1500?(ms/1000).toFixed(1)+' s':ms+' ms')+'\n','ide-i');ideStatus('');ideBusy(false);}};
- w.onerror=function(){ideOut('\nThe Python engine could not be loaded. Check your connection and try again.\n','ide-e');ideStatus('');ideBusy(false);IDE.w=null;try{w.terminate();}catch(x){}};
+  if(IDE.w!==w)return;
+  if(m.t==='out')ideOut(m.s);else if(m.t==='err')ideOut(m.s,'ide-e');
+  else if(m.t==='prog'){ideStatus('Loading Python... '+m.p+'% (about 14 MB, only the first time)');ideWd(true);}
+  else if(m.t==='status'){ideStatus(m.s);if(m.s==='Starting Python...')ideWd(true);}
+  else if(m.t==='ready'){IDE.wReady=true;ideWd(false);}
+  else if(m.t==='done'){ideWd(false);var ms=Math.round(performance.now()-IDE.t0);
+   if(m.load)ideOut('\nCheck your connection and try again.\n','ide-i');
+   else ideOut('\n'+(m.ok?'Finished':'Stopped by an error')+' in '+(ms>1500?(ms/1000).toFixed(1)+' s':ms+' ms')+'\n','ide-i');
+   ideStatus('');ideBusy(false);}};
+ w.onerror=function(){ideWd(false);ideOut('\nThe Python engine could not be started in this browser.\n','ide-e');ideStatus('');ideBusy(false);IDE.w=null;try{w.terminate();}catch(x){}};
  IDE.w=w;return w;
 }
 async function ideRemote(lang,code,stdin,sig){
@@ -1914,8 +1995,9 @@ async function ideRun(){
  if(!code.trim()){toast('Write some code first');return;}
  ideSave();$$('ideout').textContent='';ideBusy(true);IDE.t0=performance.now();
  if(lang==='python'){
-  ideStatus(IDE.wReady?'Running...':'Starting Python...');
-  ideWorker().postMessage({t:'run',code:code,stdin:stdin,base:PYBASE});
+  ideStatus(IDE.wReady?'Running...':'Loading Python...');
+  if(!IDE.wReady)ideWd(true);
+  ideWorker().postMessage({t:'run',code:code,stdin:stdin,bases:PYBASES});
   return;
  }
  ideStatus('Sending to the compile server...');
@@ -1943,7 +2025,7 @@ async function ideRun(){
 }
 function ideStop(){
  if(!IDE.busy)return;IDE.tok++;
- if(IDE.lang==='python'&&IDE.w){try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;ideOut('\nStopped.\n','ide-i');}
+ if(IDE.lang==='python'&&IDE.w){ideWd(false);try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;ideStatus('');ideOut('\nStopped.\n','ide-i');}
  else if(IDE.ab){try{IDE.ab.abort();}catch(e){}ideOut('\nStopped.\n','ide-i');}
  ideStatus('');ideBusy(false);
 }
@@ -1997,7 +2079,7 @@ function idePage(){nav('ide');
  $$('idekeys').querySelectorAll('button').forEach(function(b){b.onpointerdown=function(e){e.preventDefault();};b.onclick=function(){ideIns(b.dataset.k==='Tab'?'    ':b.dataset.k);};});
  ideSync();ideBusy(false);
 }
-window.addEventListener('hashchange',function(){if(location.hash!=='#/ide'&&IDE.w){try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;IDE.busy=false;}});
+window.addEventListener('hashchange',function(){if(location.hash!=='#/ide'&&IDE.w){ideWd(false);try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;IDE.busy=false;}});
 function isearchPage(){nav('isearch');
  app.innerHTML='<h1 style="font-size:2.2rem">Image Search</h1><p class="lead" style="font-size:1rem">Search by words or with a picture. Results come from our own independent image index, not from another search engine.</p>'+
   '<div class="card" id="idrop" style="margin-top:16px"><div class="row" style="flex-wrap:nowrap;gap:8px"><input type="text" id="iq" placeholder="Search by words, or paste an image link" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off"><label class="btn" style="cursor:pointer;display:inline-flex;align-items:center" title="Search with a picture">'+ico('image',18)+'<input type="file" id="ifile" accept="image/*" hidden></label><button class="btn pri" id="igo" style="display:inline-flex;align-items:center;gap:6px">'+ico('search',17,2.4)+'Search</button></div><div id="ithumb"></div><p class="hint" style="margin:10px 0 0">You can also drop or paste (Ctrl+V) a picture here to find similar ones.</p></div><div id="ires" style="margin-top:14px"></div>';
