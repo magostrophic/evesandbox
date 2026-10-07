@@ -58,7 +58,7 @@ input[type=text],input[type=number],input[type=password]{font:inherit;color:var(
 .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 6px 4px 12px;border-radius:99px;color:#1c1c1e;font-weight:600;font-size:.9rem}
 .chip button{border:0;background:rgba(0,0,0,.12);border-radius:50%;width:20px;height:20px;cursor:pointer;line-height:1;color:#1c1c1e}
-.wrap{overflow-x:auto;border-radius:16px;background:var(--card)}
+.wrap{position:relative;overflow-x:auto;border-radius:16px;background:var(--card)}
 table{border-collapse:collapse;width:100%;min-width:640px}
 th,td{border:.5px solid var(--line);padding:4px;text-align:center}
 th{background:var(--card);color:var(--mute);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;padding:10px 4px}
@@ -76,7 +76,7 @@ select option{color:#1c1c1e;background:#fff}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:rgba(60,60,67,.92);color:#fff;padding:10px 18px;border-radius:99px;display:none;z-index:30;font-size:.9rem}
 footer.foot{border-top:.5px solid var(--line);background:var(--card);margin-top:20px}
 .foot-in{max-width:1000px;margin:auto;padding:24px 16px;display:flex;flex-wrap:wrap;gap:16px 40px;justify-content:space-between;align-items:flex-start}
-.foot b{font-size:1rem;letter-spacing:-.02em}.foot b span{color:var(--brand)}
+.foot b{font-size:1rem;letter-spacing:-.02em}.foot b span{color:var(--brand)}.foot b.fb{display:flex;align-items:center;gap:9px}.foot b.fb .ft{color:var(--ink)}.foot b.fb .ft span{color:var(--brand)}
 .foot p{margin:.3em 0 0;color:var(--mute);font-size:.85rem;max-width:34ch}
 .foot nav{display:flex;flex-direction:column;gap:6px}
 .foot nav a{color:var(--brand);text-decoration:none;font-size:.9rem}
@@ -249,7 +249,7 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 .gbfound{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding-top:10px;border-top:.5px solid var(--line)}.gbfound .hint{display:block}
 .gbgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.gbit{display:flex;flex-direction:column;gap:3px;padding:12px}.gbth{height:130px;border-radius:12px;background:var(--fill);overflow:hidden;margin-bottom:6px}.gbth img{width:100%;height:100%;object-fit:cover;display:block}.gbtt{font-size:.95rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.gbit .hint{font-size:.8rem}
 .gbpv{display:block;max-width:100%;max-height:360px;border-radius:12px;margin-top:12px;background:#000;-webkit-touch-callout:none}
-.cs-h{position:absolute!important;opacity:0!important;pointer-events:none!important;width:1px!important;height:1px!important;margin:0!important;padding:0!important;border:0!important;overflow:hidden!important}
+.cs-h{position:absolute!important;left:0!important;top:0!important;opacity:0!important;pointer-events:none!important;width:1px!important;height:1px!important;margin:0!important;padding:0!important;border:0!important;overflow:hidden!important}
 .cs-t,select.cs-t{font:inherit;font-size:.95rem;font-weight:600;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;border:0;border-radius:8px;padding:9px 4px;color:#1c1c1e;background:transparent;cursor:pointer;text-align:center;line-height:1.25;min-width:0}
 .cs-t .cs-v{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cs-t .cs-c{flex:none;opacity:.7;transition:transform .15s}
@@ -281,21 +281,42 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .nst button{flex:1;display:flex;align-items:center;justify-content:center;border:0;padding:0;background:transparent;color:var(--brand);cursor:pointer;min-height:0}
 .nst button:hover{background:var(--fill)}.nst button:active{background:color-mix(in srgb,var(--fill) 70%,var(--brand))}
 @media (hover:none){.nst{display:none}}
-#sbar{position:fixed;top:0;right:0;bottom:0;width:0;z-index:2500;pointer-events:none;display:none}
-#sthumb{position:absolute;right:3px;top:0;width:5px;border-radius:99px;background:var(--brand);pointer-events:auto;touch-action:none;will-change:transform}
-#sthumb::before{content:"";position:absolute;top:0;bottom:0;left:-7px;right:-3px}
-#sthumb.on{width:7px;right:2px}
+#sbar{position:fixed;top:0;right:0;bottom:0;width:0;z-index:2500;pointer-events:none;display:none;opacity:0;transition:opacity .35s ease}
+#sbar.show{opacity:1;transition-duration:.12s}
+#sthumb{position:absolute;right:calc(3px + env(safe-area-inset-right,0px));top:0;width:3px;border-radius:99px;background:var(--brand);box-shadow:0 0 0 .5px rgba(255,255,255,.35);pointer-events:none;will-change:transform}
 .card.tool .ic{background:var(--brand)}
 @media print{#sbar,.cs-c{display:none!important}}
+.card.tool .ic.ired{background:#ff3b30}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .card.tool .ic.ired{background:#ff453a}}
+:root[data-theme="dark"] .card.tool .ic.ired{background:#ff453a}
+.idebar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0 12px}
+.btn.sm{padding:5px 12px;font-size:.82rem}.btn.pri.busy{opacity:.6}
+.ideed{padding:0;overflow:hidden}.ideoc{padding:0;margin-top:12px;overflow:hidden}
+.idehead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;border-bottom:.5px solid var(--line);font-size:.85rem;font-weight:600;color:var(--mute)}
+.idebody{display:flex;height:min(56vh,460px);min-height:260px;font:13.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+.idegut{margin:0;padding:12px 8px 12px 12px;text-align:right;color:var(--mute);overflow:hidden;-webkit-user-select:none;user-select:none;min-width:40px;font:inherit;border-right:.5px solid var(--line);white-space:pre;flex:none}
+.idemain{position:relative;flex:1;min-width:0}
+.idehl,.idemain textarea{position:absolute;inset:0;margin:0;padding:12px 14px 40px;font:inherit;tab-size:4;white-space:pre;border:0;letter-spacing:0;word-spacing:0;width:100%;height:100%}
+.idehl{pointer-events:none;color:var(--ink);overflow:hidden}.idehl code{font:inherit;display:block}
+.idemain textarea{background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:var(--brand);resize:none;outline:none;overflow:auto;scrollbar-width:none;-webkit-user-select:text;user-select:text}
+.idemain textarea::-webkit-scrollbar{display:none}
+.idemain textarea::selection{background:color-mix(in srgb,var(--brand) 35%,transparent)}
+.hk{color:#a855f7;font-weight:600}.hs{color:#16a34a}.hc{color:var(--mute);font-style:italic}.hn{color:#d97706}.hp{color:#e11d48}
+.idekeys{display:none;gap:6px;overflow-x:auto;padding:8px 10px;border-top:.5px solid var(--line)}
+.idekeys button{flex:none;min-width:38px;border:0;border-radius:8px;background:var(--fill);color:var(--ink);font:600 .9rem ui-monospace,Menlo,Consolas,monospace;padding:8px 10px;cursor:pointer}
+@media (hover:none){.idekeys{display:flex}}
+.idein{width:100%;border:0;border-radius:10px;background:var(--fill);color:var(--ink);padding:10px 12px;font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical;-webkit-user-select:text;user-select:text}
+.ideout{margin:0;padding:12px 14px;min-height:120px;max-height:340px;overflow:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;-webkit-user-select:text;user-select:text}
+.ide-e{color:#ff453a}.ide-i{color:var(--mute)}
 </style>
 </head>
 <body>
 <header class="nav" id="hdr"><div class="nav-in"><a class="logo" href="#/" aria-label="Eve Sandbox home"><span class="lm" id="lgimg" role="presentation"></span><span class="lt">Eve <span>Sandbox</span></span></a><nav class="menu" aria-label="Main"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></nav><button class="burger" id="burger" aria-label="Menu" aria-expanded="false" aria-controls="mpanel"><i></i><i></i><i></i></button></div><nav class="mpanel" id="mpanel" aria-label="Mobile menu"><div class="mlist"><a class="link" data-r="home" href="#/">Home</a><a class="link" data-r="tools" href="#/tools">Tools</a><a class="link" data-r="about" href="#/about">About</a><a class="link" data-r="contact" href="#/contact">Contact</a><a class="link" data-r="donate" href="#/donate">Donate</a></div></nav></header>
 <main id="app"></main>
 <footer class="foot"><div class="foot-in">
- <div><b>Eve <span>Sandbox</span></b><p>Simple tools to help students stay on top of their daily requirements.</p></div>
+ <div><b class="fb"><span class="lm"></span><span class="ft">Eve <span>Sandbox</span></span></b><p>Simple tools to help students stay on top of their daily requirements.</p></div>
  <nav><h4>Pages</h4><a href="#/">Home</a><a href="#/tools">Tools</a><a href="#/about">About</a><a href="#/contact">Contact</a><a href="#/donate">Donate</a></nav>
- <nav><h4>Tools</h4><a href="#/planner">Study Planner</a><a href="#/image">Image Tool</a><a href="#/pdf">PDF Tool</a><a href="#/virus">Virus Checker</a><a href="#/calc">Complex Calculator</a><a href="#/isearch">Image Search</a><a href="#/grab">Grab Box</a><a href="#/convert">File Converter</a></nav>
+ <nav><h4>Tools</h4><a href="#/calc">Complex Calculator</a><a href="#/ide">Eve IDE</a><a href="#/convert">File Converter</a><a href="#/grab">Grab Box</a><a href="#/isearch">Image Search</a><a href="#/image">Image Tool</a><a href="#/pdf">PDF Tool</a><a href="#/planner">Study Planner</a><a href="#/virus">Virus Checker</a></nav>
  <nav><h4>Legal</h4><a href="#/terms">Terms of Service</a><a href="#/privacy">Privacy</a></nav>
  <div class="copy">&copy; <span id="yr">2026</span> Eve Sandbox. All rights reserved.</div>
 </div></footer>
@@ -391,28 +412,32 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
  new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(scan);});}).observe(document.body,{childList:true,subtree:true});
  scan(document.body);
  window.addEventListener('hashchange',closeP);
- /* a blue scroll bar that also shows on phones, where the browser hides its own */
- var bar=document.createElement('div'),th=document.createElement('div'),de=document.documentElement,raf=0,drag=null;
- bar.id='sbar';th.id='sthumb';bar.appendChild(th);document.body.appendChild(bar);
+ /* a slim blue scroll indicator for phones: shows while scrolling, fades away when idle */
+ var bar=document.createElement('div'),th=document.createElement('div'),de=document.documentElement,hd=document.getElementById('hdr'),raf=0,hideT=0,lastY=-1;
+ bar.id='sbar';bar.setAttribute('aria-hidden','true');th.id='sthumb';bar.appendChild(th);document.body.appendChild(bar);
  function upd(){raf=0;
   if(window.innerWidth-de.clientWidth>2){bar.style.display='none';return;}
-  var H=de.clientHeight,T=Math.max(de.scrollHeight,document.body.scrollHeight),max=T-H;
-  if(max<8){bar.style.display='none';return;}
+  var H=window.innerHeight,T=Math.max(de.scrollHeight,document.body.scrollHeight),max=T-H;
+  if(max<24){bar.style.display='none';return;}
   bar.style.display='block';
-  var tr=H-16,h=Math.max(48,Math.round(tr*H/T)),y=8+(tr-h)*Math.min(1,Math.max(0,window.scrollY/max));
-  th.style.height=h+'px';th.style.transform='translateY('+y+'px)';
-  th._h=h;th._tr=tr;th._max=max;
+  var top=Math.max(0,hd?hd.getBoundingClientRect().bottom:0)+6,tr=Math.max(40,H-top-10),h=Math.max(36,Math.min(tr,Math.round(tr*H/T))),y=top+(tr-h)*Math.min(1,Math.max(0,(window.pageYOffset||de.scrollTop)/max));
+  th.style.height=h+'px';th.style.transform='translate3d(0,'+Math.round(y)+'px,0)';
  }
- function sched(){if(!raf)raf=requestAnimationFrame(upd);}
- window.addEventListener('scroll',sched,{passive:true});window.addEventListener('resize',sched);window.addEventListener('hashchange',function(){setTimeout(sched,80);});
- if(window.ResizeObserver)new ResizeObserver(sched).observe(document.body);
- th.addEventListener('pointerdown',function(e){e.preventDefault();th.setPointerCapture(e.pointerId);drag={y:e.clientY,s:window.scrollY};th.classList.add('on');});
- th.addEventListener('pointermove',function(e){if(!drag)return;var k=th._max/Math.max(1,th._tr-th._h);window.scrollTo(0,drag.s+(e.clientY-drag.y)*k);});
- ['pointerup','pointercancel'].forEach(function(n){th.addEventListener(n,function(){drag=null;th.classList.remove('on');});});
- sched();setTimeout(sched,400);
+ function onScroll(){
+  var y=window.pageYOffset||de.scrollTop;
+  if(y!==lastY){lastY=y;bar.classList.add('show');clearTimeout(hideT);hideT=setTimeout(function(){bar.classList.remove('show');},900);}
+  if(!raf)raf=requestAnimationFrame(upd);
+ }
+ function refresh(){if(!raf)raf=requestAnimationFrame(upd);}
+ window.addEventListener('scroll',onScroll,{passive:true});
+ window.addEventListener('resize',refresh);window.addEventListener('orientationchange',refresh);window.addEventListener('load',refresh);
+ window.addEventListener('hashchange',function(){bar.classList.remove('show');setTimeout(refresh,120);});
+ if(window.visualViewport)window.visualViewport.addEventListener('resize',refresh);
+ if(window.ResizeObserver){var ro=new ResizeObserver(refresh);ro.observe(document.body);ro.observe(de);}
+ refresh();setTimeout(refresh,400);
 })();
 
-(function(){var im=new Image();im.onload=function(){var e=document.getElementById('lgimg');if(e)e.classList.add('on');};im.src='evesandbox.png';
+(function(){var im=new Image();im.onload=function(){document.querySelectorAll('.lm').forEach(function(e){e.classList.add('on');});};im.src='evesandbox.png';
 ['gesturestart','gesturechange','gestureend'].forEach(function(n){document.addEventListener(n,function(e){e.preventDefault();});});
 document.addEventListener('touchmove',function(e){if(e.touches&&e.touches.length>1&&!(e.target.closest&&e.target.closest('.pvw,.vqb')))e.preventDefault();},{passive:false});
 document.addEventListener('contextmenu',function(e){if(e.target.closest&&e.target.closest('.logo'))e.preventDefault();});
@@ -442,6 +467,8 @@ var IC={
  fit:'<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>',
  hand:'<path d="M18 11V6a2 2 0 0 0-4 0M14 10V4a2 2 0 0 0-4 0v2M10 10.5V6a2 2 0 0 0-4 0v8M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>',
  swap:'<path d="M17 3l4 4-4 4M3 7h18M7 21l-4-4 4-4M21 17H3"/>',
+ play:'<path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/>',
+ code:'<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
  dlbox:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>'};
 function ico(n,z,w){z=z||20;return '<svg class="i" viewBox="0 0 24 24" width="'+z+'" height="'+z+'" fill="none" stroke="currentColor" stroke-width="'+(w||2)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>';}
@@ -459,7 +486,7 @@ function colorOf(n){for(var i=0;i<S.subjects.length;i++)if(S.subjects[i].n===n)r
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var app=document.getElementById('app');
 
-function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',isearch:'tools',grab:'tools',convert:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
+function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',isearch:'tools',grab:'tools',convert:'tools',ide:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
 
 function planner(){
  nav('planner');
@@ -1068,16 +1095,17 @@ function vDraw(){
  o.innerHTML=h;
 }
 
-var CFG={email:'',donate:[],lensApi:'',grabApi:''};
+var CFG={email:'',donate:[],lensApi:'',grabApi:'',runApi:''};
 var TL=[
- {r:'planner',c:'',ic:'calendar',n:'Study Planner',d:'Plan your week with subjects and time slots, then print it or save it as an image.'},
+ {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
+ {r:'ide',c:'ired',ic:'code',n:'Eve IDE',d:'Write and run Python, C and Java programs, with input and output right on the page.'},
+ {r:'convert',c:'i8',ic:'swap',n:'File Converter',d:'Turn pictures, PDFs, documents, spreadsheets and audio into another format, right on your device.'},
+ {r:'grab',c:'i7',ic:'dlbox',n:'Grab Box',d:'Paste a link to a file or a page and download the video, audio or document on it.'},
+ {r:'isearch',c:'i6',ic:'search',n:'Image Search',d:'Search by words or with a picture, using our own independent image index.'},
  {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop and remove plain backgrounds from images.'},
  {r:'pdf',c:'i3',ic:'pdf',n:'PDF Tool',d:'Make, merge, split and compress PDFs, and add or remove passwords.'},
- {r:'virus',c:'i4',ic:'shield',n:'Virus Checker',d:'Check whether a website or link looks safe before you open it.'},
- {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
- {r:'isearch',c:'i6',ic:'search',n:'Image Search',d:'Search by words or with a picture, using our own independent image index.'},
- {r:'grab',c:'i7',ic:'dlbox',n:'Grab Box',d:'Paste a link to a file or a page and download the video, audio or document on it.'},
- {r:'convert',c:'i8',ic:'swap',n:'File Converter',d:'Turn pictures, PDFs, documents, spreadsheets and audio into another format, right on your device.'}];
+ {r:'planner',c:'',ic:'calendar',n:'Study Planner',d:'Plan your week with subjects and time slots, then print it or save it as an image.'},
+ {r:'virus',c:'i4',ic:'shield',n:'Virus Checker',d:'Check whether a website or link looks safe before you open it.'}];
 function toolsGrid(){return '<div class="grid">'+TL.map(function(t){return '<a class="card tool" href="#/'+t.r+'"><span class="ic '+t.c+'">'+ico(t.ic,24)+'</span><h3>'+t.n+'</h3><p>'+t.d+'</p></a>';}).join('')+'<div class="card soon"><span class="tag">Coming soon</span><h3>More tools</h3><p>New features are on the way.</p></div></div>';}
 function blobs(){return '<span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span><span class="blob b4"></span>';}
 function banner(tag,title,sub){return '<section class="hero sm">'+blobs()+'<div class="hin"><span class="pill">'+tag+'</span><h1>'+title+'</h1><p class="lead">'+sub+'</p></div></section>';}
@@ -1137,7 +1165,7 @@ function privacyPage(){nav('privacy');
  app.innerHTML=banner('Legal','Privacy','Last updated: October 3, 2026')+
  '<div class="wrapc doc" style="max-width:760px"><h2 style="margin-top:0">The short version</h2><p>No accounts. Your images and PDFs stay on your device. We do not add analytics or advertising code to this site.</p>'+
  '<h2>What stays on your device</h2><ul><li>Images and PDFs you open in the tools are processed in your browser and are never sent to us.</li><li>The Study Planner saves your plan in your browser’s local storage so it is there next time. Clearing your browser data removes it.</li></ul>'+
- '<h2>What leaves your device</h2><ul><li><b>Virus Checker:</b> the domain you enter is sent to Cloudflare (DNS), rdap.org (domain registration records) and Reddit (search) to fetch results. The tool never contacts the entered site itself. Those services have their own privacy policies.</li><li><b>PDF tools:</b> the PDF software libraries are downloaded from a public content delivery network the first time you use them.</li><li><b>Links you open</b> (such as VirusTotal or Reddit) take you to other websites with their own policies.</li><li><b>Contact form:</b> if you send a message, it goes by email to the address on the Contact page, including anything you type.</li></ul>'+
+ '<h2>What leaves your device</h2><ul><li><b>Virus Checker:</b> the domain you enter is sent to Cloudflare (DNS), rdap.org (domain registration records) and Reddit (search) to fetch results. The tool never contacts the entered site itself. Those services have their own privacy policies.</li><li><b>PDF tools:</b> the PDF software libraries are downloaded from a public content delivery network the first time you use them.</li><li><b>Eve IDE:</b> Python runs on your device after its engine is downloaded from a public content delivery network. When you run C or Java, your code and input are sent to a free online compile server, which compiles and runs them and sends back the result.</li><li><b>File Converter and Grab Box:</b> files are converted on your device. Some conversions download a software library from a public content delivery network the first time. Grab Box fetches the link you paste from the website it points to.</li><li><b>Links you open</b> (such as VirusTotal or Reddit) take you to other websites with their own policies.</li><li><b>Contact form:</b> if you send a message, it goes by email to the address on the Contact page, including anything you type.</li></ul>'+
  '<h2>Hosting</h2><p>Whoever hosts the site may keep ordinary server logs, such as IP addresses and page requests, under their own policy.</p>'+
  '<h2>Questions</h2><p>Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
 var CKEY='eve-sandbox:calc:v1';
@@ -1799,6 +1827,177 @@ function convertPage(){nav('convert');
  var d=$$('fcdrop');d.ondragover=function(e){e.preventDefault();};d.ondrop=function(e){e.preventDefault();if(e.dataTransfer.files.length)fcAdd(e.dataTransfer.files);};
  fcRows();
 }
+/* ---------- Eve IDE ---------- */
+var PYBASE='https://cdn.jsdelivr.net/pyodide/v0.27.7/full/';
+var IDEW=[
+"var py=null,stdin=[],si=0,ob=[],eb=[];",
+"function fl(a,t){if(a.length){postMessage({t:t,s:new TextDecoder().decode(new Uint8Array(a))});a.length=0;}}",
+"function clean(m){var L=String(m).split('\\n'),o=[];for(var i=0;i<L.length;i++){var l=L[i];if(/^\\s+File \"(\\/lib\\/python|\\/home\\/pyodide|<exec>|<console>)/.test(l)&&!/<exec>/.test(l)){i++;continue;}o.push(l.replace(/File \"<exec>\"/,'File \"main.py\"'));}return o.join('\\n').replace(/\\s+$/,'');}",
+"onmessage=async function(e){var m=e.data;",
+" try{",
+"  if(!py){postMessage({t:'status',s:'Loading Python (about 10 MB, only the first time)...'});importScripts(m.base+'pyodide.js');py=await loadPyodide({indexURL:m.base});",
+"   py.setStdout({raw:function(b){ob.push(b&255);if(b===10||ob.length>=512)fl(ob,'out');}});",
+"   py.setStderr({raw:function(b){eb.push(b&255);if(b===10||eb.length>=512)fl(eb,'err');}});",
+"   py.setStdin({stdin:function(){return si<stdin.length?stdin[si++]:undefined;}});}",
+"  stdin=String(m.stdin||'').replace(/\\r\\n?/g,'\\n').split('\\n');if(stdin.length&&stdin[stdin.length-1]==='')stdin.pop();si=0;",
+"  postMessage({t:'status',s:'Running...'});",
+"  try{await py.loadPackagesFromImports(m.code);}catch(x){}",
+"  var g=py.globals.get('dict')();g.set('__name__','__main__');",
+"  try{await py.runPythonAsync(m.code,{globals:g});}finally{g.destroy();fl(ob,'out');fl(eb,'err');}",
+"  postMessage({t:'done',ok:true});",
+" }catch(x){fl(ob,'out');fl(eb,'err');postMessage({t:'err',s:clean((x&&x.message)||x)+'\\n'});postMessage({t:'done',ok:false});}",
+"};"
+].join('\n');
+var IDET={
+ python:'# Python runs right here on your device.\nname = input("Your name? ")\nprint("Hello,", name + "!")\n\nfor i in range(1, 4):\n    print(i, "x", i, "=", i * i)\n',
+ c:'#include <stdio.h>\n\nint main(void) {\n    char name[64];\n    printf("Your name? ");\n    scanf("%63s", name);\n    printf("Hello, %s!\\n", name);\n    for (int i = 1; i <= 3; i++) {\n        printf("%d x %d = %d\\n", i, i, i * i);\n    }\n    return 0;\n}\n',
+ java:'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner in = new Scanner(System.in);\n        System.out.print("Your name? ");\n        String name = in.next();\n        System.out.println("Hello, " + name + "!");\n        for (int i = 1; i <= 3; i++) {\n            System.out.println(i + " x " + i + " = " + (i * i));\n        }\n    }\n}\n'
+};
+var IDEN={python:'main.py',c:'main.c',java:'Main.java'},IDEL={python:'Python',c:'C',java:'Java'};
+var IDE={lang:'python',code:{python:IDET.python,c:IDET.c,java:IDET.java},stdin:'',w:null,busy:false,tok:0,ab:null,wReady:false};
+function ideLoad(){try{var d=JSON.parse(localStorage.getItem('eveide')||'null');if(d&&d.code){['python','c','java'].forEach(function(k){if(typeof d.code[k]==='string')IDE.code[k]=d.code[k];});if(IDET[d.lang])IDE.lang=d.lang;if(typeof d.stdin==='string')IDE.stdin=d.stdin;}}catch(e){}}
+function ideSave(){try{localStorage.setItem('eveide',JSON.stringify({lang:IDE.lang,code:IDE.code,stdin:IDE.stdin}));}catch(e){}}
+function ideHl(src,lang){
+ var kw={python:'False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield',
+  c:'auto break case char const continue default do double else enum extern float for goto if inline int long register restrict return short signed sizeof static struct switch typedef union unsigned void volatile while',
+  java:'abstract assert boolean break byte case catch char class const continue default do double else enum extends final finally float for goto if implements import instanceof int interface long native new package private protected public return short static super switch synchronized this throw throws try void volatile while var record true false null String'}[lang];
+ var str='"(?:\\\\.|[^"\\\\\\n])*"?|\'(?:\\\\.|[^\'\\\\\\n])*\'?';
+ var cm=lang==='python'?'#.*|\'\'\'[\\s\\S]*?(?:\'\'\'|$)|"""[\\s\\S]*?(?:"""|$)':'\\/\\/.*|\\/\\*[\\s\\S]*?(?:\\*\\/|$)';
+ var pre=lang==='c'?'|^[ \\t]*#[ \\t]*\\w+':'';
+ var re=new RegExp('('+cm+'|'+str+pre+')|\\b(\\d[\\w.]*)\\b|\\b('+kw.split(' ').join('|')+')\\b','gm');
+ var out='',last=0,m;
+ while((m=re.exec(src))){
+  if(m[0]==='')break;
+  out+=esc(src.slice(last,m.index));
+  var c=m[1]!==undefined?(/^\s*#\s*\w/.test(m[1])&&lang==='c'?'hp':(/^(#|\/\/|\/\*)/.test(m[1])?'hc':'hs')):(m[2]!==undefined?'hn':'hk');
+  out+='<span class="'+c+'">'+esc(m[0])+'</span>';last=m.index+m[0].length;
+ }
+ return out+esc(src.slice(last))+'\n ';
+}
+function ideOut(s,cls){var o=$$('ideout');if(!o)return;var sp=document.createElement('span');if(cls)sp.className=cls;sp.textContent=s;o.appendChild(sp);var near=o.scrollHeight-o.scrollTop-o.clientHeight<80;if(near)o.scrollTop=o.scrollHeight;if(o.childNodes.length>4000)o.removeChild(o.firstChild);}
+function ideStatus(s){var e=$$('idest');if(e)e.textContent=s||'';}
+function ideSync(){
+ var t=$$('idecode');if(!t)return;
+ $$('idehl').firstChild.innerHTML=ideHl(t.value,IDE.lang);
+ var n=t.value.split('\n').length,g='';for(var i=1;i<=n;i++)g+=i+'\n';$$('idegut').textContent=g;
+ $$('idehl').scrollTop=t.scrollTop;$$('idehl').scrollLeft=t.scrollLeft;$$('idegut').scrollTop=t.scrollTop;
+}
+function ideBusy(b){IDE.busy=b;var r=$$('iderun'),s=$$('idestop');if(r){r.disabled=b;r.classList.toggle('busy',b);}if(s)s.style.display=b?'':'none';}
+function ideWorker(){
+ if(IDE.w)return IDE.w;
+ var w=new Worker(URL.createObjectURL(new Blob([IDEW],{type:'text/javascript'})));
+ w.onmessage=function(e){var m=e.data;
+  if(m.t==='out')ideOut(m.s);else if(m.t==='err')ideOut(m.s,'ide-e');else if(m.t==='status')ideStatus(m.s);
+  else if(m.t==='done'){IDE.wReady=true;var ms=Math.round(performance.now()-IDE.t0);ideOut('\n'+(m.ok?'Finished':'Stopped by an error')+' in '+(ms>1500?(ms/1000).toFixed(1)+' s':ms+' ms')+'\n','ide-i');ideStatus('');ideBusy(false);}};
+ w.onerror=function(){ideOut('\nThe Python engine could not be loaded. Check your connection and try again.\n','ide-e');ideStatus('');ideBusy(false);IDE.w=null;try{w.terminate();}catch(x){}};
+ IDE.w=w;return w;
+}
+async function ideRemote(lang,code,stdin,sig){
+ var base=(CFG.runApi||'https://ce.judge0.com').replace(/\/+$/,''),id={c:50,java:62}[lang];
+ var b64=function(s){return btoa(unescape(encodeURIComponent(s)));},un=function(s){try{return s?decodeURIComponent(escape(atob(s))):'';}catch(e){return s||'';}};
+ var r=await fetch(base+'/submissions?base64_encoded=true&wait=false',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source_code:b64(code),language_id:id,stdin:b64(stdin||'')}),signal:sig});
+ if(r.status===429)throw {busy:1};if(!r.ok)throw {http:r.status};
+ var tok=(await r.json()).token;if(!tok)throw {http:0};
+ for(var i=0;i<50;i++){
+  await new Promise(function(res){setTimeout(res,i<3?500:900);});
+  if(sig.aborted)throw {abort:1};
+  var g=await fetch(base+'/submissions/'+encodeURIComponent(tok)+'?base64_encoded=true&fields=stdout,stderr,compile_output,message,status,time,memory',{signal:sig});
+  if(g.status===429)throw {busy:1};if(!g.ok)throw {http:g.status};
+  var d=await g.json();
+  if(d.status&&d.status.id>2)return {id:d.status.id,desc:d.status.description,out:un(d.stdout),err:un(d.stderr),comp:un(d.compile_output),msg:un(d.message),time:d.time,mem:d.memory};
+ }
+ throw {timeout:1};
+}
+async function ideRun(){
+ if(IDE.busy)return;
+ var code=$$('idecode').value,stdin=$$('idein').value,lang=IDE.lang,tok=++IDE.tok;
+ if(!code.trim()){toast('Write some code first');return;}
+ ideSave();$$('ideout').textContent='';ideBusy(true);IDE.t0=performance.now();
+ if(lang==='python'){
+  ideStatus(IDE.wReady?'Running...':'Starting Python...');
+  ideWorker().postMessage({t:'run',code:code,stdin:stdin,base:PYBASE});
+  return;
+ }
+ ideStatus('Sending to the compile server...');
+ IDE.ab=new AbortController();
+ try{
+  var d=await ideRemote(lang,code,stdin,IDE.ab.signal);
+  if(tok!==IDE.tok)return;
+  if(d.id===6){ideOut(d.comp||d.msg||'Compilation failed.','ide-e');ideOut('\nCompilation failed.\n','ide-i');}
+  else{
+   if(d.out)ideOut(d.out);if(d.err)ideOut(d.err,'ide-e');
+   if(d.id===5)ideOut('\nTime limit exceeded. The program ran for too long.\n','ide-e');
+   else if(d.id===3)ideOut('\nFinished'+(d.time?' in '+Math.round(parseFloat(d.time)*1000)+' ms':'')+'\n','ide-i');
+   else if(d.id===13||d.id===14)ideOut('\n'+(d.msg||d.desc)+'\n','ide-e');
+   else ideOut('\n'+(d.desc||'Stopped by an error')+(d.msg?': '+d.msg:'')+'\n','ide-e');
+  }
+ }catch(e){
+  if(tok!==IDE.tok)return;
+  if(e&&(e.abort||e.name==='AbortError'))ideOut('Stopped.\n','ide-i');
+  else if(e&&e.busy)ideOut('The free compile server is busy right now. Wait a minute and try again. Python programs are not affected.\n','ide-e');
+  else if(e&&e.timeout)ideOut('The compile server took too long to answer. Try again in a moment.\n','ide-e');
+  else if(e&&e.http)ideOut('The compile server answered with an error ('+e.http+'). Try again in a moment.\n','ide-e');
+  else ideOut('The free C and Java compile server could not be reached. Check your connection and try again. Python programs still run on your device.\n','ide-e');
+ }
+ if(tok===IDE.tok){ideStatus('');ideBusy(false);}
+}
+function ideStop(){
+ if(!IDE.busy)return;IDE.tok++;
+ if(IDE.lang==='python'&&IDE.w){try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;ideOut('\nStopped.\n','ide-i');}
+ else if(IDE.ab){try{IDE.ab.abort();}catch(e){}ideOut('\nStopped.\n','ide-i');}
+ ideStatus('');ideBusy(false);
+}
+function ideSetLang(l){
+ var t=$$('idecode');if(t)IDE.code[IDE.lang]=t.value;
+ IDE.lang=l;ideSave();
+ $$('idetabs').querySelectorAll('a').forEach(function(a){a.classList.toggle('on',a.dataset.l===l);});
+ t.value=IDE.code[l];$$('idefn').textContent=IDEN[l];
+ $$('idenote').style.display=l==='python'?'none':'';
+ ideSync();
+}
+function ideIns(txt){var t=$$('idecode');t.focus();var s=t.selectionStart,e=t.selectionEnd;t.setRangeText(txt,s,e,'end');t.dispatchEvent(new Event('input',{bubbles:true}));}
+function ideKey(e){
+ var t=e.target;
+ if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();ideRun();return;}
+ if(e.key==='Tab'){e.preventDefault();var s=t.selectionStart,en=t.selectionEnd,v=t.value;
+  if(s!==en&&v.slice(s,en).indexOf('\n')>=0){var a=v.lastIndexOf('\n',s-1)+1,blk=v.slice(a,en),nb=e.shiftKey?blk.replace(/^( {1,4}|\t)/gm,''):blk.replace(/^/gm,'    ');t.setRangeText(nb,a,en,'select');t.selectionStart=a;t.selectionEnd=a+nb.length;}
+  else if(e.shiftKey){var b=v.lastIndexOf('\n',s-1)+1,m=/^( {1,4}|\t)/.exec(v.slice(b));if(m){t.setRangeText('',b,b+m[0].length,'preserve');t.selectionStart=t.selectionEnd=Math.max(b,s-m[0].length);}}
+  else ideIns('    ');
+  t.dispatchEvent(new Event('input',{bubbles:true}));return;}
+ if(e.key==='Enter'&&!e.ctrlKey&&!e.metaKey){
+  e.preventDefault();var s2=t.selectionStart,v2=t.value,ls=v2.lastIndexOf('\n',s2-1)+1,line=v2.slice(ls,s2),ind=/^[ \t]*/.exec(line)[0];
+  var open=IDE.lang==='python'?/:\s*(#.*)?$/.test(line):/[{(\[]\s*$/.test(line);
+  var close=IDE.lang!=='python'&&/^[ \t]*[}\])]/.test(v2.slice(s2));
+  if(open&&close){var ins='\n'+ind+'    \n'+ind;t.setRangeText(ins,s2,t.selectionEnd,'end');t.selectionStart=t.selectionEnd=s2+ind.length+5;}
+  else ideIns('\n'+ind+(open?'    ':''));
+  t.dispatchEvent(new Event('input',{bubbles:true}));return;}
+}
+function idePage(){nav('ide');
+ ideLoad();
+ app.innerHTML='<h1 style="font-size:2.2rem">Eve IDE</h1><p class="lead" style="font-size:1rem">Write and run Python, C and Java programs. Press Run, or Ctrl+Enter.</p>'+
+ '<div class="idebar"><div class="seg" id="idetabs">'+['python','c','java'].map(function(l){return '<a href="javascript:void 0" data-l="'+l+'"'+(l===IDE.lang?' class="on"':'')+'>'+IDEL[l]+'</a>';}).join('')+'</div>'+
+ '<div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn" id="idestop" style="display:none">Stop</button><button class="btn pri" id="iderun">'+ico('play',15,2.6)+' Run</button></div></div>'+
+ '<div class="card ideed"><div class="idehead"><span id="idefn">'+IDEN[IDE.lang]+'</span><span class="row" style="gap:6px"><button class="btn sm" id="ideopen">Open</button><button class="btn sm" id="idesave">Save</button><button class="btn sm" id="idereset">Example</button></span></div>'+
+ '<div class="idebody"><pre class="idegut" id="idegut" aria-hidden="true"></pre><div class="idemain"><pre class="idehl" id="idehl" aria-hidden="true"><code></code></pre><textarea id="idecode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="Code editor"></textarea></div></div>'+
+ '<div class="idekeys" id="idekeys">'+['Tab','{','}','(',')','[',']','"',';',':','#','<','>','='].map(function(k){return '<button type="button" tabindex="-1" data-k="'+k+'">'+(k==='Tab'?'Tab':esc(k))+'</button>';}).join('')+'</div></div>'+
+ '<p class="hint idenote" id="idenote" style="margin:8px 2px 0;display:none">C and Java are compiled on a free online server, so your code is sent to it. Python runs on your device. In Java, name the main class <b>Main</b>.</p>'+
+ '<div class="card" style="margin-top:12px;padding:14px"><label class="hint" for="idein" style="display:block;margin-bottom:6px">Input for your program, one value per line (optional)</label><textarea id="idein" class="idein" rows="2" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="Type what input() / scanf / Scanner should read"></textarea></div>'+
+ '<div class="card ideoc"><div class="idehead"><span>Output <span class="hint" id="idest" style="margin-left:8px"></span></span><button class="btn sm" id="ideclr">Clear</button></div><pre class="ideout" id="ideout" aria-live="polite"></pre></div>';
+ var t=$$('idecode');t.value=IDE.code[IDE.lang];$$('idein').value=IDE.stdin;$$('idenote').style.display=IDE.lang==='python'?'none':'';
+ t.addEventListener('input',function(){IDE.code[IDE.lang]=t.value;ideSync();ideSave();});
+ t.addEventListener('scroll',function(){$$('idehl').scrollTop=t.scrollTop;$$('idehl').scrollLeft=t.scrollLeft;$$('idegut').scrollTop=t.scrollTop;});
+ t.addEventListener('keydown',ideKey);
+ $$('idein').addEventListener('input',function(){IDE.stdin=this.value;ideSave();});
+ $$('idetabs').querySelectorAll('a').forEach(function(a){a.onclick=function(){if(IDE.busy)ideStop();ideSetLang(a.dataset.l);};});
+ $$('iderun').onclick=ideRun;$$('idestop').onclick=ideStop;$$('ideclr').onclick=function(){$$('ideout').textContent='';};
+ $$('idereset').onclick=function(){t.value=IDET[IDE.lang];IDE.code[IDE.lang]=t.value;ideSync();ideSave();};
+ $$('idesave').onclick=function(){fileSave(new Blob([t.value],{type:'text/plain'}),IDEN[IDE.lang]);};
+ $$('ideopen').onclick=function(){var i=document.createElement('input');i.type='file';i.accept='.py,.c,.h,.java,.txt';i.onchange=function(){var f=i.files[0];if(!f)return;if(f.size>500000){toast('That file is too large');return;}
+   f.text().then(function(tx){var x=(/\.(\w+)$/.exec(f.name)||[])[1];var l={py:'python',c:'c',h:'c',java:'java'}[(x||'').toLowerCase()];if(l&&l!==IDE.lang)ideSetLang(l);t.value=tx;IDE.code[IDE.lang]=tx;ideSync();ideSave();});};i.click();};
+ $$('idekeys').querySelectorAll('button').forEach(function(b){b.onpointerdown=function(e){e.preventDefault();};b.onclick=function(){ideIns(b.dataset.k==='Tab'?'    ':b.dataset.k);};});
+ ideSync();ideBusy(false);
+}
+window.addEventListener('hashchange',function(){if(location.hash!=='#/ide'&&IDE.w){try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;IDE.busy=false;}});
 function isearchPage(){nav('isearch');
  app.innerHTML='<h1 style="font-size:2.2rem">Image Search</h1><p class="lead" style="font-size:1rem">Search by words or with a picture. Results come from our own independent image index, not from another search engine.</p>'+
   '<div class="card" id="idrop" style="margin-top:16px"><div class="row" style="flex-wrap:nowrap;gap:8px"><input type="text" id="iq" placeholder="Search by words, or paste an image link" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off"><label class="btn" style="cursor:pointer;display:inline-flex;align-items:center" title="Search with a picture">'+ico('image',18)+'<input type="file" id="ifile" accept="image/*" hidden></label><button class="btn pri" id="igo" style="display:inline-flex;align-items:center;gap:6px">'+ico('search',17,2.4)+'Search</button></div><div id="ithumb"></div><p class="hint" style="margin:10px 0 0">You can also drop or paste (Ctrl+V) a picture here to find similar ones.</p></div><div id="ires" style="margin-top:14px"></div>';
@@ -1816,8 +2015,8 @@ document.addEventListener('paste',function(e){if(location.hash!=='#/isearch')ret
 
 
 function route(){var r=location.hash.replace('#/','');menu(false);app.onclick=null;
- app.classList.toggle('full',r===''||r==='home'||!!FULL[r]||(['planner','image','pdf','virus','calc','isearch','grab','convert','index-admin'].indexOf(r)<0));
- if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='isearch')isearchPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='index-admin')indexAdminPage();else if(FULL[r])FULL[r]();else home();window.scrollTo(0,0);}
+ app.classList.toggle('full',r===''||r==='home'||!!FULL[r]||(['planner','image','pdf','virus','calc','isearch','grab','convert','ide','index-admin'].indexOf(r)<0));
+ if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='isearch')isearchPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='index-admin')indexAdminPage();else if(FULL[r])FULL[r]();else home();window.scrollTo(0,0);}
 
 document.getElementById('yr').textContent=new Date().getFullYear();window.addEventListener('hashchange',route);route();
 })();
