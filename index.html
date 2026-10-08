@@ -246,6 +246,7 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 .note{padding:12px 14px;border-radius:12px;background:var(--fill);font-size:.92rem;margin-top:12px;line-height:1.45}.note.bad{background:rgba(255,69,58,.14)}.note a{color:var(--brand)}
 .gbbar{height:8px;border-radius:99px;background:var(--fill);overflow:hidden;margin-top:12px}.gbbar i{display:block;height:100%;width:0;background:var(--brand);border-radius:99px;transition:width .15s}.gbbar i.ind{animation:gbi 1.1s ease-in-out infinite alternate}@keyframes gbi{from{margin-left:0;width:20%}to{margin-left:80%;width:20%}}
 .fctop .rm{border:0;background:var(--fill);color:var(--mute);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;width:32px;height:32px;border-radius:99px;flex:none}
+.fcsel{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:end}.fcsel .fld{margin-top:0;min-width:0}.fcarr{display:flex;align-items:center;justify-content:center;height:46px;color:var(--mute)}
 .fcrow{padding:14px;margin-top:10px}.fctop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.fcres{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.fcres .btn{display:inline-flex;align-items:center;gap:6px;max-width:100%}.fcrow .sel{max-width:100%}
 .gbfound{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding-top:10px;border-top:.5px solid var(--line)}.gbfound .hint{display:block}
 .gbgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}.gbit{display:flex;flex-direction:column;gap:3px;padding:12px}.gbth{height:130px;border-radius:12px;background:var(--fill);overflow:hidden;margin-bottom:6px}.gbth img{width:100%;height:100%;object-fit:cover;display:block}.gbtt{font-size:.95rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.gbit .hint{font-size:.8rem}
@@ -292,6 +293,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 :root[data-theme="dark"] .card.tool .ic.ired{background:#ff453a}
 .idebar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0 12px}
 .btn.sm{padding:5px 12px;font-size:.82rem}.btn.pri.busy{opacity:.6}
+#iderun{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;padding:0;border-radius:50%}#iderun svg{fill:currentColor}#iderun:disabled{cursor:default}#idestop{height:48px;padding:0 20px}
 .ideed{padding:0;overflow:hidden}.ideoc{padding:0;margin-top:12px;overflow:hidden}
 .idehead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;border-bottom:.5px solid var(--line);font-size:.85rem;font-weight:600;color:var(--mute)}
 .idebody{display:flex;height:min(56vh,460px);min-height:260px;font:13.5px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
@@ -306,6 +308,97 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .idekeys{display:none;gap:6px;overflow-x:auto;padding:8px 10px;border-top:.5px solid var(--line)}
 .idekeys button{flex:none;min-width:38px;border:0;border-radius:8px;background:var(--fill);color:var(--ink);font:600 .9rem ui-monospace,Menlo,Consolas,monospace;padding:8px 10px;cursor:pointer}
 @media (hover:none){.idekeys{display:flex}}
+/* Eve AI */
+.aiw{max-width:780px;margin:0 auto}
+.aihd{display:flex;align-items:center;gap:12px;margin-top:4px}
+.aihd h1{font-size:1.8rem;margin:0;letter-spacing:-.03em;line-height:1.1}.aihd p{margin:0;color:var(--mute);font-size:.92rem}
+.aiav{flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;color:#fff;background:linear-gradient(135deg,#ff7eb3 0%,#a56bff 55%,#3a8bff 100%);box-shadow:0 4px 14px rgba(165,107,255,.35)}
+.aiav.sm{width:30px;height:30px;box-shadow:none;margin-top:2px}.aiav.big{width:68px;height:68px;margin:0 auto}
+.aibt{display:inline-flex;align-items:center;gap:6px}.aibt em{font-style:normal;background:var(--brand);color:#fff;border-radius:99px;font-size:.7rem;font-weight:700;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 5px}
+@media (max-width:520px){.aibt span{display:none}.aibt{padding:9px 11px}}
+.aichips{display:flex;gap:8px;overflow-x:auto;padding:14px 2px 4px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;position:relative}
+@media(min-width:720px){.aichips{flex-wrap:wrap;overflow:visible}}
+.aichips::-webkit-scrollbar{display:none}
+.aichips button{flex:none;border:0;border-radius:99px;padding:8px 14px;background:var(--fill);color:var(--ink);font:inherit;font-weight:600;font-size:.88rem;cursor:pointer}
+.aichips button.on{background:var(--brand);color:#fff}
+.aiopt{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.aisel{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;color:var(--mute);font-weight:600}
+.aipill{border:1px solid var(--line);background:transparent;color:var(--mute);border-radius:99px;padding:6px 12px;font:inherit;font-size:.85rem;font-weight:600;cursor:pointer}
+.aipill.on{background:color-mix(in srgb,var(--brand) 16%,transparent);border-color:var(--brand);color:var(--brand)}
+.aith{display:flex;flex-direction:column;gap:14px;margin:18px 0 16px;min-height:140px}
+.aim{display:flex;gap:10px;align-items:flex-start;max-width:100%}
+.aim.me{justify-content:flex-end}
+.aic{min-width:0;display:flex;flex-direction:column;align-items:flex-start;max-width:min(calc(100% - 40px),680px)}
+.aim.wide .aic{flex:1 1 auto;width:100%}
+.aib{min-width:0;border-radius:18px;padding:11px 15px;line-height:1.5;font-size:.98rem;overflow-wrap:anywhere}
+.aim.eve .aib{background:var(--card);border-top-left-radius:6px;max-width:100%}
+.aim.wide .aib{width:100%}
+.aim.me .aib{background:var(--brand);color:#fff;border-bottom-right-radius:6px;white-space:pre-wrap;max-width:min(88%,560px)}
+.aib p{margin:0 0 .65em}.aib>:last-child{margin-bottom:0}
+.aib h3,.aib h4{margin:.85em 0 .3em;font-size:1.02rem;letter-spacing:-.01em}.aib>h3:first-child,.aib>h4:first-child{margin-top:0}
+.aib ul,.aib ol{margin:.2em 0 .65em;padding-left:1.35em}.aib li{margin:.15em 0}.aib li>ul,.aib li>ol{margin:.2em 0}
+.aib a{color:var(--brand)}.aib hr{border:0;border-top:.5px solid var(--line);margin:.9em 0}
+.aib blockquote{margin:.5em 0;padding:2px 0 2px 12px;border-left:3px solid var(--brand);color:var(--mute)}
+.aib code{font:.86em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--fill);padding:1px 5px;border-radius:6px}
+.aicode{margin:.55em 0;border-radius:12px;background:var(--fill);overflow:hidden}.aicode code{background:none;padding:0;font-size:.85rem}
+.aich{display:flex;justify-content:space-between;align-items:center;padding:5px 6px 5px 12px;font-size:.74rem;font-weight:600;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}
+.aicp{border:0;background:transparent;color:var(--brand);font:inherit;font-size:.78rem;font-weight:600;cursor:pointer;padding:3px 8px;text-transform:none;letter-spacing:0}
+.aicode pre{margin:0;padding:2px 12px 12px;overflow:auto;tab-size:4;-webkit-user-select:text;user-select:text}
+.aitw{overflow-x:auto;margin:.5em 0}.aitb{border-collapse:collapse;font-size:.92rem}.aitb th,.aitb td{border:.5px solid var(--line);padding:6px 10px;text-align:left}.aitb th{background:var(--fill)}
+.aimath{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.9em;color:var(--mute)}.aimath[data-k="1"]{font-family:inherit;font-size:inherit;color:inherit}
+.aimath[data-d="1"][data-k="1"]{display:block;overflow-x:auto;overflow-y:hidden;padding:4px 0}
+.aib .katex{font-size:1.06em}.aib .katex-display{margin:.4em 0}
+.aiact{display:flex;flex-wrap:wrap;gap:4px 6px;margin:5px 0 0 2px;align-items:center}
+.aiact>button{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:var(--mute);font:inherit;font-size:.8rem;font-weight:600;padding:5px 8px;border-radius:99px;cursor:pointer}
+.aiact>button:hover,.aiact>button.on{background:var(--fill);color:var(--ink)}.aiact>button.on{color:var(--brand)}
+.aifu{display:flex;flex-wrap:wrap;gap:6px;width:100%;margin-top:4px}
+.aifu button{border:1px solid var(--line);background:transparent;color:var(--brand);font:inherit;font-size:.85rem;font-weight:600;padding:6px 12px;border-radius:99px;cursor:pointer}
+.aierr .aib{background:rgba(255,69,58,.12)!important}
+.aicare .aib{background:color-mix(in srgb,var(--brand) 13%,var(--card))}.aicare .aib p{margin:0 0 .6em}.aicare .aib a{font-weight:600}
+.aidots{display:inline-flex;gap:4px;align-items:center;height:1.2em;vertical-align:middle}.aidots i{width:6px;height:6px;border-radius:50%;background:var(--mute);animation:aid 1.2s infinite ease-in-out}.aidots i:nth-child(2){animation-delay:.18s}.aidots i:nth-child(3){animation-delay:.36s}
+@keyframes aid{0%,70%,100%{opacity:.25;transform:translateY(0)}35%{opacity:1;transform:translateY(-3px)}}
+.aithk{color:var(--mute);margin-right:8px;font-size:.92rem}
+.aiwel{text-align:center;padding:26px 6px 8px}.aiwel h2{font-size:1.5rem;margin:14px 0 6px;letter-spacing:-.02em}.aiwel>p{color:var(--mute);margin:0 auto;max-width:44ch}
+.aisug{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:22px;text-align:left}
+.aisug button{display:flex;flex-direction:column;gap:3px;border:0;background:var(--card);color:var(--ink);font:inherit;padding:14px 16px;border-radius:16px;cursor:pointer;text-align:left;transition:transform .15s}
+.aisug button:active{transform:scale(.98)}.aisug button b{font-size:.98rem}.aisug button span{color:var(--mute);font-size:.84rem}
+.aicomp{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:6;background:var(--card);border-radius:24px;padding:8px 8px 6px;box-shadow:0 6px 28px rgba(0,0,0,.16),0 0 0 .5px var(--line)}
+.aicrow{display:flex;align-items:flex-end;gap:6px}
+.aicrow textarea{flex:1;min-width:0;width:auto;min-height:42px;height:42px;border-radius:0;border:0;outline:0;resize:none;background:transparent;color:var(--ink);font:inherit;font-size:max(16px,1em);line-height:1.4;padding:10px 4px;max-height:170px;overflow-y:auto}
+.aiicon,.aisend{flex:none;display:flex;align-items:center;justify-content:center;width:42px;height:42px;border:0;border-radius:50%;cursor:pointer}
+.aiicon{background:transparent;color:var(--mute)}.aiicon:hover{background:var(--fill);color:var(--ink)}
+.aisend{background:var(--brand);color:#fff}.aisend.stop svg{fill:currentColor}.aisend:disabled,.aiicon:disabled{opacity:.4;cursor:default}
+.aifoot{margin:2px 10px 2px;text-align:center;color:var(--mute);font-size:.72rem}
+@media(max-width:560px){.aif2{display:none}.aicomp{padding:6px 6px 4px}}
+.ainote{padding:2px 4px 6px}.ainchip{display:flex;align-items:center;gap:8px;background:var(--fill);border-radius:12px;padding:6px 6px 6px 10px;font-size:.85rem;color:var(--ink)}
+.ainchip .aint{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ainchip em{font-style:normal;color:var(--mute);white-space:nowrap}
+.ainchip button{margin-left:auto;flex:none;border:0;background:transparent;color:var(--mute);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+/* cards + test */
+.aiwg{width:100%}
+.aicf{background:var(--fill);border-radius:16px;padding:14px}
+.aict{display:flex;justify-content:space-between;gap:10px;align-items:baseline;font-size:.88rem}.aict span{color:var(--mute);white-space:nowrap}
+.aibar{height:5px;border-radius:99px;background:var(--line);overflow:hidden;margin:8px 0 12px}.aibar i{display:block;height:100%;background:var(--brand);border-radius:99px;transition:width .25s}
+.aifc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;min-height:170px;border:0;border-radius:14px;background:var(--card);color:var(--ink);font:inherit;padding:18px;cursor:pointer;text-align:center}
+.aifc.back{background:color-mix(in srgb,var(--brand) 14%,var(--card))}
+.aifl{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}.aift{font-size:1.1rem;font-weight:600;line-height:1.4}.aift p{margin:0}
+.aicb{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px;align-items:center}.aicb:empty{display:none}
+.aiend{text-align:center;padding:22px 14px}.aibig{font-size:2.4rem;font-weight:800;letter-spacing:-.03em}.aiend p{margin:6px 0 4px;color:var(--mute)}
+.aiqq{font-weight:600;font-size:1.02rem;margin-bottom:12px}.aiqq p{margin:0}
+.aiops{display:flex;flex-direction:column;gap:8px}
+.aiop{display:flex;align-items:center;gap:10px;width:100%;border:1.5px solid transparent;border-radius:12px;background:var(--card);color:var(--ink);font:inherit;padding:10px 12px;text-align:left;cursor:pointer}
+.aiop:disabled{cursor:default;color:var(--ink);opacity:1}
+.aik{flex:none;width:26px;height:26px;border-radius:50%;background:var(--fill);display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700}
+.aiot{min-width:0;overflow-wrap:anywhere}
+.aiop.ok{border-color:#30d158;background:rgba(48,209,88,.14)}.aiop.ok .aik{background:#30d158;color:#fff}
+.aiop.no{border-color:#ff453a;background:rgba(255,69,58,.12)}.aiop.no .aik{background:#ff453a;color:#fff}
+.aiwhy{margin-top:12px;background:var(--card);border-radius:12px;padding:10px 12px;font-size:.92rem}
+.aimiss{text-align:left;margin:12px 0}.aimiss>div{background:var(--card);border-radius:12px;padding:10px 12px;margin-top:8px;display:flex;flex-direction:column;gap:3px;font-size:.9rem}.aimiss span{color:#30d158;font-weight:600}.aimiss em{font-style:normal;color:var(--mute)}
+/* saved decks */
+.aish{position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px}
+.aish-p{position:relative;width:min(560px,100%);max-height:88vh;overflow:auto;background:var(--card);border-radius:24px;padding:22px 18px 18px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.aish-x{position:absolute;right:12px;top:12px;width:34px;height:34px;border:0;border-radius:50%;background:var(--fill);color:var(--mute);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2}
+.aidk{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--fill);border-radius:14px;padding:12px 14px;margin-top:8px}.aidk>div:first-child{min-width:0}.aidk b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.aidk span{color:var(--mute);font-size:.84rem}
+@media print{.aicomp,.aiact,.aichips,.aiopt{display:none!important}}
 .idein{width:100%;border:0;border-radius:10px;background:var(--fill);color:var(--ink);padding:10px 12px;font:13.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;resize:vertical;-webkit-user-select:text;user-select:text}
 .ideout{margin:0;padding:12px 14px;min-height:120px;max-height:340px;overflow:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;-webkit-user-select:text;user-select:text}
 .ide-e{color:#ff453a}.ide-i{color:var(--mute)}
@@ -317,7 +410,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 <footer class="foot"><div class="foot-in">
  <div><b class="fb"><span class="lm"></span><span class="ft">Eve <span>Sandbox</span></span></b><p>Simple tools to help students stay on top of their daily requirements.</p></div>
  <nav><h4>Pages</h4><a href="#/">Home</a><a href="#/tools">Tools</a><a href="#/about">About</a><a href="#/contact">Contact</a><a href="#/donate">Donate</a></nav>
- <nav><h4>Tools</h4><a href="#/calc">Complex Calculator</a><a href="#/ide">Eve IDE</a><a href="#/convert">File Converter</a><a href="#/grab">Grab Box</a><a href="#/isearch">Image Search</a><a href="#/image">Image Tool</a><a href="#/pdf">PDF Tool</a><a href="#/planner">Study Planner</a><a href="#/virus">Virus Checker</a></nav>
+ <nav><h4>Tools</h4><a href="#/calc">Complex Calculator</a><a href="#/eve">Eve AI</a><a href="#/ide">Eve IDE</a><a href="#/convert">File Converter</a><a href="#/grab">Grab Box</a><a href="#/isearch">Image Search</a><a href="#/image">Image Tool</a><a href="#/pdf">PDF Tool</a><a href="#/planner">Study Planner</a><a href="#/virus">Virus Checker</a></nav>
  <nav><h4>Legal</h4><a href="#/terms">Terms of Service</a><a href="#/privacy">Privacy</a></nav>
  <div class="copy">&copy; <span id="yr">2026</span> Eve Sandbox. All rights reserved.</div>
 </div></footer>
@@ -468,6 +561,7 @@ var IC={
  fit:'<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>',
  hand:'<path d="M18 11V6a2 2 0 0 0-4 0M14 10V4a2 2 0 0 0-4 0v2M10 10.5V6a2 2 0 0 0-4 0v8M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>',
  swap:'<path d="M17 3l4 4-4 4M3 7h18M7 21l-4-4 4-4M21 17H3"/>',
+ arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
  play:'<path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/>',
  code:'<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
  dlbox:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
@@ -487,7 +581,7 @@ function colorOf(n){for(var i=0;i<S.subjects.length;i++)if(S.subjects[i].n===n)r
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var app=document.getElementById('app');
 
-function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',isearch:'tools',grab:'tools',convert:'tools',ide:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
+function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',isearch:'tools',grab:'tools',convert:'tools',ide:'tools',eve:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
 
 function planner(){
  nav('planner');
@@ -1124,9 +1218,10 @@ function vDraw(){
  o.innerHTML=h;
 }
 
-var CFG={email:'',donate:[],lensApi:'',grabApi:'',runApi:''};
+var CFG={email:'',donate:[],lensApi:'',grabApi:'',runApi:'',aiApi:'https://eve-ai.mechanorg.workers.dev'};
 var TL=[
  {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
+ {r:'eve',c:'i1',ic:'spark',n:'Eve AI',d:'Your caring study buddy. Ask questions, get step-by-step help, make flashcards and practice tests, and learn from your own notes.'},
  {r:'ide',c:'ired',ic:'code',n:'Eve IDE',d:'Write and run Python, C and Java programs, with input and output right on the page.'},
  {r:'convert',c:'i8',ic:'swap',n:'File Converter',d:'Turn pictures, PDFs, documents, spreadsheets and audio into another format, right on your device.'},
  {r:'grab',c:'i7',ic:'dlbox',n:'Grab Box',d:'Paste a link to a file or a page and download the video, audio or document on it.'},
@@ -1194,7 +1289,7 @@ function privacyPage(){nav('privacy');
  app.innerHTML=banner('Legal','Privacy','Last updated: October 3, 2026')+
  '<div class="wrapc doc" style="max-width:760px"><h2 style="margin-top:0">The short version</h2><p>No accounts. Your images and PDFs stay on your device. We do not add analytics or advertising code to this site.</p>'+
  '<h2>What stays on your device</h2><ul><li>Images and PDFs you open in the tools are processed in your browser and are never sent to us.</li><li>The Study Planner saves your plan in your browser’s local storage so it is there next time. Clearing your browser data removes it.</li></ul>'+
- '<h2>What leaves your device</h2><ul><li><b>Virus Checker:</b> the domain you enter is sent to Cloudflare (DNS), rdap.org (domain registration records) and Reddit (search) to fetch results. The tool never contacts the entered site itself. Those services have their own privacy policies.</li><li><b>PDF tools:</b> the PDF software libraries are downloaded from a public content delivery network the first time you use them.</li><li><b>Eve IDE:</b> Python runs on your device after its engine is downloaded from a public content delivery network. When you run C or Java, your code and input are sent to a free online compile server, which compiles and runs them and sends back the result.</li><li><b>File Converter and Grab Box:</b> files are converted on your device. Some conversions download a software library from a public content delivery network the first time. Grab Box fetches the link you paste from the website it points to.</li><li><b>Links you open</b> (such as VirusTotal or Reddit) take you to other websites with their own policies.</li><li><b>Contact form:</b> if you send a message, it goes by email to the address on the Contact page, including anything you type.</li></ul>'+
+ '<h2>What leaves your device</h2><ul><li><b>Virus Checker:</b> the domain you enter is sent to Cloudflare (DNS), rdap.org (domain registration records) and Reddit (search) to fetch results. The tool never contacts the entered site itself. Those services have their own privacy policies.</li><li><b>PDF tools:</b> the PDF software libraries are downloaded from a public content delivery network the first time you use them.</li><li><b>Eve IDE:</b> Python runs on your device after its engine is downloaded from a public content delivery network. When you run C or Java, your code and input are sent to a free online compile server, which compiles and runs them and sends back the result.</li><li><b>File Converter and Grab Box:</b> files are converted on your device. Some conversions download a software library from a public content delivery network the first time. Grab Box fetches the link you paste from the website it points to.</li><li><b>Eve AI:</b> the messages you send Eve, and any notes you attach, are sent to an AI service (Cloudflare Workers AI) so it can write a reply. They are not stored by this website. Your chat history and saved flashcards stay on your device. Please do not share passwords or private personal details.</li><li><b>Links you open</b> (such as VirusTotal or Reddit) take you to other websites with their own policies.</li><li><b>Contact form:</b> if you send a message, it goes by email to the address on the Contact page, including anything you type.</li></ul>'+
  '<h2>Hosting</h2><p>Whoever hosts the site may keep ordinary server logs, such as IP addresses and page requests, under their own policy.</p>'+
  '<h2>Questions</h2><p>Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
 var CKEY='eve-sandbox:calc:v1';
@@ -1549,7 +1644,7 @@ function grabPage(){nav('grab');
 URLS.lame=['https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js'];
 URLS.xlsx=['https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'];
 URLS.mammoth=['https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js'];
-var FC={rows:[],n:0,q:'high',busy:false};
+var FC={rows:[],n:0,q:'high',busy:false,from:'',to:''};
 var FCX={png:'img',jpg:'img',jpeg:'img',webp:'img',bmp:'img',gif:'img',svg:'img',avif:'img',ico:'img',pdf:'pdf',txt:'txt',log:'txt',md:'md',markdown:'md',html:'html',htm:'html',csv:'csv',tsv:'csv',json:'json',xlsx:'sheet',xls:'sheet',ods:'sheet',docx:'docx',mp3:'aud',wav:'aud',ogg:'aud',oga:'aud',m4a:'aud',aac:'aud',flac:'aud',opus:'aud',weba:'aud',wma:'aud',amr:'aud',aiff:'aud',aif:'aud',ac3:'aud',mka:'aud',mp4:'vid',webm:'vid',mov:'vid',m4v:'vid',mkv:'vid',avi:'vid',wmv:'vid',flv:'vid','3gp':'vid',mpg:'vid',mpeg:'vid',ts:'vid'};
 var FCL={png:'PNG image',jpg:'JPG image',webp:'WebP image',bmp:'BMP image',pdf:'PDF document',txt:'Plain text (.txt)',html:'Web page (.html)',json:'JSON',csv:'CSV',tsv:'TSV',xlsx:'Excel (.xlsx)',wav:'WAV audio',mp3:'MP3 audio'};
 function fcExt(n){var m=/\.([A-Za-z0-9]+)$/.exec(n||'');return m?m[1].toLowerCase():'';}
@@ -1561,6 +1656,37 @@ function fcTargets(f,k){
  return m.filter(function(t){return t!==e;});
 }
 function fcLabel(k,t){return FCL[t]+(k==='vid'&&(t==='mp3'||t==='wav')?' (sound only)':'')+(k==='pdf'&&(t==='png'||t==='jpg')?' (one per page)':'');}
+var FCF=[['png','PNG',['png'],'img'],['jpg','JPG',['jpg','jpeg'],'img'],['webp','WebP',['webp'],'img'],['bmp','BMP',['bmp'],'img'],['gif','GIF',['gif'],'img'],['svg','SVG',['svg'],'img'],['pdf','PDF',['pdf'],'pdf'],['docx','Word (.docx)',['docx'],'docx'],['html','HTML',['html','htm'],'html'],['md','Markdown',['md','markdown'],'md'],['txt','Text (.txt)',['txt','log'],'txt'],['csv','CSV',['csv'],'csv'],['tsv','TSV',['tsv'],'csv'],['json','JSON',['json'],'json'],['xlsx','Excel',['xlsx','xls','ods'],'sheet'],['mp3','MP3',['mp3'],'aud'],['wav','WAV',['wav'],'aud'],['ogg','OGG',['ogg','oga','opus'],'aud'],['m4a','M4A',['m4a','aac'],'aud'],['flac','FLAC',['flac'],'aud'],['mp4','MP4',['mp4','m4v'],'vid'],['webm','WebM',['webm'],'vid'],['mov','MOV',['mov'],'vid'],['mkv','MKV',['mkv'],'vid'],['avi','AVI',['avi'],'vid']];
+var FCT={png:'PNG',jpg:'JPG',webp:'WebP',bmp:'BMP',pdf:'PDF',txt:'Text (.txt)',html:'HTML',json:'JSON',csv:'CSV',tsv:'TSV',xlsx:'Excel (.xlsx)',wav:'WAV',mp3:'MP3'};
+var FCALL=['png','jpg','webp','bmp','pdf','txt','html','json','csv','tsv','xlsx','wav','mp3'];
+function fcFmt(k){for(var i=0;i<FCF.length;i++)if(FCF[i][0]===k)return FCF[i];return null;}
+function fcToList(){var f=FC.from&&fcFmt(FC.from);return f?fcTargets({name:'x.'+f[0]},f[3]):FCALL;}
+function fcFix(){var l=fcToList();if(FC.from){if(l.indexOf(FC.to)<0)FC.to=l[0]||'';}else if(FC.to&&l.indexOf(FC.to)<0)FC.to='';}
+function fcMatch(file,key){var f=fcFmt(key);if(!f)return true;var e=fcExt(file.name);if(f[2].indexOf(e)>=0)return true;return !FCX[e]&&fcKind(file)===f[3]&&f[2].length>0&&!e;}
+function fcAssign(r){
+ r.bad='';if(!r.kind){r.target='';return;}
+ var ts=fcTargets(r.file,r.kind);
+ if(FC.from&&!fcMatch(r.file,FC.from)){r.target='';r.bad='nomatch';return;}
+ if(FC.to){r.target=ts.indexOf(FC.to)>=0?FC.to:'';if(!r.target)r.bad=fcExt(r.file.name)===FC.to||(FC.to==='jpg'&&fcExt(r.file.name)==='jpeg')?'same':'cant';}
+ else r.target=ts[0]||'';
+}
+function fcNote(){var f=FC.from,t=FC.to;
+ if(f==='pdf'&&(t==='png'||t==='jpg'))return 'Every page of the PDF becomes its own picture.';
+ var fm=fcFmt(f);if(fm&&fm[3]==='vid'&&(t==='mp3'||t==='wav'))return 'Only the sound is kept from the video.';
+ if(!f&&!t)return 'Not sure? Leave both as they are, then pick a format for each file after you add it.';
+ return '';}
+function fcPick(){
+ var fo='<option value="">Any file</option>'+FCF.map(function(f){return '<option value="'+f[0]+'"'+(FC.from===f[0]?' selected':'')+'>'+esc(f[1])+'</option>';}).join('');
+ var to=(FC.from?'':'<option value="">Per file</option>')+fcToList().map(function(t){return '<option value="'+t+'"'+(FC.to===t?' selected':'')+'>'+esc(FCT[t])+'</option>';}).join('');
+ var n=fcNote();
+ $$('fcpick').innerHTML='<div class="fcsel"><div class="fld"><label for="fcfrom">From</label><select id="fcfrom">'+fo+'</select></div><div class="fcarr" aria-hidden="true">'+ico('arrow',20,2.2)+'</div><div class="fld"><label for="fcto">To</label><select id="fcto">'+to+'</select></div></div>'+(n?'<p class="hint" style="margin:12px 0 0">'+esc(n)+'</p>':'');
+ $$('fcfrom').onchange=function(){FC.from=this.value;fcFix();fcChanged();};
+ $$('fcto').onchange=function(){FC.to=this.value;fcChanged();};
+ var f=FC.from&&fcFmt(FC.from),inp=$$('fcfile'),dt=$$('fcdt');
+ if(inp){if(f)inp.setAttribute('accept',f[2].map(function(e){return '.'+e;}).join(','));else inp.removeAttribute('accept');}
+ if(dt)dt.textContent=f?'Choose '+f[1]+' files':'Choose files';
+}
+function fcChanged(){FC.rows.forEach(function(r){if(r.status==='busy')return;fcAssign(r);r.status='';r.out=null;r.msg='';});fcPick();fcRows();}
 function fcQ(){return {high:{i:.92,k:192},medium:{i:.8,k:128},low:{i:.6,k:96}}[FC.q];}
 function fcBlob(cv,type,q){return new Promise(function(res,rej){cv.toBlob(function(b){if(!b||(type!=='image/png'&&b.type!==type))rej(new Error('This browser cannot make '+type.split('/')[1].toUpperCase()+' images.'));else res(b);},type,q);});}
 function fcCanvas(w,h){var c=mk(w,h);return c;}
@@ -1813,7 +1939,12 @@ function fcRows(){
  var any=FC.rows.some(function(r){return ['jpg','webp','mp3'].indexOf(r.target)>=0;});
  var h=FC.rows.map(function(f){
   var ts=f.kind?fcTargets(f.file,f.kind):[],body;
-  if(!ts.length)body='<span class="hint">This kind of file is not supported yet.</span>';
+  if(!f.kind)body='<span class="hint">This kind of file is not supported yet.</span>';
+  else if(f.bad==='nomatch'){var ff=fcFmt(FC.from);body='<div class="note bad">This is not a '+esc(ff?ff[1]:'matching')+' file. Change From to Any file, or choose a different file.</div>';}
+  else if(f.bad==='same')body='<div class="note bad">This file is already in that format. Pick a different To format.</div>';
+  else if(f.bad==='cant')body='<div class="note bad">This file cannot be turned into '+esc(FCT[FC.to]||'that format')+'. Pick a different To format.</div>';
+  else if(!ts.length)body='<span class="hint">This kind of file is not supported yet.</span>';
+  else if(FC.to)body='<span class="hint">Will become <b style="color:var(--ink)">'+esc(FCT[f.target]||f.target)+'</b></span>';
   else body='<label class="hint">Convert to <select class="sel" data-fid="'+f.id+'"'+(f.status==='busy'?' disabled':'')+'>'+ts.map(function(t){return '<option value="'+t+'"'+(t===f.target?' selected':'')+'>'+esc(fcLabel(f.kind,t))+'</option>';}).join('')+'</select></label>';
   var res='';
   if(f.status==='busy')res='<span class="hint" id="fcs'+f.id+'">Converting...</span>';
@@ -1843,19 +1974,488 @@ async function fcConvert(){
 }
 function fcAdd(files){
  Array.prototype.forEach.call(files,function(file){
-  var k=fcKind(file),ts=k?fcTargets(file,k):[];
-  FC.rows.push({id:++FC.n,file:file,kind:k,target:ts[0]||'',status:'',out:null,warn:[],msg:''});});
+  var k=fcKind(file),r={id:++FC.n,file:file,kind:k,target:'',bad:'',status:'',out:null,warn:[],msg:''};fcAssign(r);FC.rows.push(r);});
  fcRows();
 }
 function convertPage(){nav('convert');
- FC.rows=[];FC.busy=false;
+ FC.rows=[];FC.busy=false;FC.from='';FC.to='';
  app.innerHTML='<h1 style="font-size:2.2rem">File Converter</h1><p class="lead" style="font-size:1rem">Turn a file into another format that suits it. Pictures, PDFs, documents, spreadsheets, text and audio are supported, and everything is converted on your device, so your files are never uploaded.</p>'+
- '<label class="card drop" id="fcdrop" style="margin-top:16px"><input type="file" id="fcfile" multiple hidden>'+ico('upload',28)+'<b>Choose files</b><span class="hint">or drop them here</span></label>'+
+ '<div class="card" id="fcpick" style="margin-top:16px;padding:16px"></div>'+
+ '<label class="card drop" id="fcdrop" style="margin-top:14px"><input type="file" id="fcfile" multiple hidden>'+ico('upload',28)+'<b id="fcdt">Choose files</b><span class="hint">or drop them here</span></label>'+
  '<p class="hint" style="margin:10px 2px 0">Pictures: PNG, JPG, WebP, BMP, GIF, SVG &middot; Documents: PDF, Word (.docx), HTML, Markdown, text &middot; Data: Excel, CSV, TSV, JSON &middot; Sound: MP3, WAV, OGG, M4A, FLAC and sound from videos</p><div id="fclist" style="margin-top:14px"></div>';
  var inp=$$('fcfile');inp.onchange=function(){if(inp.files.length)fcAdd(inp.files);inp.value='';};
  var d=$$('fcdrop');d.ondragover=function(e){e.preventDefault();};d.ondrop=function(e){e.preventDefault();if(e.dataTransfer.files.length)fcAdd(e.dataTransfer.files);};
- fcRows();
+ fcPick();fcRows();
 }
+/* ---------- Eve AI ---------- */
+URLS.katex=['https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js'];
+var AI={msgs:[],mode:'chat',level:'high',hints:false,deep:false,count:0,busy:false,ctl:null,notes:null,pin:true,loaded:false,tm:0};
+var AIK='eveai',AID='evedecks',AIX={};
+var AIMODES=[['chat','Chat'],['explain','Explain'],['solve','Solve'],['summarize','Summarize'],['cards','Flashcards'],['test','Practice test'],['quiz','Quiz me'],['essay','Writing'],['memory','Memory'],['plan','Plan']];
+var AIPH={chat:'Ask Eve anything about your studies',explain:'What would you like explained?',solve:'Paste a problem and we will solve it step by step',summarize:'Paste your notes, or attach a file',cards:'A topic for your flashcards, or attach your notes',test:'A topic for your practice test, or attach your notes',quiz:'What should I quiz you on?',essay:'Paste your writing, or tell me about the assignment',memory:'What do you need to remember?',plan:'Tell me about your exams and how much time you have'};
+var AIPHS={chat:'Ask Eve anything...',explain:'What shall I explain?',solve:'Paste a problem to solve',summarize:'Paste notes or attach a file',cards:'A topic or your notes',test:'A topic or your notes',quiz:'What should I quiz you on?',essay:'Paste your writing',memory:'What should you remember?',plan:'Your exams and free time'};
+function aiPh(m){var t=(window.innerWidth<560?AIPHS:AIPH);return t[m]||t.chat;}
+var AILV=[['primary','Primary school'],['middle','Middle school'],['high','High school'],['college','College'],['advanced','Advanced']];
+var AIFU=[['Explain it more simply','Can you explain that more simply, with an everyday example?'],['Give me an example','Can you give me a worked example?'],['Quiz me on this','Quiz me on this, one question at a time.','quiz']];
+var AISUG=[['explain','Explain a topic simply','Start from the basics'],['cards','Make flashcards','From a topic or your notes'],['test','Practice test','Check what you know'],['solve','Solve step by step','Maths, science and more'],['summarize','Summarize my notes','Attach a file or paste text'],['plan','Plan my study week','Around your exams']];
+var AIBOX=[0,1,3,7,14,30];
+var AIDIS=/\b(kill(ing)? myself|(i am|i'm|im|feel|feeling|so) suicidal|end(ing)? my (own )?life|want(ed)? to die|wanna die|(been|keep|keeps|am|i'm|im) self[- ]?harming|hurt(ing)? myself|harm(ing)? myself|cut(ting)? myself|no reason to live|don'?t want to (be here|live|exist|be alive)|better off (dead|without me))\b/i;
+function aiCareEl(){
+ var e=document.createElement('div');e.className='aim eve aicare';
+ e.innerHTML='<span class="aiav sm">'+ico('spark',15,2)+'</span><div class="aic"><div class="aib"><p><b>I am really glad you told me.</b> You matter, and you do not have to carry this alone. Please talk to someone you trust today, like a parent, a teacher or a school counsellor.</p><p>If you are in India, you can call <b>Tele-MANAS</b> for free at any hour: <a href="tel:14416">14416</a> or <a href="tel:1800914416">1-800-91-4416</a>. If you are in danger right now, call <a href="tel:112">112</a>. Anywhere else, <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer">findahelpline.com</a> lists free helplines by country.</p></div></div>';
+ return e;
+}
+IC.spark='<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/>';
+IC.clip='<path d="M21 11.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l9-9a3.3 3.3 0 0 1 4.7 4.7l-9 9a1.7 1.7 0 0 1-2.4-2.4l8.3-8.3"/>';
+IC.send='<path d="M12 19V5M5 12l7-7 7 7"/>';
+IC.stopsq='<rect x="6" y="6" width="12" height="12" rx="2.5"/>';
+IC.copy='<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/>';
+IC.vol='<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>';
+IC.redo='<path d="M3 12a9 9 0 0 1 15.5-6.2L21 8M21 3v5h-5M21 12a9 9 0 0 1-15.5 6.2L3 16M3 21v-5h5"/>';
+IC.deck='<rect x="3" y="7" width="14" height="13" rx="2"/><path d="M7 4h12a2 2 0 0 1 2 2v11"/>';
+IC.test='<path d="M9 11l2 2 4-4"/><rect x="4" y="4" width="16" height="16" rx="3"/>';
+function aiLoad(){try{var d=JSON.parse(localStorage.getItem(AIK)||'null');if(d){
+ if(Array.isArray(d.msgs))AI.msgs=d.msgs.filter(function(m){return m&&(m.r==='u'||m.r==='e')&&typeof m.t==='string';}).slice(-60);
+ if(AILV.some(function(l){return l[0]===d.level;}))AI.level=d.level;
+ AI.hints=d.hints===true;AI.deep=d.deep===true;AI.count=+d.count||0;
+ if(AIMODES.some(function(m){return m[0]===d.mode;}))AI.mode=d.mode;
+ if(d.notes&&typeof d.notes.text==='string')AI.notes=d.notes;}}catch(e){}}
+function aiSave(){try{localStorage.setItem(AIK,JSON.stringify({msgs:AI.msgs.slice(-60),level:AI.level,hints:AI.hints,deep:AI.deep,count:AI.count,mode:AI.mode,notes:AI.notes}));}catch(e){}}
+function aiDecks(){try{var a=JSON.parse(localStorage.getItem(AID)||'[]');return Array.isArray(a)?a:[];}catch(e){return [];}}
+function aiDecksSave(a){try{localStorage.setItem(AID,JSON.stringify(a.slice(0,30)));return true;}catch(e){return false;}}
+function aiDueN(d){var n=Date.now();return d.cards.filter(function(c){return !c.d||c.d<=n;}).length;}
+
+/* markdown + maths, written for chat: nothing from the model is ever inserted as raw HTML */
+function aiMd(src,inlineOnly){
+ var codes=[],inl=[],maths=[];
+ src=String(src==null?'':src).replace(/[\u0001-\u0003]/g,'').replace(/\r\n?/g,'\n');
+ src=src.replace(/```([\w+#.-]*)[ \t]*\n([\s\S]*?)(?:\n?```|$)/g,function(m,l,c){codes.push([l,c]);return '\n\u0001'+(codes.length-1)+'\u0001\n';});
+ src=src.replace(/`([^`\n]+)`/g,function(m,c){inl.push(c);return '\u0003'+(inl.length-1)+'\u0003';});
+ var mp=function(t,d){maths.push([t,d]);return '\u0002'+(maths.length-1)+'\u0002';};
+ src=src.replace(/\$\$([\s\S]+?)\$\$/g,function(m,t){return mp(t.trim(),1);}).replace(/\\\[([\s\S]+?)\\\]/g,function(m,t){return mp(t.trim(),1);}).replace(/\\\(([\s\S]+?)\\\)/g,function(m,t){return mp(t.trim(),0);}).replace(/\$([^\s$](?:[^$\n]*?[^\s$\\])?)\$(?!\d)/g,function(m,t){return mp(t,0);});
+ src=esc(src);
+ function back(s){
+  return s.replace(/\u0003(\d+)\u0003/g,function(m,k){return '<code>'+esc(inl[+k])+'</code>';}).replace(/\u0002(\d+)\u0002/g,function(m,k){var x=maths[+k];return '<span class="aimath" data-d="'+x[1]+'" data-t="'+esc(x[0])+'">'+(x[1]?'$$':'$')+esc(x[0])+(x[1]?'$$':'$')+'</span>';});
+ }
+ function inline(s){
+  s=s.replace(/\[([^\]\n]+)\]\((#\/(?:planner|calc|ide|image|pdf|convert))\)/g,'<a href="$2">$1</a>').replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g,function(m,t,u){return '<a href="'+u+'" target="_blank" rel="noopener noreferrer">'+t+'</a>';})
+   .replace(/(^|[\s(])(https?:\/\/[^\s<)]*[^\s<).,;:!?])/g,function(m,p,u){return p+'<a href="'+u+'" target="_blank" rel="noopener noreferrer">'+u+'</a>';})
+   .replace(/\*\*(?=\S)([^\n]*?\S)\*\*/g,'<strong>$1</strong>').replace(/__(?=\S)([^\n]*?\S)__/g,'<strong>$1</strong>')
+   .replace(/(^|[^*\w])\*(?![\s*])([^*\n]*?[^\s*])\*(?![*\w])/g,'$1<em>$2</em>').replace(/(^|[^\w])_(?![\s_])([^_\n]*?[^\s_])_(?![\w])/g,'$1<em>$2</em>')
+   .replace(/~~(?=\S)([^\n]*?\S)~~/g,'<del>$1</del>');
+  return back(s);
+ }
+ if(inlineOnly)return inline(src.replace(/\n+/g,' '));
+ var L=src.split('\n'),out=[],i=0,m;
+ var LI=/^(\s*)([-*+]|\d{1,3}[.)])\s+(.*)$/;
+ function cells(r){r=r.trim().replace(/^\|/,'').replace(/\|$/,'');return r.split('|').map(function(c){return c.trim();});}
+ function listHtml(items){
+  var h='',st=[];
+  items.forEach(function(it,ix){
+   var ind=it[0],o=it[1],top=st.length?st[st.length-1]:null;
+   while(st.length&&ind<st[st.length-1].ind){h+='</li></'+(st.pop().o?'ol':'ul')+'>';top=st.length?st[st.length-1]:null;}
+   if(top&&ind===top.ind){h+='</li><li>'+inline(it[2]);}
+   else{st.push({ind:ind,o:o});h+=(o?'<ol>':'<ul>')+'<li>'+inline(it[2]);}
+  });
+  while(st.length)h+='</li></'+(st.pop().o?'ol':'ul')+'>';
+  return h;
+ }
+ function isBlock(ln,nx){return /^\u0001\d+\u0001$/.test(ln.trim())||/^#{1,4}\s/.test(ln)||/^&gt;/.test(ln)||LI.test(ln)||/^\s*([-*_])(\s*\1){2,}\s*$/.test(ln)||(ln.indexOf('|')>=0&&nx!==undefined&&/^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(nx));}
+ while(i<L.length){
+  var ln=L[i];
+  if(!ln.trim()){i++;continue;}
+  if((m=/^\u0001(\d+)\u0001$/.exec(ln.trim()))){var cd=codes[+m[1]];out.push('<div class="aicode"><div class="aich"><span>'+esc(cd[0]||'code')+'</span><button type="button" class="aicp" data-a="cp">Copy</button></div><pre><code>'+esc(cd[1])+'</code></pre></div>');i++;continue;}
+  if((m=/^(#{1,4})\s+(.+)$/.exec(ln))){out.push('<h'+(m[1].length<3?3:4)+'>'+inline(m[2])+'</h'+(m[1].length<3?3:4)+'>');i++;continue;}
+  if(/^\s*([-*_])(\s*\1){2,}\s*$/.test(ln)){out.push('<hr>');i++;continue;}
+  if(/^&gt;/.test(ln)){var q=[];while(i<L.length&&/^&gt;/.test(L[i])){q.push(L[i].replace(/^&gt;\s?/,''));i++;}out.push('<blockquote>'+inline(q.join('\n').replace(/\n/g,'<br>'))+'</blockquote>');continue;}
+  if(ln.indexOf('|')>=0&&i+1<L.length&&/^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/.test(L[i+1])){
+   var hd=cells(ln),rows=[];i+=2;while(i<L.length&&L[i].indexOf('|')>=0&&L[i].trim()){rows.push(cells(L[i]));i++;}
+   out.push('<div class="aitw"><table class="aitb"><thead><tr>'+hd.map(function(c){return '<th>'+inline(c)+'</th>';}).join('')+'</tr></thead><tbody>'+rows.map(function(r){return '<tr>'+hd.map(function(_,k){return '<td>'+inline(r[k]||'')+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>');continue;}
+  if((m=LI.exec(ln))){
+   var its=[];
+   for(;;){
+    var mm=i<L.length&&LI.exec(L[i]);
+    if(mm){var di=mm[1].replace(/\t/g,'    ').length,dn=/\d/.test(mm[2].charAt(0));if(its.length&&di===its[0][0]&&dn!==its[0][1])break;its.push([di,dn,mm[3],parseInt(mm[2],10)||1]);i++;continue;}
+    var j=i;while(j<L.length&&!L[j].trim())j++;
+    if(i<L.length&&!L[i].trim()&&j<L.length&&LI.test(L[j])){i=j;continue;}
+    if(its.length&&i<L.length&&L[i].trim()&&/^\s{2,}\S/.test(L[i])&&!LI.test(L[i])){its[its.length-1][2]+='<br>'+L[i].trim();i++;continue;}
+    break;
+   }
+   var first=its[0];out.push(listHtml(its).replace(/^<ol>/,first[1]&&first[3]>1?'<ol start="'+first[3]+'">':'<ol>'));continue;}
+  var p=[ln];i++;
+  while(i<L.length&&L[i].trim()&&!isBlock(L[i],L[i+1])){p.push(L[i]);i++;}
+  out.push('<p>'+inline(p.join('\n').replace(/\n/g,'<br>'))+'</p>');
+ }
+ return out.join('');
+}
+function aiKatex(){
+ if(AIX.kx)return AIX.kx;
+ if(AIX.kxf&&Date.now()-AIX.kxf<60000)return Promise.reject(new Error('x'));
+ if(!AIX.css){AIX.css=1;var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css';document.head.appendChild(l);}
+ AIX.kx=need('katex').then(function(){return window.katex;},function(e){AIX.kx=null;AIX.kxf=Date.now();throw e;});
+ return AIX.kx;
+}
+function aiMath(root){
+ var els=(root||document).querySelectorAll('.aimath:not([data-k])');if(!els.length)return;
+ if(window.katex){els.forEach(function(e){try{window.katex.render(e.dataset.t,e,{displayMode:e.dataset.d==='1',throwOnError:false,strict:'ignore',trust:false});e.dataset.k='1';}catch(x){e.dataset.k='0';}});return;}
+ aiKatex().then(function(){aiMath(root);},function(){});
+}
+function aiPlain(t){
+ return String(t).replace(/```[\s\S]*?(```|$)/g,' (code) ').replace(/\$\$[\s\S]+?\$\$/g,' (equation) ').replace(/\\\[[\s\S]+?\\\]/g,' (equation) ').replace(/\$([^$\n]+)\$/g,function(m,x){return ' '+x.replace(/\\[a-zA-Z]+/g,' ').replace(/[{}^_\\]/g,' ')+' ';}).replace(/!?\[([^\]]*)\]\([^)]*\)/g,'$1').replace(/https?:\/\/\S+/g,' link ').replace(/[#*_`>~|]/g,' ').replace(/\s+/g,' ').trim();
+}
+function aiVoice(){
+ try{var vs=speechSynthesis.getVoices()||[];if(!vs.length)return null;var lg=(navigator.language||'en').slice(0,2).toLowerCase(),pool=vs.filter(function(v){return (v.lang||'').toLowerCase().indexOf(lg)===0;});if(!pool.length)pool=vs;
+  var f=pool.filter(function(v){return /female|zira|aria|jenny|samantha|karen|moira|tessa|fiona|victoria|susan|hazel|libby|sonia|natasha|\bava\b|allison|emma|salli|joanna|google us english|serena|kate|neerja|swara|heera|veena|lekha/i.test(v.name);});
+  return f[0]||pool[0];}catch(e){return null;}
+}
+function aiSayUI(){document.querySelectorAll('[data-a="say"]').forEach(function(b){var on=AIX.say===b;b.classList.toggle('on',on);var s=b.querySelector('span');if(s)s.textContent=on?'Stop':'Listen';});}
+function aiSpeak(text,btn){
+ if(!('speechSynthesis' in window)){toast('Reading aloud is not available on this device');return;}
+ var ss=speechSynthesis,same=AIX.say===btn;
+ if(ss.speaking||ss.pending){ss.cancel();AIX.say=null;aiSayUI();if(same)return;}
+ var u=new SpeechSynthesisUtterance(aiPlain(text)),v=aiVoice();if(v){u.voice=v;u.lang=v.lang;}u.rate=1;u.pitch=1.08;
+ u.onend=u.onerror=function(){if(AIX.say===btn){AIX.say=null;aiSayUI();}};
+ AIX.say=btn;aiSayUI();ss.speak(u);
+}
+function aiLeave(){
+ if(AI.ctl){try{AI.ctl.abort();}catch(e){}}
+ AI.busy=false;try{if('speechSynthesis' in window)speechSynthesis.cancel();}catch(e){}AIX.say=null;
+ var s=document.querySelector('.aish');if(s)s.remove();
+}
+function aiHistory(){
+ var h=[];AI.msgs.forEach(function(m){if(!m.t)return;h.push({role:m.r==='u'?'user':'assistant',content:m.t});});
+ return h;
+}
+function aiErr(code,st){
+ var T={limit:'I have helped so many students today that I need a little rest. Please come back in a while. My energy comes back every day.',slow:'Let us take a short breather. You are sending messages very quickly. Try again in a minute.',busy:'I am having a little trouble thinking right now. Please try again in a moment.',down:'I am having a little trouble thinking right now. Please try again in a moment.',big:'That is a lot for me to read at once. Try a shorter message, or attach fewer notes.',empty:'I could not put an answer together that time. Please try again.',format:'I could not put that together this time. Please try again.',net:'I cannot reach my study room right now. Please check your connection and try again.',forbidden:'Eve is not available from here yet.'};
+ return T[code]||(st===429?T.limit:T.down);
+}
+/* ----- thread ----- */
+function aiTh(){return $$('aith');}
+function aiNear(){var th=aiTh(),c=$$('aicomp');if(!th||!c)return true;return th.getBoundingClientRect().bottom-c.getBoundingClientRect().top<90;}
+function aiReveal(el){var c=$$('aicomp'),th=aiTh();if(!el||!c||!th||!th.contains(el))return;var d=el.getBoundingClientRect().bottom-(c.getBoundingClientRect().top-12);if(d>0)window.scrollBy(0,d);}
+function aiScroll(force){
+ if(!force&&!AI.pin)return;var th=aiTh(),c=$$('aicomp');if(!th||!c)return;
+ var d=th.getBoundingClientRect().bottom-c.getBoundingClientRect().top+14;if(d>0)window.scrollBy(0,d);
+}
+function aiEl(m,ix){
+ var d=document.createElement('div');d.className='aim '+(m.r==='u'?'me':'eve');d.dataset.i=ix;
+ if(m.r==='u'){d.innerHTML='<div class="aib"></div>';d.firstChild.textContent=m.t;return d;}
+ d.innerHTML='<span class="aiav sm">'+ico('spark',15,2)+'</span><div class="aic"><div class="aib"></div><div class="aiact"></div></div>';
+ return d;
+}
+function aiBubble(el){return el.querySelector('.aib');}
+function aiFill(el,m){
+ var b=aiBubble(el);
+ if(m.k==='cards'||m.k==='quiz'){
+  el.classList.add('wide');b.innerHTML='<p style="margin:0 0 10px">'+aiMd(m.t,true)+'</p><div class="aiwg"></div>';
+  var host=b.querySelector('.aiwg');
+  if(m.k==='cards')aiCards(host,m.d,{save:true});else aiQuiz(host,m.d,{});
+  return;
+ }
+ b.innerHTML=aiMd(m.t);aiMath(b);
+}
+function aiActs(el,m,last){
+ var a=el.querySelector('.aiact');if(!a)return;var h='';
+ if(m.k){if(last)h='<button type="button" data-a="redo">'+ico('redo',14,2)+'<span>Make a new one</span></button>';}
+ else{
+  h='<button type="button" data-a="copy">'+ico('copy',14,2)+'<span>Copy</span></button><button type="button" data-a="say">'+ico('vol',14,2)+'<span>Listen</span></button>';
+  if(m.t.length>140)h+='<button type="button" data-a="mkc">'+ico('deck',14,2)+'<span>Flashcards</span></button><button type="button" data-a="mkt">'+ico('test',14,2)+'<span>Practice test</span></button>';
+  if(last)h+='<button type="button" data-a="redo">'+ico('redo',14,2)+'<span>Redo</span></button>';
+ }
+ if(last&&!m.k){h+='<div class="aifu">'+AIFU.map(function(f,k){return '<button type="button" data-a="fu" data-k="'+k+'">'+esc(f[0])+'</button>';}).join('')+'</div>';}
+ a.innerHTML=h;
+}
+function aiRender(){
+ var th=aiTh();if(!th)return;th.innerHTML='';
+ if(!AI.msgs.length){aiWelcome();return;}
+ AI.msgs.forEach(function(m,ix){var el=aiEl(m,ix);th.appendChild(el);if(m.r==='u'&&m.care)th.appendChild(aiCareEl());if(m.r==='e'){aiFill(el,m);aiActs(el,m,ix===AI.msgs.length-1);}});
+ aiBadge();
+}
+function aiWelcome(){
+ var th=aiTh(),off=!CFG.aiApi;
+ th.innerHTML='<div class="aiwel"><span class="aiav big">'+ico('spark',30,1.8)+'</span><h2>'+(off?'Eve is getting ready':'Hi, I am Eve')+'</h2><p>'+(off?'She will be here very soon. You can still look at your saved flashcards.':'I am here to help you understand, practise and remember. What shall we learn today?')+'</p>'+
+  (off?'':'<div class="aisug">'+AISUG.map(function(s){return '<button type="button" data-s="'+s[0]+'"><b>'+esc(s[1])+'</b><span>'+esc(s[2])+'</span></button>';}).join('')+'</div>')+'</div>';
+}
+function aiBadge(){var b=$$('aibg'),n=aiDecks().length;if(b){b.textContent=n?n:'';b.style.display=n?'':'none';}}
+function aiNotesUI(){
+ var e=$$('ainote');if(!e)return;
+ if(!AI.notes){e.innerHTML='';e.style.display='none';return;}
+ e.style.display='';e.innerHTML='<div class="ainchip">'+ico('clip',14,2)+'<span class="aint">'+esc(AI.notes.name)+'</span><em>'+AI.notes.words.toLocaleString()+' words'+(AI.notes.cut?', first part used':'')+'</em><button type="button" data-a="rmnote" aria-label="Remove notes">'+ico('x',14,2.4)+'</button></div>';
+}
+async function aiReadNotes(file){
+ var e=fcExt(file.name),t='';
+ if(file.size>30*1048576)throw new Error('That file is too big. Try one under 30 MB.');
+ if(e==='pdf'){
+  await need('pdfjs');var doc;
+  try{doc=await window.pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;}catch(x){throw new Error(pdfMsg(x));}
+  for(var p=1;p<=Math.min(doc.numPages,80)&&t.length<20000;p++){var pg=await doc.getPage(p),tc=await pg.getTextContent(),s='';tc.items.forEach(function(it){s+=it.str+(it.hasEOL?'\n':' ');});t+=s+'\n\n';}
+ }else if(e==='docx'){await need('mammoth');t=(await window.mammoth.extractRawText({arrayBuffer:await file.arrayBuffer()})).value;}
+ else if(/^(html?|xhtml)$/.test(e)){t=fcHtmlText(await file.text());}
+ else if(/^(txt|md|markdown|csv|tsv|json|log)$/.test(e)||/^text\//.test(file.type)){t=await file.text();}
+ else throw new Error('Eve can read text files, PDFs and Word documents.');
+ t=t.replace(/\r\n?/g,'\n').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim();
+ if(!t)throw new Error('I could not find any text in that file. Scanned pictures cannot be read yet.');
+ return {name:file.name.length>40?file.name.slice(0,36)+'...':file.name,text:t.slice(0,14000),cut:t.length>14000,words:t.split(/\s+/).length};
+}
+/* ----- sending ----- */
+function aiBusy(b){
+ AI.busy=b;var s=$$('aisend');if(!s)return;
+ s.innerHTML=ico(b?'stopsq':'send',b?20:20,2.4);s.setAttribute('aria-label',b?'Stop':'Send');s.classList.toggle('stop',b);
+}
+function aiFail(host,code,st,retry){
+ var e=document.createElement('div');e.className='aim eve aierr';e.innerHTML='<span class="aiav sm">'+ico('spark',15,2)+'</span><div class="aic"><div class="aib">'+esc(aiErr(code,st))+'</div>'+(retry?'<div class="aiact"><button type="button" data-a="retry">'+ico('redo',14,2)+'<span>Try again</span></button></div>':'')+'</div>';
+ host.appendChild(e);aiScroll(true);
+}
+function aiClearErr(){document.querySelectorAll('.aierr').forEach(function(e){e.remove();});}
+function aiSend(text,mo){
+ if(AI.busy){return;}
+ var mode=mo||AI.mode;text=String(text||'').trim();
+ if(!text&&AI.notes){text=({summarize:'Please summarize my notes.',cards:'Make flashcards from my notes.',test:'Make a practice test from my notes.',explain:'Please explain my notes.'})[mode]||'';}
+ if(!text){toast('Type a message for Eve first');return;}
+ if(!CFG.aiApi)return;
+ aiClearErr();
+ if(!AI.msgs.length)aiTh().innerHTML='';
+ var um={r:'u',t:text.slice(0,6000),mo:mode};if(AIDIS.test(text.replace(/[\u2018\u2019]/g,"'")))um.care=true;AI.msgs.push(um);
+ aiTh().appendChild(aiEl(um,AI.msgs.length-1));if(um.care)aiTh().appendChild(aiCareEl());
+ var inp=$$('aiin');inp.value='';aiGrow();
+ AI.pin=true;aiScroll(true);aiSave();
+ aiRespond(mode);
+}
+function aiRespond(mode){
+ aiClearErr();
+ var last=AI.msgs[AI.msgs.length-1];
+ if(mode==='cards'||mode==='test')return aiTask(mode==='cards'?'cards':'quiz',last.src?'':last.t,last.src);
+ return aiChat(mode);
+}
+function aiUrl(){return String(CFG.aiApi).replace(/\/+$/,'')+'/chat';}
+async function aiChat(mode){
+ var th=aiTh(),m={r:'e',t:'',mo:mode},ix=AI.msgs.length;
+ var el=aiEl(m,ix);th.appendChild(el);aiBubble(el).innerHTML='<span class="aidots"><i></i><i></i><i></i></span>';
+ AI.ctl=new AbortController();aiBusy(true);AI.pin=true;aiScroll(true);
+ var started=false,raf=0,body={messages:aiHistory(),mode:mode==='chat'?'chat':mode,level:AI.level,hints:AI.hints,deep:AI.deep,notes:AI.notes?AI.notes.text:''};
+ function paint(){raf=0;if(!el.isConnected)return;aiBubble(el).innerHTML=aiMd(m.t);aiMath(aiBubble(el));aiScroll();}
+ var code='',status=0;
+ try{
+  var res=await fetch(aiUrl(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:AI.ctl.signal});
+  status=res.status;
+  if(!res.ok){try{code=(await res.json()).error||'';}catch(e){}throw new Error('http');}
+  if(!res.body||!res.body.getReader){var tx=await res.text();tx.split('\n').forEach(function(l){if(l.indexOf('data:')===0){try{var j=JSON.parse(l.slice(5));if(j.t)m.t+=j.t;else if(j.error)code=j.error;}catch(e){}}});paint();}
+  else{
+   var rd=res.body.getReader(),dec=new TextDecoder(),buf='';
+   for(;;){
+    var r=await rd.read();if(r.done)break;buf+=dec.decode(r.value,{stream:true});var i;
+    while((i=buf.indexOf('\n'))>=0){
+     var ln=buf.slice(0,i).trim();buf=buf.slice(i+1);if(ln.indexOf('data:')!==0)continue;
+     var j;try{j=JSON.parse(ln.slice(5));}catch(e){continue;}
+     if(j.t){started=true;m.t+=j.t;if(!raf)raf=requestAnimationFrame(paint);}
+     else if(j.k==='think'&&!started){var b0=aiBubble(el);if(!b0.querySelector('.aithk'))b0.innerHTML='<span class="aithk">Eve is thinking</span><span class="aidots"><i></i><i></i><i></i></span>';}
+     else if(j.error)code=j.error;
+    }
+   }
+  }
+ }catch(e){
+  if(e&&e.name==='AbortError'){code='';}
+  else if(!code){code=m.t?'':'net';}
+ }
+ if(raf)cancelAnimationFrame(raf);
+ AI.ctl=null;aiBusy(false);
+ if(!el.isConnected)return;
+ if(m.t){aiBubble(el).innerHTML=aiMd(m.t);aiMath(aiBubble(el));AI.msgs.push(m);aiActs(el,m,true);aiSave();AI.pin&&aiScroll();AIX.lastEl=el;aiPrevActs(el);}
+ else{el.remove();if(code)aiFail(th,code,status,true);}
+ if(m.t&&code&&code!=='empty')aiFail(th,code,status,false);
+}
+function aiPrevActs(cur){
+ var th=aiTh();if(!th)return;th.querySelectorAll('.aim.eve:not(.aierr)').forEach(function(e){if(e===cur)return;var f=e.querySelector('.aifu');if(f)f.remove();var r=e.querySelector('[data-a="redo"]');if(r)r.remove();});
+}
+async function aiTask(kind,topic,notesOverride){
+ var th=aiTh(),ix=AI.msgs.length,label=kind==='cards'?'Making your flashcards':'Writing your practice test';
+ var el=aiEl({r:'e',t:''},ix);th.appendChild(el);aiBubble(el).innerHTML='<span class="aithk">'+label+'</span><span class="aidots"><i></i><i></i><i></i></span>';
+ AI.ctl=new AbortController();aiBusy(true);AI.pin=true;aiScroll(true);
+ var n=aiCountFor(kind==='cards'?'cards':'test'),notes=notesOverride!=null?notesOverride:(AI.notes?AI.notes.text:''),code='',status=0,data=null;
+ try{
+  var res=await fetch(aiUrl(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({task:kind,topic:topic,notes:notes,count:n,level:AI.level}),signal:AI.ctl.signal});
+  status=res.status;var j=null;try{j=await res.json();}catch(e){}
+  if(!res.ok||!j||!j.ok){code=(j&&j.error)||'down';}else data=j.data;
+ }catch(e){code=(e&&e.name==='AbortError')?'':'net';}
+ AI.ctl=null;aiBusy(false);
+ if(!el.isConnected)return;
+ el.remove();
+ if(!data){if(code)aiFail(th,code,status,true);return;}
+ var cnt=kind==='cards'?data.cards.length:data.questions.length;
+ var m={r:'e',k:kind==='cards'?'cards':'quiz',d:data,t:kind==='cards'?'I made '+cnt+' flashcards for you: '+data.title+'.':'I made a practice test with '+cnt+' questions: '+data.title+'.',mo:kind==='cards'?'cards':'test'};
+ AI.msgs.push(m);var e2=aiEl(m,AI.msgs.length-1);th.appendChild(e2);aiFill(e2,m);aiActs(e2,m,true);aiPrevActs(e2);aiSave();aiScroll(true);
+}
+function aiCountFor(m){var cnt=m==='cards'?[5,10,15,20]:[3,5,8,10],def=m==='cards'?10:5;return AI.count&&cnt.indexOf(AI.count)>=0?AI.count:def;}
+function aiStop(){if(AI.ctl)AI.ctl.abort();}
+function aiRedo(){
+ if(AI.busy)return;var last=AI.msgs[AI.msgs.length-1];
+ if(!last||last.r!=='e')return;var mo=last.mo||'chat';AI.msgs.pop();aiSave();
+ var th=aiTh(),els=th.querySelectorAll('.aim.eve');if(els.length)els[els.length-1].remove();
+ aiRespond(mo);
+}
+function aiFromText(t,kind){
+ if(AI.busy)return;if(!CFG.aiApi)return;
+ var src=String(t).slice(0,8000),um={r:'u',t:kind==='cards'?'Make flashcards from that.':'Make a practice test from that.',mo:kind,src:src};AI.msgs.push(um);aiTh().appendChild(aiEl(um,AI.msgs.length-1));aiSave();AI.pin=true;aiScroll(true);aiTask(kind==='cards'?'cards':'quiz','',src);
+}
+/* ----- flashcards ----- */
+function aiCards(host,deck,opt){
+ opt=opt||{};var list=deck.cards,q=list.map(function(_,i){return i;}),first={},flip=false,done=0,total=list.length,saved=false;
+ function draw(){
+  if(!q.length)return end();
+  var c=list[q[0]];
+  host.innerHTML='<div class="aicf"><div class="aict"><b>'+esc(deck.title)+'</b><span>'+Math.min(done+1,total)+' / '+total+'</span></div><div class="aibar"><i style="width:'+Math.round(done/total*100)+'%"></i></div>'+
+   '<button type="button" class="aifc'+(flip?' back':'')+'" data-f="1"><span class="aifl">'+(flip?'Answer':'Question')+'</span><div class="aift">'+aiMd(flip?c.a:c.q)+'</div></button>'+
+   '<div class="aicb">'+(flip?'<button type="button" class="btn" data-f="no">Still learning</button><button type="button" class="btn pri" data-f="yes">Got it</button>':'<button type="button" class="btn pri" data-f="1">Show answer</button>')+'</div></div>';
+  aiMath(host);
+ }
+ function end(){
+  var ok=0,miss=[];list.forEach(function(c,i){if(first[i])ok++;else miss.push(i);});
+  var msg=ok===total?'You knew every card. Lovely work!':ok/total>=.7?'Nice work. A little more practice and these will stick.':'Good effort. Going over them again is how memory grows. You have got this.';
+  host.innerHTML='<div class="aicf aiend"><div class="aibig">'+ok+' / '+total+'</div><p>'+msg+'</p><div class="aicb">'+(miss.length?'<button type="button" class="btn" data-f="miss">Practise the '+miss.length+' I missed</button>':'')+(opt.save&&!saved?'<button type="button" class="btn pri" data-f="save">Save deck</button>':'')+(saved?'<span class="hint">Saved to My decks</span>':'')+'<button type="button" class="btn" data-f="again">Start again</button></div></div>';
+  host._miss=miss;
+ }
+ host.onclick=function(e){
+  var t=e.target.closest('[data-f]');if(!t||!host.contains(t))return;var a=t.dataset.f,idx=q[0];
+  if(a==='1'){flip=!flip;draw();}
+  else if(a==='yes'){if(first[idx]===undefined){first[idx]=true;if(opt.onRate)opt.onRate(list[idx],true);}q.shift();done++;flip=false;draw();}
+  else if(a==='no'){if(first[idx]===undefined){first[idx]=false;if(opt.onRate)opt.onRate(list[idx],false);}q.push(q.shift());flip=false;draw();}
+  else if(a==='again'){q=list.map(function(_,i){return i;});first={};done=0;flip=false;draw();}
+  else if(a==='miss'){q=(host._miss||[]).slice();q.forEach(function(i){delete first[i];});done=total-q.length;flip=false;draw();}
+  else if(a==='save'){saved=aiSaveDeck(deck);if(saved)toast('Saved to My decks');end();}
+  aiReveal(host.querySelector('.aicb'));
+ };
+ draw();
+}
+function aiSaveDeck(deck){
+ var a=aiDecks();a.unshift({id:Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36),title:deck.title,t:Date.now(),cards:deck.cards.slice(0,200).map(function(c){return {q:c.q,a:c.a,b:0,d:0};})});
+ var ok=aiDecksSave(a);if(!ok)toast('Could not save on this device');aiBadge();return ok;
+}
+/* ----- practice test ----- */
+function aiQuiz(host,quiz,opt){
+ var qs=quiz.questions,i=0,score=0,miss=[],pick=-1;
+ function draw(){
+  if(i>=qs.length)return end();var q=qs[i];pick=-1;
+  host.innerHTML='<div class="aicf"><div class="aict"><b>'+esc(quiz.title)+'</b><span>Question '+(i+1)+' of '+qs.length+'</span></div><div class="aibar"><i style="width:'+Math.round(i/qs.length*100)+'%"></i></div><div class="aiqq">'+aiMd(q.q)+'</div><div class="aiops">'+
+   q.options.map(function(o,k){return '<button type="button" class="aiop" data-o="'+k+'"><span class="aik">'+'ABCDE'.charAt(k)+'</span><span class="aiot">'+aiMd(o,true)+'</span></button>';}).join('')+'</div><div class="aiwhy" style="display:none"></div><div class="aicb"></div></div>';
+  aiMath(host);
+ }
+ function end(){
+  var pc=score/qs.length,msg=pc===1?'Perfect score. You really know this!':pc>=.7?'Great work. You have a solid grip on this.':pc>=.4?'A good start. Let us look at what to review.':'This one was tough, and that is okay. Seeing what you missed is the first step to learning it.';
+  host.innerHTML='<div class="aicf aiend"><div class="aibig">'+score+' / '+qs.length+'</div><p>'+msg+'</p>'+(miss.length?'<div class="aimiss">'+miss.map(function(k){var q=qs[k];return '<div><b>'+aiMd(q.q,true)+'</b><span>Answer: '+aiMd(q.options[q.answer],true)+'</span>'+(q.why?'<em>'+aiMd(q.why,true)+'</em>':'')+'</div>';}).join('')+'</div>':'')+'<div class="aicb">'+(miss.length?'<button type="button" class="btn pri" data-q="retry">Try the ones I missed</button>':'')+'<button type="button" class="btn" data-q="again">Take it again</button></div></div>';
+  aiMath(host);host._miss=miss.slice();
+ }
+ host.onclick=function(e){
+  var t=e.target.closest('[data-o],[data-q]');if(!t||!host.contains(t))return;
+  if(t.dataset.o!==undefined){
+   if(pick>=0)return;pick=+t.dataset.o;var q=qs[i],ok=pick===q.answer;if(ok)score++;else miss.push(i);
+   host.querySelectorAll('.aiop').forEach(function(b,k){b.disabled=true;if(k===q.answer)b.classList.add('ok');else if(k===pick)b.classList.add('no');});
+   var w=host.querySelector('.aiwhy');w.style.display='';w.innerHTML='<b>'+(ok?'Correct!':'Not quite.')+'</b> '+(q.why?aiMd(q.why,true):'');aiMath(w);
+   host.querySelector('.aicb').innerHTML='<button type="button" class="btn pri" data-q="next">'+(i+1>=qs.length?'See my score':'Next')+'</button>';aiReveal(host.querySelector('.aicb'));
+  }else if(t.dataset.q==='next'){i++;draw();}
+  else if(t.dataset.q==='again'){i=0;score=0;miss=[];draw();}
+  else if(t.dataset.q==='retry'){var ms=(host._miss||[]).map(function(k){return qs[k];});qs=ms;i=0;score=0;miss=[];draw();}
+ };
+ draw();
+}
+/* ----- saved decks ----- */
+function aiSheet(){
+ var s=document.createElement('div');s.className='aish';s.innerHTML='<div class="aish-p" role="dialog" aria-modal="true"><button type="button" class="aish-x" aria-label="Close">'+ico('x',18,2.4)+'</button><div class="aish-b"></div></div>';
+ document.body.appendChild(s);
+ function close(){s.remove();document.removeEventListener('keydown',kd);aiBadge();}
+ function kd(e){if(e.key==='Escape')close();}
+ s.addEventListener('click',function(e){if(e.target===s||e.target.closest('.aish-x'))close();});document.addEventListener('keydown',kd);
+ return s.querySelector('.aish-b');
+}
+function aiDecksUI(){
+ var body=aiSheet();
+ function list(){
+  var a=aiDecks();
+  body.innerHTML='<h2 style="margin:0 0 4px;font-size:1.3rem">My decks</h2><p class="hint" style="margin:0 0 14px">Cards you get right come back later, and ones you miss come back sooner. That is how memory sticks.</p>'+
+   (a.length?a.map(function(d){var due=aiDueN(d);return '<div class="aidk" data-id="'+d.id+'"><div><b>'+esc(d.title)+'</b><span>'+d.cards.length+' cards &middot; '+(due?due+' ready to review':'all caught up')+'</span></div><div class="row" style="gap:6px;flex-wrap:nowrap"><button type="button" class="btn sm pri" data-k="go">'+(due?'Review':'Practise')+'</button><button type="button" class="btn sm" data-k="del" aria-label="Delete deck">'+ico('x',14,2.4)+'</button></div></div>';}).join(''):'<div class="note">No saved decks yet. Ask Eve for flashcards, then tap <b>Save deck</b> at the end.</div>');
+ }
+ list();
+ body.onclick=function(e){
+  var b=e.target.closest('[data-k]');if(!b)return;
+  if(b.dataset.k==='back'){list();return;}
+  var row=b.closest('[data-id]'),all=aiDecks(),d=all.filter(function(x){return x.id===row.dataset.id;})[0];if(!d)return;
+  if(b.dataset.k==='del'){aiDecksSave(all.filter(function(x){return x.id!==d.id;}));list();aiBadge();return;}
+  var now=Date.now(),idx=[];d.cards.forEach(function(c,i){if(!c.d||c.d<=now)idx.push(i);});
+  if(!idx.length)d.cards.forEach(function(c,i){idx.push(i);});
+  var deck={title:d.title,cards:idx.map(function(i){var c=d.cards[i];return {q:c.q,a:c.a,_i:i};})};
+  body.innerHTML='<button type="button" class="btn sm" data-k="back" style="margin-bottom:12px">Back</button><div class="aiwg"></div>';
+  aiCards(body.querySelector('.aiwg'),deck,{onRate:function(c,ok){
+   var cur=aiDecks(),dd=cur.filter(function(x){return x.id===d.id;})[0];if(!dd)return;var cc=dd.cards[c._i];if(!cc)return;
+   if(ok){cc.b=Math.min(5,(cc.b||0)+1);cc.d=Date.now()+AIBOX[cc.b]*864e5;}else{cc.b=0;cc.d=0;}
+   aiDecksSave(cur);}});
+ };
+}
+/* ----- page ----- */
+function aiGrow(){var t=$$('aiin');if(!t)return;if(!t.value){t.style.height='';return;}t.style.height='auto';t.style.height=Math.min(t.scrollHeight,170)+'px';}
+function aiModeSet(m){
+ AI.mode=m;aiSave();
+ var c=$$('aichips');if(c){c.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.m===m);});var on=c.querySelector('.on');if(on&&on.scrollIntoView&&c.scrollWidth>c.clientWidth){c.scrollLeft=Math.max(0,on.offsetLeft-12);}}
+ var t=$$('aiin');if(t)t.placeholder=aiPh(m);
+ aiOpts();
+}
+function aiOpts(){
+ var o=$$('aiopt');if(!o)return;var m=AI.mode,tk=(m==='cards'||m==='test');
+ var cnt=m==='cards'?[5,10,15,20]:[3,5,8,10],cur=aiCountFor(m);
+ o.innerHTML='<label class="aisel">Level <select class="sel" id="ailv">'+AILV.map(function(l){return '<option value="'+l[0]+'"'+(AI.level===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join('')+'</select></label>'+
+  (tk?'<label class="aisel">'+(m==='cards'?'Cards':'Questions')+' <select class="sel" id="aicnt">'+cnt.map(function(n){return '<option value="'+n+'"'+(cur===n?' selected':'')+'>'+n+'</option>';}).join('')+'</select></label>':'')+
+  '<button type="button" class="aipill'+(AI.hints?' on':'')+'" id="aihint" aria-pressed="'+AI.hints+'" title="Eve guides you with hints before giving the answer">Hints first</button>'+
+  '<button type="button" class="aipill'+(AI.deep?' on':'')+'" id="aideep" aria-pressed="'+AI.deep+'" title="Slower, but better for hard problems">Think deeper</button>';
+ $$('ailv').onchange=function(){AI.level=this.value;aiSave();};
+ if(tk)$$('aicnt').onchange=function(){AI.count=+this.value;aiSave();};
+ $$('aihint').onclick=function(){AI.hints=!AI.hints;this.classList.toggle('on',AI.hints);this.setAttribute('aria-pressed',AI.hints);aiSave();toast(AI.hints?'Hints first is on. Eve will guide you before giving answers.':'Hints first is off');};
+ $$('aideep').onclick=function(){AI.deep=!AI.deep;this.classList.toggle('on',AI.deep);this.setAttribute('aria-pressed',AI.deep);aiSave();toast(AI.deep?'Think deeper is on. Replies are slower but better for hard problems.':'Think deeper is off');};
+}
+function aiPage(){
+ nav('eve');
+ if(!AI.loaded){aiLoad();AI.loaded=true;}
+ AI.busy=false;AI.ctl=null;AI.pin=true;var off=!CFG.aiApi;
+ app.innerHTML='<div class="aiw"><div class="aihd"><span class="aiav">'+ico('spark',24,1.8)+'</span><div style="min-width:0"><h1>Eve</h1><p>Your study buddy</p></div><span class="sp"></span><button type="button" class="btn sm aibt" id="aidk" aria-label="My decks">'+ico('deck',15,2)+'<span>My decks</span><em id="aibg" style="display:none"></em></button><button type="button" class="btn sm aibt" id="ainew" aria-label="New chat">'+ico('plus',15,2.4)+'<span>New chat</span></button></div>'+
+  '<div class="aichips" id="aichips">'+AIMODES.map(function(m){return '<button type="button" data-m="'+m[0]+'">'+m[1]+'</button>';}).join('')+'</div>'+
+  '<div class="aiopt" id="aiopt"></div><div class="aith" id="aith" role="log" aria-live="polite"></div>'+
+  '<div class="aicomp" id="aicomp"><div class="ainote" id="ainote" style="display:none"></div><div class="aicrow"><button type="button" class="aiicon" id="aiat" aria-label="Attach notes" title="Attach notes (PDF, Word or text)"'+(off?' disabled':'')+'>'+ico('clip',20,2)+'</button><textarea id="aiin" rows="1" maxlength="6000" aria-label="Message Eve" placeholder=""'+(off?' disabled':'')+'></textarea><button type="button" class="aisend" id="aisend" aria-label="Send"'+(off?' disabled':'')+'>'+ico('send',20,2.4)+'</button></div><p class="aifoot">Eve is an AI and can make mistakes.<span class="aif2"> Check anything important.</span></p></div></div><input type="file" id="aifile" hidden accept=".txt,.md,.markdown,.csv,.tsv,.json,.html,.htm,.pdf,.docx">';
+ aiModeSet(AI.mode);aiNotesUI();aiRender();aiBadge();
+ $$('aichips').onclick=function(e){var b=e.target.closest('button');if(b){aiModeSet(b.dataset.m);$$('aiin').focus({preventScroll:true});}};
+ $$('ainew').onclick=function(){if(AI.busy)aiStop();AI.msgs=[];AI.notes=null;aiSave();aiNotesUI();aiClearErr();aiRender();window.scrollTo(0,0);toast('Started a new chat');};
+ $$('aidk').onclick=aiDecksUI;
+ var inp=$$('aiin'),fine=window.matchMedia&&matchMedia('(pointer:fine)').matches;
+ inp.oninput=aiGrow;
+ inp.onkeydown=function(e){if(e.key==='Enter'&&!e.shiftKey&&fine&&!e.isComposing){e.preventDefault();if(!AI.busy)aiSend(inp.value);}};
+ $$('aisend').onclick=function(){if(AI.busy)aiStop();else aiSend(inp.value);};
+ $$('aiat').onclick=function(){$$('aifile').click();};
+ $$('aifile').onchange=async function(e){
+  var f=e.target.files[0];e.target.value='';if(!f)return;
+  toast('Reading '+f.name+'...');
+  try{AI.notes=await aiReadNotes(f);aiSave();aiNotesUI();toast('Eve has your notes. Ask her about them!');}
+  catch(x){toast((x&&x.message)||'I could not read that file');}
+ };
+ $$('ainote').onclick=function(e){if(e.target.closest('[data-a="rmnote"]')){AI.notes=null;aiSave();aiNotesUI();}};
+ var th=$$('aith');
+ th.onclick=function(e){
+  var s=e.target.closest('[data-s]');
+  if(s){aiModeSet(s.dataset.s);var t=$$('aiin');t.focus();if(s.dataset.s==='summarize'&&!AI.notes)$$('aifile').click();return;}
+  var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a,msgEl=b.closest('.aim'),m=msgEl&&AI.msgs[+msgEl.dataset.i];
+  if(a==='cp'){var pre=b.closest('.aicode').querySelector('pre');aiCopy(pre.textContent);}
+  else if(a==='copy'&&m)aiCopy(m.t);
+  else if(a==='say'&&m)aiSpeak(m.t,b);
+  else if(a==='redo')aiRedo();
+  else if(a==='retry'){aiClearErr();var l=AI.msgs[AI.msgs.length-1];if(l&&l.r==='u')aiRespond(l.mo||AI.mode);}
+  else if(a==='mkc'&&m)aiFromText(m.t,'cards');
+  else if(a==='mkt'&&m)aiFromText(m.t,'test');
+  else if(a==='fu'){var f=AIFU[+b.dataset.k];if(f)aiSend(f[1],f[2]);}
+ };
+ window.addEventListener('scroll',aiOnScroll,{passive:true});
+}
+function aiOnScroll(){if(!aiTh()){window.removeEventListener('scroll',aiOnScroll);return;}if(!AI.busy)return;AI.pin=aiNear();}
+function aiCopy(t){
+ function ok(){toast('Copied');}
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(ok,function(){aiCopyOld(t);});}else aiCopyOld(t);
+}
+function aiCopyOld(t){try{var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('Copied');}catch(e){toast('Could not copy');}}
 /* ---------- Eve IDE ---------- */
 var PYBASES=[].concat(/^https?:/.test(location.protocol)?[new URL('pyodide/',location.href).href]:[],['https://cdn.jsdelivr.net/pyodide/v0.27.7/full/','https://cdn.jsdelivr.net/npm/pyodide@0.27.7/','https://unpkg.com/pyodide@0.27.7/']);
 var IDEW=[
@@ -2056,9 +2656,9 @@ function ideKey(e){
 }
 function idePage(){nav('ide');
  ideLoad();
- app.innerHTML='<h1 style="font-size:2.2rem">Eve IDE</h1><p class="lead" style="font-size:1rem">Write and run Python, C and Java programs. Press Run, or Ctrl+Enter.</p>'+
+ app.innerHTML='<h1 style="font-size:2.2rem">Eve IDE</h1><p class="lead" style="font-size:1rem">Write and run Python, C and Java programs. Press the play button, or Ctrl+Enter.</p>'+
  '<div class="idebar"><div class="seg" id="idetabs">'+['python','c','java'].map(function(l){return '<a href="javascript:void 0" data-l="'+l+'"'+(l===IDE.lang?' class="on"':'')+'>'+IDEL[l]+'</a>';}).join('')+'</div>'+
- '<div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn" id="idestop" style="display:none">Stop</button><button class="btn pri" id="iderun">'+ico('play',15,2.6)+' Run</button></div></div>'+
+ '<div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn" id="idestop" style="display:none">Stop</button><button class="btn pri" id="iderun" aria-label="Run" title="Run (Ctrl+Enter)">'+ico('play',20,2)+'</button></div></div>'+
  '<div class="card ideed"><div class="idehead"><span id="idefn">'+IDEN[IDE.lang]+'</span><span class="row" style="gap:6px"><button class="btn sm" id="ideopen">Open</button><button class="btn sm" id="idesave">Save</button><button class="btn sm" id="idereset">Example</button></span></div>'+
  '<div class="idebody"><pre class="idegut" id="idegut" aria-hidden="true"></pre><div class="idemain"><pre class="idehl" id="idehl" aria-hidden="true"><code></code></pre><textarea id="idecode" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" aria-label="Code editor"></textarea></div></div>'+
  '<div class="idekeys" id="idekeys">'+['Tab','{','}','(',')','[',']','"',';',':','#','<','>','='].map(function(k){return '<button type="button" tabindex="-1" data-k="'+k+'">'+(k==='Tab'?'Tab':esc(k))+'</button>';}).join('')+'</div></div>'+
@@ -2079,7 +2679,7 @@ function idePage(){nav('ide');
  $$('idekeys').querySelectorAll('button').forEach(function(b){b.onpointerdown=function(e){e.preventDefault();};b.onclick=function(){ideIns(b.dataset.k==='Tab'?'    ':b.dataset.k);};});
  ideSync();ideBusy(false);
 }
-window.addEventListener('hashchange',function(){if(location.hash!=='#/ide'&&IDE.w){ideWd(false);try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;IDE.busy=false;}});
+window.addEventListener('hashchange',function(){if(location.hash!=='#/eve')aiLeave();if(location.hash!=='#/ide'&&IDE.w){ideWd(false);try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;IDE.busy=false;}});
 function isearchPage(){nav('isearch');
  app.innerHTML='<h1 style="font-size:2.2rem">Image Search</h1><p class="lead" style="font-size:1rem">Search by words or with a picture. Results come from our own independent image index, not from another search engine.</p>'+
   '<div class="card" id="idrop" style="margin-top:16px"><div class="row" style="flex-wrap:nowrap;gap:8px"><input type="text" id="iq" placeholder="Search by words, or paste an image link" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off"><label class="btn" style="cursor:pointer;display:inline-flex;align-items:center" title="Search with a picture">'+ico('image',18)+'<input type="file" id="ifile" accept="image/*" hidden></label><button class="btn pri" id="igo" style="display:inline-flex;align-items:center;gap:6px">'+ico('search',17,2.4)+'Search</button></div><div id="ithumb"></div><p class="hint" style="margin:10px 0 0">You can also drop or paste (Ctrl+V) a picture here to find similar ones.</p></div><div id="ires" style="margin-top:14px"></div>';
@@ -2097,8 +2697,8 @@ document.addEventListener('paste',function(e){if(location.hash!=='#/isearch')ret
 
 
 function route(){var r=location.hash.replace('#/','');menu(false);app.onclick=null;
- app.classList.toggle('full',r===''||r==='home'||!!FULL[r]||(['planner','image','pdf','virus','calc','isearch','grab','convert','ide','index-admin'].indexOf(r)<0));
- if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='isearch')isearchPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='index-admin')indexAdminPage();else if(FULL[r])FULL[r]();else home();window.scrollTo(0,0);}
+ app.classList.toggle('full',r===''||r==='home'||!!FULL[r]||(['planner','image','pdf','virus','calc','isearch','grab','convert','ide','eve','index-admin'].indexOf(r)<0));
+ if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='isearch')isearchPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(r==='index-admin')indexAdminPage();else if(FULL[r])FULL[r]();else home();window.scrollTo(0,0);}
 
 document.getElementById('yr').textContent=new Date().getFullYear();window.addEventListener('hashchange',route);route();
 })();
