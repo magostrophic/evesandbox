@@ -127,7 +127,8 @@ header.open .burger i:nth-child(1){top:20px;transform:rotate(45deg)}
 header.open .burger i:nth-child(2){opacity:0}
 header.open .burger i:nth-child(3){top:20px;transform:rotate(-45deg)}
 .mpanel{position:absolute;left:0;right:0;top:100%;max-height:0;overflow:hidden;visibility:hidden;background:var(--bg);transition:max-height .3s ease,visibility 0s .3s}
-header.open .mpanel{max-height:calc(100vh - var(--hh));max-height:calc(100svh - var(--hh));visibility:visible;overflow:auto;transition:max-height .35s ease}
+header.open .mpanel{max-height:calc(100vh - var(--hh));max-height:calc(100svh - var(--hh));visibility:visible;overflow:hidden;transition:max-height .35s ease}
+header.open.mset .mpanel{overflow:auto}
 .mlist{margin:14px 16px 20px;background:var(--card);border-radius:18px;overflow:hidden}
 .mlist a{display:flex;justify-content:space-between;align-items:center;padding:15px 18px;color:var(--ink);text-decoration:none;font-size:1.05rem;font-weight:500;border-top:.5px solid var(--line)}
 .mlist a:first-child{border-top:0}
@@ -1429,7 +1430,7 @@ function atOut(){var at=C.at,r=atCalc(),req=reqPct(),v=$$('atv');if(!v)return;
   else if(r.T+n>0){var pp=(r.A+a)/(r.T+n)*100;fm=dot(!isNaN(req)?(pp+1e-9>=req?'good':'bad'):'','Projected overall attendance: <b>'+f1(pp)+'%</b> ('+(r.A+a)+' of '+(r.T+n)+' classes).');}}
  o.innerHTML=fm;}
 
-function menu(o){var b=document.getElementById('burger');if(!b)return;b.setAttribute('aria-expanded',o?'true':'false');document.getElementById('hdr').classList.toggle('open',!!o);document.body.style.overflow=o?'hidden':'';}
+function menu(o){var b=document.getElementById('burger');if(!b)return;b.setAttribute('aria-expanded',o?'true':'false');var hd=document.getElementById('hdr');clearTimeout(menu.t);hd.classList.remove('mset');hd.classList.toggle('open',!!o);if(o)menu.t=setTimeout(function(){hd.classList.add('mset');},400);document.body.style.overflow=o?'hidden':'';}
 document.getElementById('burger').onclick=function(){menu(this.getAttribute('aria-expanded')!=='true');};
 document.getElementById('mpanel').addEventListener('click',function(e){if(e.target.closest('a'))menu(false);});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')menu(false);});
@@ -2111,7 +2112,7 @@ function aiPlain(t){
  return String(t).replace(/```[\s\S]*?(```|$)/g,' (code) ').replace(/\$\$[\s\S]+?\$\$/g,' (equation) ').replace(/\\\[[\s\S]+?\\\]/g,' (equation) ').replace(/\$([^$\n]+)\$/g,function(m,x){return ' '+x.replace(/\\[a-zA-Z]+/g,' ').replace(/[{}^_\\]/g,' ')+' ';}).replace(/!?\[([^\]]*)\]\([^)]*\)/g,'$1').replace(/https?:\/\/\S+/g,' link ').replace(/[#*_`>~|]/g,' ').replace(/\s+/g,' ').trim();
 }
 var AIFEM=/\b(aria|jenny|sonia|libby|maisie|ava|emma|michelle|nancy|jane|sara|amber|ashley|cora|elizabeth|monica|clara|natasha|annette|molly|zira|hazel|susan|heera|neerja|swara|veena|lekha|kalpana|priya|samantha|karen|moira|tessa|fiona|victoria|allison|serena|kate|nicky|zoe|joanna|salli|kendra|kimberly|ivy|amy|olivia|isabella|aditi|raveena|catherine|linda|laura|helena|paulina|sabina|lucia|elsa)|female|woman|google us english|google (हिन्दी|hindi)/i;
-var AIMAL=/\b(david|mark|george|ravi|hemant|prabhat|rishi|guy|ryan|christopher|eric|brian|andrew|daniel|alex|fred|tom|james|thomas|oliver|aaron|arthur|rocko|reed|eddy|diego|jorge|luca|henry|matthew|joey|justin|kevin|russell|geraint|liam|alan|bruce|ralph|albert|gordon|noah|mike|steffan|connor|jacques|cellos|bells|boing|bubbles|trinoids|zarvox|whisper|wobble|jester|organ|superstar|hysterical|deranged)\b|\bmale\b/i;
+var AIMAL=/\b(david|mark|george|ravi|hemant|prabhat|rishi|guy|ryan|christopher|eric|brian|andrew|daniel|alex|fred|tom|james|thomas|oliver|aaron|arthur|wilson|jason|tony|jacob|roger|davis|mitchell|william|clark|alfie|sam|rocko|reed|eddy|diego|jorge|luca|henry|matthew|joey|justin|kevin|russell|geraint|liam|alan|bruce|ralph|albert|gordon|noah|mike|steffan|connor|jacques|cellos|bells|boing|bubbles|trinoids|zarvox|whisper|wobble|jester|organ|superstar|hysterical|deranged)\b|\bmale\b/i;
 function aiVoices(){try{return (window.speechSynthesis.getVoices()||[]).filter(function(v){return v&&v.name;});}catch(e){return [];}}
 function aiIsFem(v){return !!v&&AIFEM.test(v.name)&&!AIMAL.test(v.name);}
 function aiRank(){
@@ -2121,24 +2122,14 @@ function aiRank(){
   if(l.indexOf(lg)===0)s+=40;if(l===full)s+=10;if(l.indexOf('en')===0)s+=6;
   return {v:v,s:s};}).sort(function(a,b){return b.s-a.s;});
 }
-function aiSavedVoice(){try{return localStorage.getItem('evevoice')||'';}catch(e){return '';}}
 function aiVoice(){
- var r=aiRank();if(!r.length)return null;var want=aiSavedVoice();
- if(want)for(var i=0;i<r.length;i++)if(r[i].v.name===want)return r[i].v;
- return r[0].v;
+ var r=aiRank();return r.length?r[0].v:null;
 }
-function aiVoiceName(v){return String(v.name).replace(/^Microsoft\s+/i,'').replace(/\s+-\s+.*$/,'').replace(/\s*Online\s*\(Natural\)/i,' (natural)').replace(/\s*\(Natural\)/i,' (natural)')+' · '+(v.lang||'');}
-function aiVoiceUI(){
- if(!('speechSynthesis' in window))return '';
- var r=aiRank().filter(function(x){return x.s>-100;}).slice(0,10);if(!r.length)return '';
- var cur=aiSavedVoice();
- return '<label class="aisel">Voice <select class="sel" id="aivoice" style="max-width:190px"><option value="">Eve (soft, automatic)</option>'+r.map(function(x){return '<option value="'+esc(x.v.name)+'"'+(cur===x.v.name?' selected':'')+'>'+esc(aiVoiceName(x.v))+'</option>';}).join('')+'</select></label>';
-}
-/* voices arrive a moment after the page opens on many browsers: ask early and refresh the picker when they show up */
+/* voices arrive a moment after the page opens on many browsers: ask early, and Listen waits for them if they are late */
 function aiVoiceInit(){
  if(!('speechSynthesis' in window))return;
+ try{localStorage.removeItem('evevoice');}catch(e){}
  aiVoices();
- if(!AIX.vi){AIX.vi=1;try{speechSynthesis.addEventListener('voiceschanged',function(){if($$('aiopt'))aiOpts();});}catch(e){}}
 }
 function aiVoicesReady(cb){var n=0;(function t(){if(aiVoices().length||n++>6)return cb();setTimeout(t,120);})();}
 function aiChunks(t){
@@ -2149,7 +2140,7 @@ function aiChunks(t){
 /* a soft, slightly slow delivery, one short sentence group at a time so it sounds natural and never cuts off */
 function aiSpeakText(text,onDone){
  var ss=window.speechSynthesis,parts=aiChunks(text);if(!parts.length){if(onDone)onDone();return;}
- var v=aiVoice(),chosen=!!aiSavedVoice(),lift=v&&!chosen&&!aiIsFem(v);
+ var v=aiVoice(),lift=v&&!aiIsFem(v);
  parts.forEach(function(p,i){var u=new SpeechSynthesisUtterance(p);if(v){try{u.voice=v;u.lang=v.lang;}catch(e){}}u.rate=.92;u.pitch=lift?1.2:1;u.volume=1;
   if(onDone){if(i===parts.length-1)u.onend=onDone;u.onerror=onDone;}ss.speak(u);});
 }
@@ -2450,12 +2441,11 @@ function aiModeSet(m){
 function aiOpts(){
  var o=$$('aiopt');if(!o)return;var m=AI.mode,tk=(m==='cards'||m==='test');
  var cnt=m==='cards'?[5,10,15,20]:[3,5,8,10],cur=aiCountFor(m);
- o.innerHTML='<label class="aisel">Level <select class="sel" id="ailv">'+AILV.map(function(l){return '<option value="'+l[0]+'"'+(AI.level===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join('')+'</select></label>'+aiVoiceUI()+
+ o.innerHTML='<label class="aisel">Level <select class="sel" id="ailv">'+AILV.map(function(l){return '<option value="'+l[0]+'"'+(AI.level===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join('')+'</select></label>'+
   (tk?'<label class="aisel">'+(m==='cards'?'Cards':'Questions')+' <select class="sel" id="aicnt">'+cnt.map(function(n){return '<option value="'+n+'"'+(cur===n?' selected':'')+'>'+n+'</option>';}).join('')+'</select></label>':'')+
   '<button type="button" class="aipill'+(AI.hints?' on':'')+'" id="aihint" aria-pressed="'+AI.hints+'" title="Eve guides you with hints before giving the answer">Hints first</button>'+
   '<button type="button" class="aipill'+(AI.deep?' on':'')+'" id="aideep" aria-pressed="'+AI.deep+'" title="Slower, but better for hard problems">Think deeper</button>';
  $$('ailv').onchange=function(){AI.level=this.value;aiSave();};
- var av=$$('aivoice');if(av)av.onchange=function(){try{if(this.value)localStorage.setItem('evevoice',this.value);else localStorage.removeItem('evevoice');}catch(e){}try{speechSynthesis.cancel();}catch(e){}AIX.tok=(AIX.tok||0)+1;AIX.say=null;aiSayUI();aiVoicesReady(function(){aiSpeakText("Hi, I'm Eve. I'm here to help you learn.");});};
  if(tk)$$('aicnt').onchange=function(){AI.count=+this.value;aiSave();};
  $$('aihint').onclick=function(){AI.hints=!AI.hints;this.classList.toggle('on',AI.hints);this.setAttribute('aria-pressed',AI.hints);aiSave();toast(AI.hints?'Hints first is on. Eve will guide you before giving answers.':'Hints first is off');};
  $$('aideep').onclick=function(){AI.deep=!AI.deep;this.classList.toggle('on',AI.deep);this.setAttribute('aria-pressed',AI.deep);aiSave();toast(AI.deep?'Think deeper is on. Replies are slower but better for hard problems.':'Think deeper is off');};
