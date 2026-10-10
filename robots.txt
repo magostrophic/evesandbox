@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /index-admin/
+Disallow: /grab/
+Disallow: /isearch/
+
+Sitemap: https://evesandbox.com/sitemap.xml
