@@ -804,7 +804,7 @@ function vDraw(){
  o.innerHTML=h;
 }
 
-var CFG=Object.assign({email:'',donate:[],lensApi:'',grabApi:'',runApi:'',aiApi:''},window.EVE_CFG||{});
+var CFG=Object.assign({email:'',donate:[],lensApi:'',grabApi:'',runApi:'',aiApi:'',turnstileKey:''},window.EVE_CFG||{});
 var TL=[
  {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
  {r:'eve',c:'i1',ic:'spark',n:'Eve AI',d:'Your caring study buddy. Ask questions, get step-by-step help, make flashcards and practice tests, and learn from your own notes.'},
@@ -841,6 +841,13 @@ function aboutPage(){nav('about');
  '<div class="grid" style="margin-top:20px"><div class="card"><span class="ic">'+ico('lock',24)+'</span><h3>Private by design</h3><p>Images and PDFs are processed in your browser. They are not uploaded.</p></div><div class="card"><span class="ic i2">'+ico('heart',24)+'</span><h3>Free and simple</h3><p>No accounts, no paywalls, no clutter. Open a tool and use it.</p></div><div class="card"><span class="ic i3">'+ico('trend',24)+'</span><h3>Always growing</h3><p>New tools are added over time, shaped by what students actually need.</p></div></div>'+
  '<h2>What you can do today</h2><ul>'+TL.filter(function(t){return !t.lock;}).map(function(t){return '<li><b>'+t.n+'.</b> '+t.d+'</li>';}).join('')+'</ul>'+
  '<h2>Get involved</h2><p>Have an idea for a tool, or found something that does not work? <a href="#/contact" style="color:var(--brand)">Tell us</a>. If Eve Sandbox helps you, you can <a href="#/donate" style="color:var(--brand)">support its development</a>.</p></div>';}
+/* ---------- Cloudflare Turnstile (bot check for the Contact form). Off until turnstileKey is set in config.js ---------- */
+var TS={p:null};
+function tsOn(){return !!CFG.turnstileKey;}
+function tsLib(){if(TS.p)return TS.p;TS.p=new Promise(function(ok,no){
+ if(window.turnstile)return ok(window.turnstile);
+ var sc=document.createElement('script');sc.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';sc.async=true;
+ sc.onload=function(){window.turnstile?ok(window.turnstile):(TS.p=null,no(new Error('ts')));};sc.onerror=function(){TS.p=null;no(new Error('ts'));};document.head.appendChild(sc);});return TS.p;}
 function contactPage(){nav('contact');
  app.innerHTML=banner('Contact','Get in touch','Ideas, bug reports and questions are all welcome.')+
  '<div class="wrapc"><div class="card" style="max-width:640px"><form id="cf" novalidate>'+
@@ -849,11 +856,14 @@ function contactPage(){nav('contact');
  '<label class="fld">Topic<select id="ct"><option>Question</option><option>Bug report</option><option>Tool idea</option><option>Other</option></select></label>'+
  '<label class="fld">Message<textarea id="cm" maxlength="3000"></textarea></label>'+
  '<div class="hp" aria-hidden="true"><label>Leave this empty<input id="cw" type="text" tabindex="-1" autocomplete="off"></label></div>'+
- '<div class="bar"><span class="sp"></span><button class="btn pri" id="cb" type="submit">Send message</button></div>'+
+ (tsOn()?'<div class="cts" id="cts"></div>':'')+'<div class="bar"><span class="sp"></span><button class="btn pri" id="cb" type="submit">Send message</button></div>'+
  '<p class="cfs" id="cs" role="status" aria-live="polite"></p></form>'+
  (CFG.email?'<p class="hint cfmail">Prefer email? Write to <a href="mailto:'+esc(CFG.email)+'">'+esc(CFG.email)+'</a>.</p>':'')+'</div></div>';
  var st=document.getElementById('cs'),bt=document.getElementById('cb');
  function say(t,k){st.className='cfs'+(k?' '+k:'');st.textContent=t;}
+ var tok='',tid=null;
+ if(tsOn()&&CFG.aiApi){tsLib().then(function(T){var h=document.getElementById('cts');if(!h)return;tid=T.render(h,{sitekey:CFG.turnstileKey,theme:'auto',callback:function(x){tok=x;},'expired-callback':function(){tok='';},'error-callback':function(){tok='';}});},function(){say('The security check could not load. Please reload the page.','bad');});}
+ function tsReset(){tok='';try{if(tid!=null&&window.turnstile)turnstile.reset(tid);}catch(e){}}
  function viaMail(t,body){if(!CFG.email)return false;location.href='mailto:'+CFG.email+'?subject='+encodeURIComponent('Eve Sandbox: '+t)+'&body='+encodeURIComponent(body);return true;}
  document.getElementById('cf').onsubmit=function(e){e.preventDefault();
   var n=document.getElementById('cn').value.trim(),em=document.getElementById('ce').value.trim(),t=document.getElementById('ct').value,m=document.getElementById('cm').value.trim(),hp=document.getElementById('cw').value;
@@ -861,19 +871,22 @@ function contactPage(){nav('contact');
   if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){say('That email address does not look right. Please check it, or leave it empty.','bad');return;}
   var body=m+'\n\n- '+(n||'Anonymous')+(em?' ('+em+')':'');
   if(!CFG.aiApi){if(!viaMail(t,body)){say('Sending is not available yet. Please try again soon.','bad');}else say('Your email app should open with the message ready to send.');return;}
+  if(tsOn()&&!tok){say('Please finish the security check above first.','bad');return;}
   bt.disabled=true;bt.textContent='Sending...';say('');
   var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},20000);
   function fail(msg){bt.disabled=false;bt.textContent='Send message';say(msg,'bad');}
   function backup(){fail('We could not send that right now.'+(CFG.email?' Please email us at '+CFG.email+' instead.':' Please try again in a little while.'));}
-  fetch(String(CFG.aiApi).replace(/\/+$/,'')+'/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,topic:t,message:m,website:hp}),signal:ctl.signal})
+  fetch(String(CFG.aiApi).replace(/\/+$/,'')+'/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:em,topic:t,message:m,website:hp,token:tok}),signal:ctl.signal})
   .then(function(r){return r.json().catch(function(){return {};}).then(function(j){return {r:r,j:j};});})
-  .then(function(x){clearTimeout(tm);
+  .then(function(x){clearTimeout(tm);tsReset();
+   if(!(x.r.ok&&x.j.ok))console.warn('contact form refused:',x.r.status,x.j.error||'');
+   if(x.j.error==='captcha'){fail('The security check did not pass. Please try again.');return;}
    if(x.r.ok&&x.j.ok){document.getElementById('cf').reset();bt.disabled=false;bt.textContent='Send message';say('Thank you! Your message has been sent.'+(em?' We will reply by email.':''),'ok');return;}
    if(x.j.error==='slow'){fail('You have sent a few messages already. Please try again a little later.');return;}
    if(x.j.error==='short'){fail('Please write a short message first.');return;}
    if(x.j.error==='email'){fail('That email address does not look right. Please check it, or leave it empty.');return;}
    backup();})
-  .catch(function(){clearTimeout(tm);backup();});};}
+  .catch(function(e){clearTimeout(tm);tsReset();console.warn('contact form could not reach the server:',e&&e.message);backup();});};}
 function donatePage(){nav('donate');
  var links=(CFG.donate||[]).filter(function(d){return /^https:\/\//.test(d.url||'');});
  app.innerHTML=banner('Donate','Help keep it free','Eve Sandbox is free for every student. Donations pay for the time and hosting that keep it going.')+
@@ -896,7 +909,7 @@ function privacyPage(){nav('privacy');
  app.innerHTML=banner('Legal','Privacy','Last updated: October 3, 2026')+
  '<div class="wrapc doc" style="max-width:760px"><h2 style="margin-top:0">The short version</h2><p>No accounts. Your images and PDFs stay on your device. We do not add analytics or advertising code to this site.</p>'+
  '<h2>What stays on your device</h2><ul><li>Images and PDFs you open in the tools are processed in your browser and are never sent to us.</li><li>The Study Planner saves your plan in your browser’s local storage so it is there next time. Clearing your browser data removes it.</li></ul>'+
- '<h2>What leaves your device</h2><ul><li><b>Virus Checker:</b> the domain you enter is sent to Cloudflare (DNS), rdap.org (domain registration records) and Reddit (search) to fetch results. The tool never contacts the entered site itself. Those services have their own privacy policies.</li><li><b>PDF tools:</b> the PDF software libraries are downloaded from a public content delivery network the first time you use them.</li><li><b>Eve IDE:</b> Python runs on your device after its engine is downloaded from a public content delivery network. When you run C or Java, your code and input are sent to a free online compile server, which compiles and runs them and sends back the result.</li><li><b>File Converter and Grab Box:</b> files are converted on your device. Some conversions download a software library from a public content delivery network the first time. Grab Box fetches the link you paste from the website it points to.</li><li><b>Eve AI:</b> the messages you send Eve, and any notes you attach, are sent to an AI service (Cloudflare Workers AI) so it can write a reply. They are not stored by this website. Your chat history and saved flashcards stay on your device. Please do not share passwords or private personal details.</li><li><b>Links you open</b> (such as VirusTotal or Reddit) take you to other websites with their own policies.</li><li><b>Contact form:</b> the name, email and message you type are sent to us through an email delivery service so they reach us. We use them only to read and answer your message.</li></ul>'+
+ '<h2>What leaves your device</h2><ul><li><b>Virus Checker:</b> the domain you enter is sent to Cloudflare (DNS), rdap.org (domain registration records) and Reddit (search) to fetch results. The tool never contacts the entered site itself. Those services have their own privacy policies.</li><li><b>PDF tools:</b> the PDF software libraries are downloaded from a public content delivery network the first time you use them.</li><li><b>Eve IDE:</b> Python runs on your device after its engine is downloaded from a public content delivery network. When you run C or Java, your code and input are sent to a free online compile server, which compiles and runs them and sends back the result.</li><li><b>File Converter and Grab Box:</b> files are converted on your device. Some conversions download a software library from a public content delivery network the first time. Grab Box fetches the link you paste from the website it points to.</li><li><b>Eve AI:</b> the messages you send Eve, and any notes you attach, are sent to an AI service (Cloudflare Workers AI) so it can write a reply. They are not stored by this website. Your chat history and saved flashcards stay on your device. Please do not share passwords or private personal details.</li><li><b>Links you open</b> (such as VirusTotal or Reddit) take you to other websites with their own policies.</li><li><b>Bot check:</b> the Contact form can use Cloudflare Turnstile to tell people from automated programs. Cloudflare may look at technical details of your browser to do this, under its own privacy policy.</li><li><b>Contact form:</b> the name, email and message you type are sent to us through an email delivery service so they reach us. We use them only to read and answer your message.</li></ul>'+
  '<h2>Hosting</h2><p>Whoever hosts the site may keep ordinary server logs, such as IP addresses and page requests, under their own policy.</p>'+
  '<h2>Questions</h2><p>Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
 var CKEY='eve-sandbox:calc:v1';
