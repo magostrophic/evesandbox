@@ -858,7 +858,7 @@ function contactPage(){nav('contact');
  '<div class="hp" aria-hidden="true"><label>Leave this empty<input id="cw" type="text" tabindex="-1" autocomplete="off"></label></div>'+
  (tsOn()?'<div class="cts" id="cts"></div>':'')+'<div class="bar"><span class="sp"></span><button class="btn pri" id="cb" type="submit">Send message</button></div>'+
  '<p class="cfs" id="cs" role="status" aria-live="polite"></p></form>'+
- (CFG.email?'<p class="hint cfmail">Prefer email? Write to <a href="mailto:'+esc(CFG.email)+'">'+esc(CFG.email)+'</a>.</p>':'')+'</div></div>';
+ '</div></div>';
  var st=document.getElementById('cs'),bt=document.getElementById('cb');
  function say(t,k){st.className='cfs'+(k?' '+k:'');st.textContent=t;}
  var tok='',tid=null;
