@@ -140,6 +140,8 @@ var IC={
  search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
  ext:'<path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
  calc:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M16 14v4M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/>',
+ qr:'<rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3M21 21v.01M12 7v3a2 2 0 0 1-2 2H7M3 12h.01M12 3h.01M12 16v.01M16 12h1M21 12v.01M12 21v-1"/>',
+ copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
  plus:'<path d="M5 12h14M12 5v14"/>',
  minus:'<path d="M5 12h14"/>',
  fit:'<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>',
@@ -165,7 +167,7 @@ function colorOf(n){for(var i=0;i<S.subjects.length;i++)if(S.subjects[i].n===n)r
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var app=document.getElementById('app');
 
-function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',isearch:'tools',grab:'tools',convert:'tools',ide:'tools',eve:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
+function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',qr:'tools',isearch:'tools',grab:'tools',convert:'tools',ide:'tools',eve:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
 
 function planner(){
  nav('planner');
@@ -804,7 +806,7 @@ function vDraw(){
  o.innerHTML=h;
 }
 
-var CFG=Object.assign({email:'',donate:[],lensApi:'',grabApi:'',runApi:'',aiApi:'',turnstileKey:''},window.EVE_CFG||{});
+var CFG=Object.assign({email:'',donate:[],donateApi:'',lensApi:'',grabApi:'',runApi:'',aiApi:'',turnstileKey:''},window.EVE_CFG||{});
 var TL=[
  {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
  {r:'eve',c:'i1',ic:'spark',n:'Eve AI',d:'Your caring study buddy. Ask questions, get step-by-step help, make flashcards and practice tests, and learn from your own notes.'},
@@ -814,6 +816,7 @@ var TL=[
  {r:'isearch',c:'i6',ic:'search',lock:1,n:'Image Search',d:'Search by words or with a picture, using our own independent image index.'},
  {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop and remove plain backgrounds from images.'},
  {r:'pdf',c:'i3',ic:'pdf',n:'PDF Tool',d:'Make, merge, split and compress PDFs, and add or remove passwords.'},
+ {r:'qr',c:'i9',ic:'qr',n:'QR Code Generator',d:'Make a QR code for a link, text, Wi-Fi, email, phone number or contact card, and download it as PNG or SVG.'},
  {r:'planner',c:'',ic:'calendar',n:'Study Planner',d:'Plan your week with subjects and time slots, then print it or save it as an image.'},
  {r:'virus',c:'i4',ic:'shield',n:'Virus Checker',d:'Check whether a website or link looks safe before you open it.'}];
 var LOCKED={};TL.forEach(function(t){if(t.lock)LOCKED[t.r]=1;});
@@ -887,29 +890,93 @@ function contactPage(){nav('contact');
    if(x.j.error==='email'){fail('That email address does not look right. Please check it, or leave it empty.');return;}
    backup();})
   .catch(function(e){clearTimeout(tm);tsReset();console.warn('contact form could not reach the server:',e&&e.message);backup();});};}
+var DN={amt:'',busy:false};
+var DQ=[50,100,250,500,1000];
+function inr(n){return '₹'+Number(n).toLocaleString('en-IN');}
 function donatePage(){nav('donate');
- var links=(CFG.donate||[]).filter(function(d){return /^https:\/\//.test(d.url||'');});
+ var links=(CFG.donate||[]).filter(function(d){return /^https:\/\//.test(d.url||'');}),api=(CFG.donateApi||'').replace(/\/+$/,'');
+ var box;
+ if(api){
+  box='<div id="dnote"></div><h3 style="margin:0 0 4px">Support Eve Sandbox</h3><p style="margin:0 0 6px">Choose an amount, or type your own. You will pay on a secure page run by our payment partner.</p>'+
+   '<form id="dform" novalidate autocomplete="on"><div class="dch" id="dch">'+DQ.map(function(v){return '<button type="button" class="btn" data-v="'+v+'">'+inr(v)+'</button>';}).join('')+'</div>'+
+   '<label class="qfl" for="damt">Amount in rupees (₹)<input type="text" id="damt" inputmode="numeric" maxlength="6" placeholder="Enter an amount" autocomplete="off"></label>'+
+   '<label class="qfl" for="dph">Mobile number<input type="text" id="dph" inputmode="tel" maxlength="16" placeholder="10-digit mobile number" autocomplete="tel-national"></label>'+
+   '<div class="qg2"><label class="qfl" for="dnm">Name (optional)<input type="text" id="dnm" maxlength="60" autocomplete="name"></label><label class="qfl" for="dem">Email (optional)<input type="text" id="dem" inputmode="email" maxlength="120" autocomplete="email" autocapitalize="off" spellcheck="false"></label></div>'+
+   '<div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" id="dws" tabindex="-1" autocomplete="off"></label></div>'+
+   '<p class="hint" style="margin:10px 0 0">Our payment partner needs a mobile number to start a payment. Your details go to our payment partner and are not stored by Eve Sandbox. Donations are optional and every tool stays free.</p>'+
+   '<div class="bar"><button class="btn pri" id="dgo" type="submit" disabled>Donate</button></div><p class="cfs" id="dmsg" role="status" aria-live="polite"></p></form>';
+ }else if(links.length){
+  box='<h3 style="margin:0 0 6px">Support Eve Sandbox</h3><p style="margin:0 0 12px">Choose a way to give. Every contribution, big or small, helps.</p><div class="cta" style="margin-top:0">'+links.map(function(d){return '<a class="btn pri" target="_blank" rel="noopener noreferrer" href="'+esc(d.url)+'">'+esc(d.label||'Donate')+'</a>';}).join('')+'</div>';
+ }else box='<h3 style="margin:0 0 6px">Support Eve Sandbox</h3><p style="margin:0">Donations are not open yet. Thank you for thinking of it. Check back soon, or <a href="#/contact" style="color:var(--brand)">get in touch</a> if you would like to help in another way.</p>';
  app.innerHTML=banner('Donate','Help keep it free','Eve Sandbox is free for every student. Donations pay for the time and hosting that keep it going.')+
- '<div class="wrapc doc"><div class="card" style="max-width:640px"><h3 style="margin:0 0 6px">Support Eve Sandbox</h3>'+
- (links.length?'<p style="margin:0 0 12px">Choose a way to give. Every contribution, big or small, helps.</p><div class="cta" style="margin-top:0">'+links.map(function(d){return '<a class="btn pri" target="_blank" rel="noopener noreferrer" href="'+esc(d.url)+'">'+esc(d.label||'Donate')+'</a>';}).join('')+'</div>':'<p style="margin:0">Donations are not open yet. Thank you for thinking of it. Check back soon, or <a href="#/contact" style="color:var(--brand)">get in touch</a> if you would like to help in another way.</p>')+'</div>'+
+ '<div class="wrapc doc"><div class="card" style="max-width:640px">'+box+'</div>'+
  '<h2>Where the money goes</h2><ul><li>Building and improving the tools.</li><li>Hosting and keeping the site fast and online.</li><li>Keeping Eve Sandbox free, with no ads and no sign-up.</li></ul>'+
- '<p>Donating is optional and does not unlock anything. Every tool stays free for everyone.</p></div>';}
+ '<p>Donating is optional and does not unlock anything. Every tool stays free for everyone.</p></div>';
+ if(api){dInit(api);dThanks(api);}
+}
+function dAmt(){var t=($$('damt').value||'').replace(/[,\s]/g,'');return /^\d{1,6}$/.test(t)?parseInt(t,10):NaN;}
+function dSync(){var a=dAmt(),ok=a>=10&&a<=50000;
+ $$('dgo').disabled=!ok||DN.busy;$$('dgo').textContent=DN.busy?'Opening payment page...':(ok?'Donate '+inr(a):'Donate');
+ document.querySelectorAll('#dch .btn').forEach(function(b){b.classList.toggle('pri',ok&&+b.dataset.v===a);});}
+function dInit(api){
+ $$('dch').onclick=function(e){var v=e.target.dataset&&e.target.dataset.v;if(!v)return;$$('damt').value=v;$$('dmsg').textContent='';dSync();};
+ $$('damt').oninput=function(){this.value=this.value.replace(/[^\d,\s]/g,'');$$('dmsg').textContent='';dSync();};
+ $$('dform').onsubmit=async function(e){e.preventDefault();if(DN.busy)return;
+  var a=dAmt(),m=$$('dmsg');m.className='cfs';
+  if(!(a>=10&&a<=50000)){m.className='cfs bad';m.textContent='Please enter an amount between ₹10 and ₹50,000.';return;}
+  var ph=$$('dph').value.replace(/[\s\-()]/g,'').replace(/^(\+91|91|0)(?=\d{10}$)/,'');
+  if(!/^[6-9]\d{9}$/.test(ph)){m.className='cfs bad';m.textContent='Please enter a valid 10-digit mobile number.';$$('dph').focus();return;}
+  var em=$$('dem').value.trim();
+  if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){m.className='cfs bad';m.textContent='That email address does not look right.';$$('dem').focus();return;}
+  DN.busy=true;dSync();m.textContent='';
+  try{
+   var r=await fetch(api+'/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,phone:ph,name:$$('dnm').value,email:em,website:$$('dws').value})});
+   var j=null;try{j=await r.json();}catch(x){}
+   if(r.ok&&j&&/^https:\/\//.test(j.url||'')){m.textContent='Taking you to the secure payment page...';window.location.href=j.url;return;}
+   var er=(j&&j.error)||'';console.warn('donation not started:',r.status,er);
+   m.className='cfs bad';
+   m.textContent=er==='amount'?'Please enter an amount between ₹10 and ₹50,000.':er==='phone'?'Please enter a valid 10-digit mobile number.':er==='email'?'That email address does not look right.':er==='slow'?'That was a lot of tries. Please wait a little while and try again.':'We could not start the payment right now. Please try again in a little while.';
+  }catch(x){console.warn('donation could not reach the server:',x);m.className='cfs bad';m.textContent='We could not start the payment right now. Please check your internet connection and try again.';}
+  DN.busy=false;dSync();};
+ dSync();
+}
+async function dThanks(api){
+ var id=(new URLSearchParams(location.search)).get('thanks');if(!id||!/^don_[a-z0-9]{8,40}$/.test(id))return;
+ var n=$$('dnote');if(!n)return;
+ n.innerHTML='<div class="note" style="margin:0 0 16px">Checking your payment...</div>';
+ try{history.replaceState(null,'',U('donate'));}catch(e){}
+ var st='UNKNOWN',amt=0;
+ try{var r=await fetch(api+'/status?id='+encodeURIComponent(id));var j=await r.json();st=j.status||'UNKNOWN';amt=j.amount||0;}catch(e){}
+ if(!$$('dnote'))return;
+ if(st==='PAID')n.innerHTML='<div class="note" style="margin:0 0 16px;background:rgba(52,199,89,.16)"><b>Thank you!</b> Your donation'+(amt?' of '+esc(inr(amt)):'')+' went through. It really helps keep Eve Sandbox free for every student.</div>';
+ else if(st==='PENDING')n.innerHTML='<div class="note" style="margin:0 0 16px"><b>We have not received the payment yet.</b> If you completed it, it can take a few minutes to show up. If you did not finish, you are welcome to try again below.</div>';
+ else if(st==='EXPIRED')n.innerHTML='<div class="note" style="margin:0 0 16px">That payment link has expired, so nothing was charged. You are welcome to try again below.</div>';
+ else n.innerHTML='<div class="note" style="margin:0 0 16px">We could not check that payment just now. If money left your account, it will be shown in your bank or UPI app, and you can <a href="#/contact">contact us</a>.</div>';
+}
 function termsPage(){nav('terms');
- app.innerHTML=banner('Legal','Terms of Service','Last updated: October 3, 2026')+
+ app.innerHTML=banner('Legal','Terms of Service','Last updated: October 10, 2026')+
  '<div class="wrapc doc" style="max-width:760px"><p>By using Eve Sandbox you agree to these terms. If you do not agree, please do not use the site.</p>'+
  '<h2>1. Using the site</h2><p>Eve Sandbox provides free tools for personal and educational use. You must use them lawfully and must not use the site to harm others, break the law, or interfere with how the site works.</p>'+
  '<h2>2. Your files and data</h2><p>The image and PDF tools work inside your browser. Your files are not uploaded to Eve Sandbox. You keep all rights to your files and are responsible for having the right to edit them. Keep a copy of your originals, because we cannot recover files for you. See the <a href="#/privacy" style="color:var(--brand)">Privacy</a> page for details.</p>'+
  '<h2>3. Passwords on PDFs</h2><p>If you protect a PDF with a password, we cannot recover that password for you. Only remove a password from a file you own or have permission to unlock. The tool cannot guess or crack passwords.</p>'+
  '<h2>4. Virus Checker</h2><p>The Virus Checker gives an automated opinion based on the look of an address and on third-party services. It is not a guarantee that a site is safe or unsafe. Use your own judgment, and do not enter passwords or payment details on a site you are unsure about.</p>'+
  '<h2>5. No warranty</h2><p>The site and its tools are provided “as is” and “as available”, without promises of accuracy, availability or fitness for a particular purpose. To the fullest extent the law allows, we are not liable for any loss or damage from using the site or relying on its results.</p>'+
- '<h2>6. Third-party services and links</h2><p>Some features use or link to services run by others, such as Cloudflare, Reddit and security-checking websites. We do not control them and are not responsible for their content or policies.</p>'+
+ '<h2>6. Third-party services and links</h2><p>Some features use or link to services run by others, such as lookup services, security-checking websites and payment and email services. We do not control them and are not responsible for their content or policies.</p>'+
  '<h2>7. Changes</h2><p>We may change the site or these terms from time to time. Continuing to use the site after a change means you accept the updated terms.</p>'+
  '<h2>8. Contact</h2><p>Questions about these terms? Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
 function privacyPage(){nav('privacy');
- app.innerHTML=banner('Legal','Privacy','Last updated: October 3, 2026')+
+ app.innerHTML=banner('Legal','Privacy','Last updated: October 10, 2026')+
  '<div class="wrapc doc" style="max-width:760px"><h2 style="margin-top:0">The short version</h2><p>No accounts. Your images and PDFs stay on your device. We do not add analytics or advertising code to this site.</p>'+
- '<h2>What stays on your device</h2><ul><li>Images and PDFs you open in the tools are processed in your browser and are never sent to us.</li><li>The Study Planner saves your plan in your browser’s local storage so it is there next time. Clearing your browser data removes it.</li></ul>'+
- '<h2>What leaves your device</h2><ul><li><b>Virus Checker:</b> the domain you enter is sent to Cloudflare (DNS), rdap.org (domain registration records) and Reddit (search) to fetch results. The tool never contacts the entered site itself. Those services have their own privacy policies.</li><li><b>PDF tools:</b> the PDF software libraries are downloaded from a public content delivery network the first time you use them.</li><li><b>Eve IDE:</b> Python runs on your device after its engine is downloaded from a public content delivery network. When you run C or Java, your code and input are sent to a free online compile server, which compiles and runs them and sends back the result.</li><li><b>File Converter and Grab Box:</b> files are converted on your device. Some conversions download a software library from a public content delivery network the first time. Grab Box fetches the link you paste from the website it points to.</li><li><b>Eve AI:</b> the messages you send Eve, and any notes you attach, are sent to an AI service (Cloudflare Workers AI) so it can write a reply. They are not stored by this website. Your chat history and saved flashcards stay on your device. Please do not share passwords or private personal details.</li><li><b>Links you open</b> (such as VirusTotal or Reddit) take you to other websites with their own policies.</li><li><b>Bot check:</b> the Contact form can use Cloudflare Turnstile to tell people from automated programs. Cloudflare may look at technical details of your browser to do this, under its own privacy policy.</li><li><b>Contact form:</b> the name, email and message you type are sent to us through an email delivery service so they reach us. We use them only to read and answer your message.</li></ul>'+
+ '<h2>What stays on your device</h2><ul><li>Images and PDFs you open in the tools are processed in your browser and are never sent to us.</li><li>The Study Planner, the Complex Calculator and your Eve AI chats save their data in your browser so it is there next time. Clearing your browser data removes it.</li></ul>'+
+ '<h2>What leaves your device</h2><p>Some features need help from outside services. We keep this to the minimum each feature needs, and those services follow their own privacy policies.</p><ul>'+
+ '<li><b>Virus Checker:</b> the address you enter is sent to a few public lookup services to find out about it. The tool never visits the address itself.</li>'+
+ '<li><b>Supporting software:</b> some tools (such as the PDF tools, the File Converter and Eve IDE) download the extra software they need from a public source the first time you use them.</li>'+
+ '<li><b>Eve IDE:</b> Python runs on your device. When you run C or Java, your code and input are sent to an online service that runs them and sends back the result.</li>'+
+ '<li><b>Grab Box:</b> it fetches the link you paste from the website it points to.</li>'+
+ '<li><b>Eve AI:</b> the messages you send Eve, and any notes you attach, are sent to an AI service so it can write a reply. They are not stored by this website. Your chat history and saved flashcards stay on your device. Please do not share passwords or private personal details.</li>'+
+ '<li><b>Links you open</b> take you to other websites with their own policies.</li>'+
+ '<li><b>Contact form:</b> the form uses a security check to tell people from automated programs, and the check provider may look at technical details of your browser to do this. The name, email and message you type are sent to us by email so they reach us. We use them only to read and answer your message.</li>'+
+ '<li><b>Donations:</b> if you donate, the amount and the mobile number you type (plus the name and email, if you give them) are sent to our payment partner to start the payment, and you pay on their page under their own privacy policy. Eve Sandbox does not store your payment details or your mobile number.</li></ul>'+
  '<h2>Hosting</h2><p>Whoever hosts the site may keep ordinary server logs, such as IP addresses and page requests, under their own policy.</p>'+
  '<h2>Questions</h2><p>Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
 var CKEY='eve-sandbox:calc:v1';
@@ -1052,8 +1119,8 @@ var FULL={tools:toolsPage,about:aboutPage,contact:contactPage,donate:donatePage,
 
 /* ---------- pages and addresses ---------- */
 var PAGE=EVE_PAGE,PM=!!PAGE,BASEP=EVE_BASE,INIT404=PAGE==='404';
-var ROUTES=['tools','about','contact','donate','terms','privacy','planner','image','pdf','virus','calc','isearch','grab','convert','ide','eve','index-admin'];
-var TITLES={home:'Home',tools:'Tools',about:'About',contact:'Contact',donate:'Donate',terms:'Terms of Service',privacy:'Privacy',planner:'Study Planner',image:'Image Tool',pdf:'PDF Tool',virus:'Virus Checker',calc:'Complex Calculator',isearch:'Image Search',grab:'Grab Box',convert:'File Converter',ide:'Eve IDE',eve:'Eve AI','index-admin':'Image Index','404':'Page Not Found'};
+var ROUTES=['tools','about','contact','donate','terms','privacy','planner','image','pdf','virus','calc','qr','isearch','grab','convert','ide','eve','index-admin'];
+var TITLES={home:'Home',tools:'Tools',about:'About',contact:'Contact',donate:'Donate',terms:'Terms of Service',privacy:'Privacy',planner:'Study Planner',image:'Image Tool',pdf:'PDF Tool',virus:'Virus Checker',calc:'Complex Calculator',qr:'QR Code Generator',isearch:'Image Search',grab:'Grab Box',convert:'File Converter',ide:'Eve IDE',eve:'Eve AI','index-admin':'Image Index','404':'Page Not Found'};
 function U(r){r=(!r||r==='home')?'':r;return PM?BASEP+(r?r+'/':''):'#/'+r;}
 function curR(){
  if(!PM)return location.hash.replace('#/','');
@@ -1282,6 +1349,177 @@ function grabPage(){nav('grab');
  '<div class="card" style="margin-top:16px"><div class="row" style="flex-wrap:nowrap;gap:8px"><input type="text" id="gbu" inputmode="url" placeholder="Paste a link here" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn pri" id="gbgo">Grab</button></div>'+
  '<p class="hint" style="margin:10px 0 0">Only download files you made or have permission to save. Video sites and social networks are not supported.</p></div><div class="note" id="gbmsg" style="display:none"></div><div id="gbout"></div>';
  $$('gbgo').onclick=function(){gbGo();};$$('gbu').onkeydown=function(e){if(e.key==='Enter')gbGo();};
+}
+/* ---------- QR Code Generator ---------- */
+/* QR encoder: qrcode-generator by Kazuhiko Arase, MIT license (https://github.com/kazuhikoarase/qrcode-generator). Bundled so the tool works offline. */
+var QRL=(function(){var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(o*r,n*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});;return qrcode;})();
+QRL.stringToBytes=QRL.stringToBytesFuncs['UTF-8'];
+var QKEY='eve-sandbox:qr:v1';
+var QS={tab:'link',v:{link:'',text:'',ssid:'',wpw:'',wsec:'WPA',whid:'',eto:'',esub:'',ebody:'',ph:'',smn:'',smm:'',cfn:'',cln:'',corg:'',ctel:'',cem:'',curl:''},
+ fg:'#000000',bg:'#ffffff',tr:false,ecl:'M',st:'square',mg:4,px:1024,logo:null,logoUrl:'',res:null};
+try{var qraw=localStorage.getItem(QKEY);if(qraw){var qp=JSON.parse(qraw);
+ if(qp&&/^#[0-9a-f]{6}$/i.test(qp.fg)&&/^#[0-9a-f]{6}$/i.test(qp.bg)){QS.fg=qp.fg;QS.bg=qp.bg;QS.tr=!!qp.tr;
+  if('LMQH'.indexOf(qp.ecl)>=0&&qp.ecl)QS.ecl=qp.ecl;if(['square','rounded','dots'].indexOf(qp.st)>=0)QS.st=qp.st;
+  if([0,2,4,6,8].indexOf(qp.mg)>=0)QS.mg=qp.mg;if([512,1024,2048,4096].indexOf(qp.px)>=0)QS.px=qp.px;}}}catch(e){}
+function qSave(){try{localStorage.setItem(QKEY,JSON.stringify({fg:QS.fg,bg:QS.bg,tr:QS.tr,ecl:QS.ecl,st:QS.st,mg:QS.mg,px:QS.px}));}catch(e){}}
+var QTABS=[['link','Link'],['text','Text'],['wifi','Wi-Fi'],['email','Email'],['phone','Phone'],['sms','SMS'],['card','Contact']];
+function qWifiEsc(s){return String(s).replace(/([\\;,:"])/g,'\\$1');}
+function qVcEsc(s){return String(s).replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/([;,])/g,'\\$1');}
+function qData(){var v=QS.v,t=QS.tab;
+ if(t==='link'){var u=v.link.trim();if(!u)return '';return /^[a-z][a-z0-9+.\-]*:/i.test(u)&&!/^[^\s\/:]+:\d+(\/|$)/.test(u)?u:'https://'+u;}
+ if(t==='text')return v.text.trim()?v.text:'';
+ if(t==='wifi'){if(!v.ssid.trim())return '';var nop=v.wsec==='nopass';
+  return 'WIFI:T:'+v.wsec+';S:'+qWifiEsc(v.ssid)+';'+(nop?'':'P:'+qWifiEsc(v.wpw)+';')+(v.whid?'H:true;':'')+';';}
+ if(t==='email'){var to=v.eto.trim();if(!to)return '';var q=[];if(v.esub)q.push('subject='+encodeURIComponent(v.esub));if(v.ebody)q.push('body='+encodeURIComponent(v.ebody));
+  return 'mailto:'+to+(q.length?'?'+q.join('&'):'');}
+ if(t==='phone'){var n=v.ph.replace(/[^\d+]/g,'');return n?'tel:'+n:'';}
+ if(t==='sms'){var n2=v.smn.replace(/[^\d+]/g,'');return n2?'SMSTO:'+n2+':'+v.smm:'';}
+ if(t==='card'){var fn=v.cfn.trim(),ln=v.cln.trim();if(!(fn||ln||v.corg.trim()||v.ctel.trim()||v.cem.trim()||v.curl.trim()))return '';
+  var L=['BEGIN:VCARD','VERSION:3.0','N:'+qVcEsc(ln)+';'+qVcEsc(fn)+';;;','FN:'+qVcEsc((fn+' '+ln).trim()||v.corg.trim())];
+  if(v.corg.trim())L.push('ORG:'+qVcEsc(v.corg.trim()));if(v.ctel.trim())L.push('TEL:'+v.ctel.trim());if(v.cem.trim())L.push('EMAIL:'+v.cem.trim());if(v.curl.trim())L.push('URL:'+v.curl.trim());
+  L.push('END:VCARD');return L.join('\n');}
+ return '';}
+function qBuild(data){var lv=(QS.logo?'H':QS.ecl),q=QRL(0,lv);q.addData(data);q.make();
+ var n=q.getModuleCount(),m=[];for(var r=0;r<n;r++){m[r]=[];for(var c=0;c<n;c++)m[r][c]=q.isDark(r,c);}
+ var ls=0;if(QS.logo){ls=Math.max(3,Math.floor(n*0.22));if((n-ls)%2)ls++;}
+ return {n:n,m:m,lv:lv,ls:ls};}
+function qRR(x,y,w,h,r){if(r<=0)return 'M'+x+' '+y+'h'+w+'v'+h+'h-'+w+'z';
+ var a='a'+r+' '+r+' 0 0 1 ';
+ return 'M'+(x+r)+' '+y+'h'+(w-2*r)+a+r+' '+r+'v'+(h-2*r)+a+'-'+r+' '+r+'h-'+(w-2*r)+a+'-'+r+' -'+r+'v-'+(h-2*r)+a+r+' -'+r+'z';}
+function qFind(r,c,n){return (r<7&&c<7)||(r<7&&c>=n-7)||(r>=n-7&&c<7);}
+function qPath(res){var n=res.n,m=res.m,mg=QS.mg,st=QS.st,d='',r,c;
+ var skip=function(r,c){return res.ls&&r>=(n-res.ls)/2&&r<(n+res.ls)/2&&c>=(n-res.ls)/2&&c<(n+res.ls)/2;};
+ if(st==='square'){
+  for(r=0;r<n;r++){c=0;while(c<n){if(m[r][c]&&!skip(r,c)){var s=c;while(c<n&&m[r][c]&&!skip(r,c))c++;d+='M'+(s+mg)+' '+(r+mg)+'h'+(c-s)+'v1h-'+(c-s)+'z';}else c++;}}
+  return d;}
+ var rad=st==='dots'?0.42:0.3;
+ for(r=0;r<n;r++)for(c=0;c<n;c++){
+  if(!m[r][c]||qFind(r,c,n)||skip(r,c))continue;
+  var x=c+mg,y=r+mg;
+  if(st==='dots'){var cx=x+0.5,cy=y+0.5;d+='M'+(cx-rad)+' '+cy+'a'+rad+' '+rad+' 0 1 0 '+(rad*2)+' 0a'+rad+' '+rad+' 0 1 0 -'+(rad*2)+' 0z';}
+  else d+=qRR(x,y,1,1,rad);}
+ [[0,0],[0,n-7],[n-7,0]].forEach(function(p){var x=p[1]+mg,y=p[0]+mg;
+  d+=qRR(x,y,7,7,st==='dots'?3.2:2.2)+qRR(x+1,y+1,5,5,st==='dots'?2.2:1.3)+qRR(x+2,y+2,3,3,st==='dots'?1.5:0.9);});
+ return d;}
+function qLogoBox(res){var mg=QS.mg,o=Math.floor((res.n-res.ls)/2)+mg;return {x:o,y:o,s:res.ls};}
+function qCanvas(res,px){var T=res.n+2*QS.mg,cell=Math.max(1,Math.floor(px/T)),W=cell*T,cv=document.createElement('canvas');
+ cv.width=cv.height=W;var x=cv.getContext('2d');
+ if(!QS.tr){x.fillStyle=QS.bg;x.fillRect(0,0,W,W);}
+ x.fillStyle=QS.fg;x.save();x.scale(cell,cell);x.fill(new Path2D(qPath(res)),'evenodd');x.restore();
+ if(res.ls&&QS.logo){var b=qLogoBox(res),pad=0.45,iw=QS.logo.naturalWidth||QS.logo.width,ih=QS.logo.naturalHeight||QS.logo.height,inner=b.s-pad*2,k=Math.min(inner/iw,inner/ih),w=iw*k,h=ih*k;
+  x.save();x.scale(cell,cell);
+  if(QS.tr){x.fillStyle='#ffffff';}else x.fillStyle=QS.bg;
+  x.fill(new Path2D(qRR(b.x,b.y,b.s,b.s,0.8)));
+  x.drawImage(QS.logo,b.x+(b.s-w)/2,b.y+(b.s-h)/2,w,h);x.restore();}
+ return cv;}
+function qSvg(res){var T=res.n+2*QS.mg,s='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+T+' '+T+'" width="1024" height="1024" shape-rendering="'+(QS.st==='square'?'crispEdges':'geometricPrecision')+'">';
+ if(!QS.tr)s+='<rect width="'+T+'" height="'+T+'" fill="'+QS.bg+'"/>';
+ s+='<path fill-rule="evenodd" fill="'+QS.fg+'" d="'+qPath(res)+'"/>';
+ if(res.ls&&QS.logoUrl){var b=qLogoBox(res),pad=0.45;
+  s+='<path fill="'+(QS.tr?'#ffffff':QS.bg)+'" d="'+qRR(b.x,b.y,b.s,b.s,0.8)+'"/><image href="'+QS.logoUrl+'" x="'+(b.x+pad)+'" y="'+(b.y+pad)+'" width="'+(b.s-pad*2)+'" height="'+(b.s-pad*2)+'" preserveAspectRatio="xMidYMid meet"/>';}
+ return s+'</svg>';}
+function qLum(h){var c=[1,3,5].map(function(i){var v=parseInt(h.substr(i,2),16)/255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);});return 0.2126*c[0]+0.7152*c[1]+0.0722*c[2];}
+function qContrast(){var a=qLum(QS.fg),b=qLum(QS.bg),hi=Math.max(a,b),lo=Math.min(a,b);return {ratio:(hi+0.05)/(lo+0.05),inverted:a>b};}
+var QERR={L:'Low (7%)',M:'Medium (15%)',Q:'Quartile (25%)',H:'High (30%)'};
+
+function qrPage(){nav('qr');
+ app.innerHTML='<h1 style="font-size:2.2rem">QR Code Generator</h1><p class="lead" style="font-size:1rem">Make a QR code for a link, text, Wi-Fi, email, phone number or contact card. Everything is made on your device, so nothing you type is uploaded.</p>'+
+ '<div class="qrw"><div class="qrl">'+
+ '<div class="seg" id="qtabs" style="margin:16px 0 0">'+QTABS.map(function(t){return '<a data-qt="'+t[0]+'" href="javascript:void 0">'+t[1]+'</a>';}).join('')+'</div>'+
+ '<div class="card" style="margin-top:12px" id="qf"></div>'+
+ '<div class="card" style="margin-top:14px" id="qo"></div></div>'+
+ '<div class="qrr"><div class="card qrp" id="qp"></div></div></div>';
+ $$('qtabs').onclick=function(e){var t=e.target.dataset.qt;if(!t)return;QS.tab=t;qForm();qUpdate();};
+ qPanel();qForm();qOpts();qUpdate();
+}
+function qField(k,label,o){o=o||{};var id='qi-'+k,val=esc(QS.v[k]);
+ if(o.area)return '<label class="qfl" for="'+id+'">'+label+'<textarea id="'+id+'" data-qk="'+k+'" rows="'+(o.rows||4)+'" maxlength="'+(o.max||1200)+'" placeholder="'+esc(o.ph||'')+'">'+val+'</textarea></label>';
+ return '<label class="qfl" for="'+id+'">'+label+'<input type="text" id="'+id+'" data-qk="'+k+'" value="'+val+'" maxlength="'+(o.max||300)+'" placeholder="'+esc(o.ph||'')+'"'+(o.im?' inputmode="'+o.im+'"':'')+' autocomplete="off" autocapitalize="off" spellcheck="false"></label>';}
+function qForm(){var t=QS.tab,h='';
+ document.querySelectorAll('#qtabs a').forEach(function(a){a.classList.toggle('on',a.dataset.qt===t);});
+ if(t==='link')h=qField('link','Website link',{ph:'https://example.com',im:'url',max:1000})+'<p class="hint" style="margin:8px 0 0">If you leave out the https://, we add it for you.</p>';
+ else if(t==='text')h=qField('text','Your text',{area:1,rows:5,ph:'Type or paste anything',max:1200});
+ else if(t==='wifi')h=qField('ssid','Network name',{ph:'MyWiFi',max:60})+qField('wpw','Password',{ph:'Leave empty for an open network',max:80})+
+  '<label class="qfl" for="qi-wsec">Security<select class="sel" id="qi-wsec" data-qk="wsec"><option value="WPA"'+(QS.v.wsec==='WPA'?' selected':'')+'>WPA / WPA2 / WPA3</option><option value="WEP"'+(QS.v.wsec==='WEP'?' selected':'')+'>WEP</option><option value="nopass"'+(QS.v.wsec==='nopass'?' selected':'')+'>No password</option></select></label>'+
+  '<label class="qck"><input type="checkbox" id="qi-whid" data-qk="whid"'+(QS.v.whid?' checked':'')+'> Hidden network</label>'+
+  '<p class="hint" style="margin:8px 0 0">Anyone who scans this code can join your network, so only share it with people you trust.</p>';
+ else if(t==='email')h=qField('eto','Send to',{ph:'name@example.com',im:'email',max:200})+qField('esub','Subject (optional)',{max:200})+qField('ebody','Message (optional)',{area:1,rows:3,max:800});
+ else if(t==='phone')h=qField('ph','Phone number',{ph:'+91 98765 43210',im:'tel',max:30});
+ else if(t==='sms')h=qField('smn','Phone number',{ph:'+91 98765 43210',im:'tel',max:30})+qField('smm','Message (optional)',{area:1,rows:3,max:400});
+ else if(t==='card')h='<div class="qg2">'+qField('cfn','First name',{max:60})+qField('cln','Last name',{max:60})+'</div>'+qField('corg','Organisation or school',{max:100})+
+  '<div class="qg2">'+qField('ctel','Phone',{im:'tel',max:30})+qField('cem','Email',{im:'email',max:120})+'</div>'+qField('curl','Website',{im:'url',max:200});
+ var f=$$('qf');f.innerHTML=h;
+ f.oninput=f.onchange=function(e){var k=e.target.dataset.qk;if(!k)return;var v=e.target.type==='checkbox'?e.target.checked:e.target.value;if(QS.v[k]===v)return;QS.v[k]=v;qUpdate();};
+}
+function qOpts(){var o=$$('qo'),lv=QS.logo?'H':QS.ecl;
+ function sel(id,list,cur,dis){return '<select class="sel" id="'+id+'"'+(dis?' disabled':'')+'>'+list.map(function(x){return '<option value="'+x[0]+'"'+(String(x[0])===String(cur)?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select>';}
+ o.innerHTML='<b>Style</b><div class="qg2" style="margin-top:6px">'+
+  '<label class="qfl">Code colour<input type="color" id="qfg" value="'+QS.fg+'"></label>'+
+  '<label class="qfl">Background<input type="color" id="qbg" value="'+QS.bg+'"'+(QS.tr?' disabled':'')+'></label></div>'+
+  '<label class="qck"><input type="checkbox" id="qtr"'+(QS.tr?' checked':'')+'> Transparent background</label>'+
+  '<div class="qfl">Shape</div><div class="seg" id="qst" style="width:fit-content;max-width:100%;margin-top:5px"><a data-s="square" href="javascript:void 0">Square</a><a data-s="rounded" href="javascript:void 0">Rounded</a><a data-s="dots" href="javascript:void 0">Dots</a></div>'+
+  '<div class="qg2"><label class="qfl">Error correction'+sel('qec',[['L',QERR.L],['M',QERR.M],['Q',QERR.Q],['H',QERR.H]],lv,!!QS.logo)+'</label>'+
+  '<label class="qfl">Margin'+sel('qmg',[[0,'None'],[2,'Small'],[4,'Standard'],[6,'Wide'],[8,'Extra wide']],QS.mg)+'</label></div>'+
+  '<p class="hint" style="margin:8px 0 0">Higher error correction lets a code survive smudges or a logo, but makes it denser.</p>'+
+  '<div class="qfl" style="margin-top:14px">Logo in the middle (optional)</div>'+
+  '<div class="row" style="margin-top:6px;gap:8px"><label class="btn" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px">'+ico('upload',16)+(QS.logo?'Change logo':'Add logo')+'<input type="file" id="qlg" accept="image/*" hidden></label>'+(QS.logo?'<button class="btn" id="qlx" type="button">Remove</button>':'')+'</div>'+
+  (QS.logo?'<p class="hint" style="margin:8px 0 0">Error correction is set to High so the code still scans. Always test it with your phone.</p>':'');
+ $$('qfg').oninput=function(){QS.fg=this.value;qSave();qUpdate();};
+ $$('qbg').oninput=function(){QS.bg=this.value;qSave();qUpdate();};
+ $$('qtr').onchange=function(){QS.tr=this.checked;qSave();qOpts();qUpdate();};
+ document.querySelectorAll('#qst a').forEach(function(a){a.classList.toggle('on',a.dataset.s===QS.st);});
+ $$('qst').onclick=function(e){var s=e.target.dataset.s;if(!s)return;QS.st=s;qSave();document.querySelectorAll('#qst a').forEach(function(a){a.classList.toggle('on',a.dataset.s===QS.st);});qUpdate();};
+ $$('qec').onchange=function(){QS.ecl=this.value;qSave();qUpdate();};
+ $$('qmg').onchange=function(){QS.mg=+this.value;qSave();qUpdate();};
+ $$('qlg').onchange=function(e){var f=e.target.files[0];e.target.value='';if(f)qLoadLogo(f);};
+ if($$('qlx'))$$('qlx').onclick=function(){QS.logo=null;QS.logoUrl='';qOpts();qUpdate();};
+}
+function qLoadLogo(f){
+ if(!/^image\//.test(f.type)){toast('Please choose an image file');return;}
+ var rd=new FileReader();
+ rd.onerror=function(){toast('That image could not be read');};
+ rd.onload=function(){var im=new Image();
+  im.onerror=function(){toast('That image could not be read');};
+  im.onload=function(){
+   var w=im.naturalWidth||im.width,h=im.naturalHeight||im.height;
+   if(!w||!h){toast('That image could not be read');return;}
+   var k=Math.min(1,320/Math.max(w,h)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(w*k));cv.height=Math.max(1,Math.round(h*k));
+   cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);
+   var url=cv.toDataURL('image/png'),i2=new Image();
+   i2.onload=function(){QS.logo=i2;QS.logoUrl=url;qOpts();qUpdate();};
+   i2.src=url;};
+  im.src=rd.result;};
+ rd.readAsDataURL(f);
+}
+function qPanel(){var p=$$('qp');
+ p.innerHTML='<div class="qbox" id="qbox"></div><div id="qnote"></div>'+
+  '<div class="row" style="margin-top:14px;gap:8px;justify-content:center"><button class="btn pri" id="qdp" type="button">Download PNG</button><button class="btn" id="qds" type="button">Download SVG</button></div>'+
+  '<div class="row" style="margin-top:8px;gap:8px;justify-content:center"><button class="btn" id="qcp" type="button" style="display:inline-flex;align-items:center;gap:6px">'+ico('copy',15,2)+'Copy image</button>'+
+  '<label class="qfl" style="margin:0;display:flex;align-items:center;gap:6px;font-size:.84rem">PNG size<select class="sel" id="qsz" style="width:auto">'+[[512,'512 px'],[1024,'1024 px'],[2048,'2048 px'],[4096,'4096 px']].map(function(x){return '<option value="'+x[0]+'"'+(x[0]===QS.px?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select></label></div>'+
+  '<p class="hint" style="margin:12px 0 0;text-align:center">Test the code with your phone before you print or share it.</p>';
+ var base='eve-sandbox-qr';
+ $$('qsz').onchange=function(){QS.px=+this.value;qSave();};
+ $$('qdp').onclick=function(){if(!QS.res)return;qCanvas(QS.res,QS.px).toBlob(function(b){if(b)saveBlob(b,base+'.png');else toast('Could not make the PNG');},'image/png');};
+ $$('qds').onclick=function(){if(!QS.res)return;saveBlob(new Blob([qSvg(QS.res)],{type:'image/svg+xml'}),base+'.svg');};
+ $$('qcp').onclick=function(){if(!QS.res)return;
+  if(!(navigator.clipboard&&window.ClipboardItem&&navigator.clipboard.write)){toast('Copying is not supported here. Please use Download.');return;}
+  qCanvas(QS.res,Math.min(QS.px,2048)).toBlob(function(b){if(!b){toast('Could not copy the image');return;}
+   navigator.clipboard.write([new ClipboardItem({'image/png':b})]).then(function(){toast('Copied!');},function(){toast('Copying was blocked. Please use Download.');});},'image/png');};
+}
+function qUpdate(){var box=$$('qbox');if(!box)return;
+ var data=qData(),res=null,err='';
+ if(data){try{res=qBuild(data);}catch(e){err='That is too much for one QR code. Please shorten it'+(QS.logo?', remove the logo':'')+' or lower the error correction.';}}
+ QS.res=res;
+ var ok=!!res,note='',ct=qContrast();
+ if(ok&&!QS.tr){if(ct.ratio<3)note='The colours are too close together, so phones may not be able to scan this code. Pick a darker code colour or a lighter background.';
+  else if(ct.inverted)note='Light code on a dark background is hard for some scanner apps to read. If it does not scan, swap the colours.';}
+ box.classList.toggle('tr',!!QS.tr);
+ if(ok){var cv=qCanvas(res,640),shown=$$('qcv');
+  if(!shown){box.innerHTML='<canvas id="qcv" aria-label="Your QR code" role="img"></canvas>';shown=$$('qcv');}
+  shown.width=cv.width;shown.height=cv.height;shown.getContext('2d').drawImage(cv,0,0);}
+ else box.innerHTML='<div class="qempty">'+ico('qr',56,1.6)+'<span>'+(err?esc(err):'Your QR code will appear here as you type.')+'</span></div>';
+ $$('qnote').innerHTML=ok&&note?'<div class="note" style="margin-top:12px">'+esc(note)+'</div>':'';
+ ['qdp','qds','qcp'].forEach(function(i){$$(i).disabled=!ok;});
 }
 /* ---------- File Converter ---------- */
 URLS.lame=['https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js'];
@@ -2390,8 +2628,8 @@ document.addEventListener('paste',function(e){if(curR()!=='isearch'||LOCKED.isea
 function route(){var r=curR();menu(false);app.onclick=null;
  var known=r===''||r==='home'||r==='404'||ROUTES.indexOf(r)>=0;if(!known)r=PM?'404':'';
  setTitle(r===''?'home':r);
- app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||!!LOCKED[r]||(['planner','image','pdf','virus','calc','isearch','grab','convert','ide','eve','index-admin'].indexOf(r)<0));
- if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='isearch')isearchPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(r==='index-admin')indexAdminPage();else if(FULL[r])FULL[r]();else home();
+ app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||!!LOCKED[r]||(['planner','image','pdf','virus','calc','qr','isearch','grab','convert','ide','eve','index-admin'].indexOf(r)<0));
+ if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='qr')qrPage();else if(r==='isearch')isearchPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(r==='index-admin')indexAdminPage();else if(FULL[r])FULL[r]();else home();
  fixLinks(app);window.scrollTo(0,0);}
 
 document.getElementById('yr').textContent=new Date().getFullYear();
