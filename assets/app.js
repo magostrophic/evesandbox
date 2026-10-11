@@ -806,7 +806,7 @@ function vDraw(){
  o.innerHTML=h;
 }
 
-var CFG=Object.assign({email:'',donate:[],donateApi:'',lensApi:'',grabApi:'',runApi:'',aiApi:'',turnstileKey:''},window.EVE_CFG||{});
+var CFG=Object.assign({email:'',phone:'',legalName:'',address:'',donate:[],donateApi:'',lensApi:'',grabApi:'',runApi:'',aiApi:'',turnstileKey:''},window.EVE_CFG||{});
 var TL=[
  {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
  {r:'eve',c:'i1',ic:'spark',n:'Eve AI',d:'Your caring study buddy. Ask questions, get step-by-step help, make flashcards and practice tests, and learn from your own notes.'},
@@ -843,6 +843,7 @@ function aboutPage(){nav('about');
  '<div class="wrapc doc"><h2 style="margin-top:0">Why it exists</h2><p>Students juggle deadlines, file formats, forms and links from every direction. Most tools for these jobs are cluttered, locked behind sign-ups, or upload your files to someone else’s server. Eve Sandbox puts the common ones in one clean place.</p>'+
  '<div class="grid" style="margin-top:20px"><div class="card"><span class="ic">'+ico('lock',24)+'</span><h3>Private by design</h3><p>Images and PDFs are processed in your browser. They are not uploaded.</p></div><div class="card"><span class="ic i2">'+ico('heart',24)+'</span><h3>Free and simple</h3><p>No accounts, no paywalls, no clutter. Open a tool and use it.</p></div><div class="card"><span class="ic i3">'+ico('trend',24)+'</span><h3>Always growing</h3><p>New tools are added over time, shaped by what students actually need.</p></div></div>'+
  '<h2>What you can do today</h2><ul>'+TL.filter(function(t){return !t.lock;}).map(function(t){return '<li><b>'+t.n+'.</b> '+t.d+'</li>';}).join('')+'</ul>'+
+ (CFG.legalName?'<h2>Who runs it</h2><p>Eve Sandbox is operated by '+esc(CFG.legalName)+'. You can reach us on the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p>':'')+
  '<h2>Get involved</h2><p>Have an idea for a tool, or found something that does not work? <a href="#/contact" style="color:var(--brand)">Tell us</a>. If Eve Sandbox helps you, you can <a href="#/donate" style="color:var(--brand)">support its development</a>.</p></div>';}
 /* ---------- Cloudflare Turnstile (bot check for the Contact form). Off until turnstileKey is set in config.js ---------- */
 var TS={p:null};
@@ -851,6 +852,12 @@ function tsLib(){if(TS.p)return TS.p;TS.p=new Promise(function(ok,no){
  if(window.turnstile)return ok(window.turnstile);
  var sc=document.createElement('script');sc.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';sc.async=true;
  sc.onload=function(){window.turnstile?ok(window.turnstile):(TS.p=null,no(new Error('ts')));};sc.onerror=function(){TS.p=null;no(new Error('ts'));};document.head.appendChild(sc);});return TS.p;}
+function contactDetails(){
+ var r=[];if(CFG.legalName)r.push(['Operated by',esc(CFG.legalName)]);
+ if(CFG.email)r.push(['Email','<a href="mailto:'+esc(CFG.email)+'" style="color:var(--brand)">'+esc(CFG.email)+'</a>']);
+ if(CFG.phone)r.push(['Phone','<a href="tel:'+esc(String(CFG.phone).replace(/[^\d+]/g,''))+'" style="color:var(--brand)">'+esc(CFG.phone)+'</a>']);
+ if(CFG.address)r.push(['Address',esc(CFG.address)]);
+ return (CFG.legalName||CFG.phone||CFG.address)&&r.length?'<div class="card" style="max-width:640px;margin-top:16px"><h3 style="margin:0 0 8px">Contact details</h3>'+r.map(function(x){return '<p style="margin:4px 0"><b>'+x[0]+':</b> '+x[1]+'</p>';}).join('')+'</div>':'';}
 function contactPage(){nav('contact');
  app.innerHTML=banner('Contact','Get in touch','Ideas, bug reports and questions are all welcome.')+
  '<div class="wrapc"><div class="card" style="max-width:640px"><form id="cf" novalidate>'+
@@ -861,7 +868,7 @@ function contactPage(){nav('contact');
  '<div class="hp" aria-hidden="true"><label>Leave this empty<input id="cw" type="text" tabindex="-1" autocomplete="off"></label></div>'+
  (tsOn()?'<div class="cts" id="cts"></div>':'')+'<div class="bar"><span class="sp"></span><button class="btn pri" id="cb" type="submit">Send message</button></div>'+
  '<p class="cfs" id="cs" role="status" aria-live="polite"></p></form>'+
- '</div></div>';
+ '</div>'+contactDetails()+'</div>';
  var st=document.getElementById('cs'),bt=document.getElementById('cb');
  function say(t,k){st.className='cfs'+(k?' '+k:'');st.textContent=t;}
  var tok='',tid=null;
@@ -932,7 +939,10 @@ function dInit(api){
   try{
    var r=await fetch(api+'/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,phone:ph,name:$$('dnm').value,email:em,website:$$('dws').value})});
    var j=null;try{j=await r.json();}catch(x){}
-   if(r.ok&&j&&/^https:\/\//.test(j.url||'')){m.textContent='Taking you to the secure payment page...';window.location.href=j.url;return;}
+   if(r.ok&&j&&/^session_/.test(j.session||'')){m.textContent='Taking you to the secure payment page...';
+    try{var CF=await cfSdk();CF({mode:j.mode==='production'?'production':'sandbox'}).checkout({paymentSessionId:j.session,redirectTarget:'_self'});setTimeout(function(){DN.busy=false;dSync();},5000);return;}
+    catch(x){console.warn('payment page could not open:',x);}
+   }
    var er=(j&&j.error)||'';console.warn('donation not started:',r.status,er);
    m.className='cfs bad';
    m.textContent=er==='amount'?'Please enter an amount between ₹10 and ₹50,000.':er==='phone'?'Please enter a valid 10-digit mobile number.':er==='email'?'That email address does not look right.':er==='slow'?'That was a lot of tries. Please wait a little while and try again.':'We could not start the payment right now. Please try again in a little while.';
@@ -940,6 +950,10 @@ function dInit(api){
   DN.busy=false;dSync();};
  dSync();
 }
+function cfSdk(){if(window.Cashfree)return Promise.resolve(window.Cashfree);
+ if(!cfSdk.p)cfSdk.p=new Promise(function(ok,no){var sc=document.createElement('script');sc.src='https://sdk.cashfree.com/js/v3/cashfree.js';sc.async=true;
+  sc.onload=function(){window.Cashfree?ok(window.Cashfree):(cfSdk.p=null,no(new Error('sdk')));};sc.onerror=function(){cfSdk.p=null;no(new Error('sdk'));};document.head.appendChild(sc);});
+ return cfSdk.p;}
 async function dThanks(api){
  var id=(new URLSearchParams(location.search)).get('thanks');if(!id||!/^don_[a-z0-9]{8,40}$/.test(id))return;
  var n=$$('dnote');if(!n)return;
