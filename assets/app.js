@@ -172,6 +172,7 @@ function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc
 function planner(){
  nav('planner');
  var D=days(),h='';
+ h+='<h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Study Planner</h1>';
  h+='<input class="title-in" id="ttl" type="text" value="'+esc(S.title)+'" aria-label="Planner title">';
  h+='<div class="chips-wrap"><p class="hint" style="margin:.2em 0 8px">1. Add your subjects</p><div class="chips">';
  S.subjects.forEach(function(s,i){h+='<span class="chip" style="background:'+s.c+'">'+esc(s.n)+'<button data-del="'+i+'" aria-label="Remove '+esc(s.n)+'">'+ico('x',12,3)+'</button></span>';});
