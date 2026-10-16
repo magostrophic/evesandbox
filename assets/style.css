@@ -195,6 +195,7 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 .dsp{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}.dsc{padding:14px;font-size:.93rem;line-height:1.35}.dsc b{display:block;margin-bottom:2px}
 .dpick{margin-top:12px;padding:16px}.dpt{display:flex;gap:10px;align-items:flex-start}.dno{flex:none;width:26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center}.dpn{font-weight:700;font-size:1.02rem;line-height:1.3;padding-top:2px}
 .dst{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.dst .btn.pri{color:#fff}.dst a.btn{display:inline-flex}
+.dtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.dstore{background:rgba(10,132,255,.14);color:var(--brand)}.dq{padding:12px 0;border-top:1px solid var(--line)}.dq:first-child{border-top:0;padding-top:0}.dq>span{font-weight:600;font-size:.95rem}.dq .dst{margin-top:8px}
 .dmore{margin-top:10px}.dmore summary{cursor:pointer;color:var(--brand);font-size:.86rem;font-weight:600;list-style:none}.dmore summary::-webkit-details-marker{display:none}.dmore summary::after{content:' ▾'}.dmore[open] summary::after{content:' ▴'}
 .dul{margin:8px 0 0;padding-left:20px;font-size:.93rem;line-height:1.4}.dul li{margin:3px 0}
 .dgh{margin:18px 0 0;font-size:.95rem;letter-spacing:-.01em}
@@ -291,6 +292,7 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 .cs-t:disabled{opacity:.5;cursor:not-allowed}
 td .cs-t .cs-c{display:none}
 .sel.cs-t,.cs-t.sel{width:auto;background:var(--fill);padding:8px 10px 8px 14px;color:var(--ink);border-radius:99px;font-weight:600}
+.qfl .cs-t.sel{display:flex;max-width:100%}
 .cs-t.sel:hover{background:color-mix(in srgb,var(--fill) 80%,var(--brand))}
 .cs-t.sel .cs-c{color:var(--brand);opacity:1}
 .fld .cs-t{font-weight:400;color:var(--ink);background:var(--fill);border-radius:12px;padding:12px 14px;width:100%;justify-content:space-between;text-align:left}

@@ -977,7 +977,7 @@ function termsPage(){nav('terms');
  '<h2>2. Your files and data</h2><p>The image and PDF tools work inside your browser. Your files are not uploaded to Eve Sandbox. You keep all rights to your files and are responsible for having the right to edit them. Keep a copy of your originals, because we cannot recover files for you. See the <a href="#/privacy" style="color:var(--brand)">Privacy</a> page for details.</p>'+
  '<h2>3. Passwords on PDFs</h2><p>If you protect a PDF with a password, we cannot recover that password for you. Only remove a password from a file you own or have permission to unlock. The tool cannot guess or crack passwords.</p>'+
  '<h2>4. Virus Checker</h2><p>The Virus Checker gives an automated opinion based on the look of an address and on third-party services. It is not a guarantee that a site is safe or unsafe. Use your own judgment, and do not enter passwords or payment details on a site you are unsure about.</p>'+
- '<h2>5. Prices and suggestions</h2><p>Suggestions, price ranges and verdicts in Deal or No Deal and Eve AI are automated estimates, not live prices or professional advice. Prices, offers and stock change often, so check everything on the store’s own page before you pay. Eve Sandbox does not sell products and is not connected to the stores it links to.</p>'+
+ '<h2>5. Prices and suggestions</h2><p>Suggestions, price ranges and verdicts in Deal or No Deal and Eve AI are automated estimates, not live prices or professional advice. Prices, offers and stock change often, so check everything on the store’s own page before you pay. Product links come from an automated web search and can be out of date, sold out or not exactly what you meant. Eve Sandbox does not sell products and is not connected to the stores it links to.</p>'+
  '<h2>6. No warranty</h2><p>The site and its tools are provided “as is” and “as available”, without promises of accuracy, availability or fitness for a particular purpose. To the fullest extent the law allows, we are not liable for any loss or damage from using the site or relying on its results.</p>'+
  '<h2>7. Third-party services and links</h2><p>Some features use or link to services run by others, such as lookup services, security-checking websites and payment and email services. We do not control them and are not responsible for their content or policies.</p>'+
  '<h2>8. Changes</h2><p>We may change the site or these terms from time to time. Continuing to use the site after a change means you accept the updated terms.</p>'+
@@ -992,7 +992,7 @@ function privacyPage(){nav('privacy');
  '<li><b>Eve IDE:</b> Python runs on your device. When you run C or Java, your code and input are sent to an online service that runs them and sends back the result.</li>'+
  '<li><b>Grab Box:</b> it fetches the link you paste from the website it points to.</li>'+
  '<li><b>Eve AI:</b> the messages you send Eve, and any notes you attach, are sent to an AI service so it can write a reply. They are not stored by this website. Your chat history and saved flashcards stay on your device. Please do not share passwords or private personal details.</li>'+
- '<li><b>Deal or No Deal:</b> what you type about the item you want, your budget, and any prices you add are sent to an AI service so it can write its suggestions. They are not stored by this website. Please do not type personal details.</li>'+
+ '<li><b>Deal or No Deal:</b> what you type about the item you want, your budget, and any prices you add are sent to an AI service so it can write its suggestions, and to a web search service that looks for matching product pages. They are not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Links you open</b> take you to other websites with their own policies.</li>'+
  '<li><b>Contact form:</b> the form uses a security check to tell people from automated programs, and the check provider may look at technical details of your browser to do this. The name, email and message you type are sent to us by email so they reach us. We use them only to read and answer your message.</li>'+
  '<li><b>Donations:</b> if you donate, the amount and the mobile number you type (plus the name and email, if you give them) are sent to our payment partner to start the payment, and you pay on their page under their own privacy policy. Eve Sandbox does not store your payment details or your mobile number.</li></ul>'+
@@ -1383,12 +1383,12 @@ function dCall(path,body){var base=String(CFG.dealApi||'').replace(/\/+$/,''),ct
   return r.json().catch(function(){return {};}).then(function(j){clearTimeout(tm);if(r.ok&&j&&j.ok&&j.data)return j.data;var e=new Error('x');e.code=(j&&j.error)||'down';throw e;});
  },function(e){clearTimeout(tm);var x=new Error('net');x.code=(e&&e.name==='AbortError')?'timeout':'net';throw x;});}
 function dQ(q){return encodeURIComponent(String(q).slice(0,120));}
-function dLinks(q){var g=function(s){return 'https://www.google.com/search?q='+dQ(q+' site:'+s);};
- return {main:[['Amazon.in','https://www.amazon.in/s?k='+dQ(q)],['Flipkart','https://www.flipkart.com/search?q='+dQ(q)]],
-  more:[['Croma',g('croma.com')],['Reliance Digital',g('reliancedigital.in')],['Vijay Sales',g('vijaysales.com')],['Google Shopping','https://www.google.com/search?tbm=shop&q='+dQ(q)]]};}
-function dBtns(q){var L=dLinks(q),a=function(x,c){return '<a class="btn sm'+c+'" href="'+x[1]+'" target="_blank" rel="noopener noreferrer">'+esc(x[0])+'</a>';};
- return '<div class="dst">'+L.main.map(function(x){return a(x,' pri');}).join('')+'</div><details class="dmore"><summary>More stores</summary><div class="dst">'+L.more.map(function(x){return a(x,'');}).join('')+'</div></details>';}
-function dRange(name){var p=((DS.plan&&DS.plan.picks)||[]).filter(function(x){return x.name===name;})[0];return p&&p.price_low>0?p:null;}
+function dLinks(q){var e=dQ(q);return {main:[['Amazon.in','https://www.amazon.in/s?k='+e],['Flipkart','https://www.flipkart.com/search?q='+e]],
+ more:[['Croma','https://www.croma.com/searchB?q='+e+'%3Arelevance&text='+e],['Reliance Digital','https://www.reliancedigital.in/products?q='+e],['Vijay Sales','https://www.vijaysales.com/search/'+e]]};}
+function dBtns(q){var L=dLinks(q),a=function(x,c){return '<a class="btn sm'+c+'" href="'+x[1]+'" target="_blank" rel="noopener noreferrer">Search '+esc(x[0])+'</a>';};
+ return '<div class="dst">'+L.main.map(function(x){return a(x,'');}).join('')+'</div><details class="dmore"><summary>More stores</summary><div class="dst">'+L.more.map(function(x){return a(x,'');}).join('')+'</div></details>';}
+function dItems(){var p=DS.plan;return p?((p.products&&p.products.length)?p.products:(p.picks||[])):[];}
+function dRange(name){var p=dItems().filter(function(x){return x.name===name;})[0];return p&&p.price_low>0?p:null;}
 function dRangeTxt(p){return p.price_high>p.price_low?inr(p.price_low)+' to '+inr(p.price_high):'about '+inr(p.price_low);}
 function dVerdict(total,p){if(!p)return null;var lo=p.price_low,hi=p.price_high||lo;
  if(total<lo*.75)return {k:'warn',t:'Too good to be true?',m:'This is far below the usual price ('+dRangeTxt(p)+'). Check that it is the same model, brand new, and sold by a trusted seller.'};
@@ -1422,12 +1422,15 @@ function dealPage(){nav('deal');
   else if(t.id==='dgo')dFind();};
  $$('dpk').onchange=dProdSync;$$('dsk').onchange=function(){$$('dsow').style.display=this.value==='Other'?'block':'none';};
  $$('dadd').onclick=dAdd;
- $$('dres').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(!t||t.dataset.use==null)return;var p=DS.plan&&DS.plan.picks[+t.dataset.use];if(!p)return;dProdOpts(p.name);dProdSync();var c=$$('dcmp');if(c&&c.scrollIntoView)c.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(function(){$$('dpp').focus({preventScroll:true});},350);};
+ $$('dres').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(!t||t.dataset.use==null)return;var p=dItems()[+t.dataset.use];if(!p)return;dProdOpts(p.name);dProdSync();
+  if(p.store){var sk=$$('dsk'),key=p.store==='Amazon.in'?'Amazon':p.store,hit=DSTORES.indexOf(key)>=0&&key!=='Other';sk.value=hit?key:'Other';$$('dsow').style.display=hit?'none':'block';if(!hit)$$('dso').value=p.store;}
+  $$('dpp').value=p.price>0?String(p.price):'';
+  var c=$$('dcmp');if(c&&c.scrollIntoView)c.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(function(){$$('dpp').focus({preventScroll:true});},350);};
  $$('doffers').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(!t||t.dataset.rm==null)return;var id=+t.dataset.rm;DS.offers=DS.offers.filter(function(o){return o.id!==id;});DS.judge=null;DS.jstate='idle';dOffers();dAct();};
  $$('dact').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(t&&t.id==='djb')dJudge();};
  dProdOpts();dProdSync();dRender();dOffers();dAct();
 }
-function dProdOpts(sel){var s=$$('dpk');if(!s)return;var names=[];((DS.plan&&DS.plan.picks)||[]).forEach(function(p){names.push(p.name);});DS.offers.forEach(function(o){if(names.indexOf(o.pick)<0)names.push(o.pick);});
+function dProdOpts(sel){var s=$$('dpk');if(!s)return;var names=[];dItems().forEach(function(p){names.push(p.name);});DS.offers.forEach(function(o){if(names.indexOf(o.pick)<0)names.push(o.pick);});
  var cur=sel||s.value;s.innerHTML=names.map(function(n){return '<option value="'+esc(n)+'">'+esc(n)+'</option>';}).join('')+'<option value="__o">Another product…</option>';
  s.value=(cur&&(names.indexOf(cur)>=0||cur==='__o'))?cur:(names.length?names[0]:'__o');}
 function dProdSync(){var s=$$('dpk'),w=$$('dptw');if(!s||!w)return;var o=s.value==='__o';w.style.display=o?'block':'none';}
@@ -1436,15 +1439,23 @@ function dRender(){var h='',el=$$('dres');if(!el)return;
  else if(DS.state==='err')h='<div class="msg bad"><span class="dotk"></span><span>'+esc(DS.err)+'</span></div><div class="card" style="margin-top:12px"><b>You can still search the stores yourself</b><p class="hint" style="margin:4px 0 0">Searching for: '+esc(DS.need)+'</p>'+dBtns(DS.need)+'</div>';
  else if(DS.state==='ok'&&DS.plan)h=dPlanHtml(DS.plan);
  el.innerHTML=h;}
-function dPlanHtml(p){var h='';
+function dPlanHtml(p){var h='',live=p.products&&p.products.length;
  if(p.summary)h+='<div class="card dsum" style="margin-top:16px"><div class="dsh">'+ico('spark',18)+'<b>Eve’s take</b></div><p style="margin:6px 0 0">'+esc(p.summary)+'</p></div>';
- if(p.specs.length)h+='<h3 class="dh">What to look for</h3><div class="dsp">'+p.specs.map(function(s){return '<div class="card dsc"><b>'+esc(s.name)+'</b><div>'+esc(s.want)+'</div>'+(s.why?'<div class="hint">'+esc(s.why)+'</div>':'')+'</div>';}).join('')+'</div>';
- if(p.picks.length)h+='<h3 class="dh">Good options to check</h3>'+p.picks.map(function(x,i){
+ if(p.specs&&p.specs.length)h+='<h3 class="dh">What to look for</h3><div class="dsp">'+p.specs.map(function(s){return '<div class="card dsc"><b>'+esc(s.name)+'</b><div>'+esc(s.want)+'</div>'+(s.why?'<div class="hint">'+esc(s.why)+'</div>':'')+'</div>';}).join('')+'</div>';
+ if(live){h+='<h3 class="dh">Best matches we found</h3><p class="hint" style="margin:-4px 4px 0">Real product pages from Amazon.in, Flipkart, Croma, Reliance Digital and Vijay Sales. A price shown here comes from the search result and may be out of date, so always check the store page.</p>'+p.products.map(function(x,i){
   return '<div class="card dpick"><div class="dpt"><span class="dno">'+(i+1)+'</span><div class="dpn">'+esc(x.name)+'</div></div>'+
-   (x.price_low>0?'<div style="margin-top:8px"><span class="pl2">Rough estimate: '+dRangeTxt(x)+'</span></div>':'')+
-   (x.why?'<p style="margin:8px 0 0">'+esc(x.why)+'</p>':'')+(x.tradeoff?'<p class="hint" style="margin:4px 0 0"><b>Trade-off:</b> '+esc(x.tradeoff)+'</p>':'')+
-   dBtns(x.search||x.name)+'<div class="dch" style="margin-top:10px"><button class="btn sm" type="button" data-use="'+i+'">Add a price I found</button></div></div>';}).join('');
- if(p.avoid.length)h+='<h3 class="dh">Watch out for</h3><div class="card"><ul class="dul">'+p.avoid.map(function(a){return '<li>'+esc(a)+'</li>';}).join('')+'</ul></div>';
+   '<div class="dtags"><span class="pl2 dstore">'+esc(x.store)+'</span><span class="pl2">'+(x.price>0?'Seen in search: '+inr(x.price):'Price: check the page')+'</span></div>'+
+   (x.why?'<p style="margin:8px 0 0">'+esc(x.why)+'</p>':'')+(x.tradeoff?'<p class="hint" style="margin:4px 0 0"><b>Check:</b> '+esc(x.tradeoff)+'</p>':'')+
+   '<div class="dst"><a class="btn sm pri" href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer nofollow">Open on '+esc(x.store)+'</a><button class="btn sm" type="button" data-use="'+i+'">Add a price I found</button></div></div>';}).join('');}
+ else{
+  if(p.mode==='guide'&&p.queries&&p.queries.length)h+='<div class="msg warn" style="margin-top:12px"><span class="dotk"></span><span>'+(p.capped?'Eve has used today’s product searches, so here are searches you can open on the stores. Product links are back tomorrow.':p.searchFailed?'Eve could not reach the store search just now, so here are searches you can open on the stores.':'No matching product pages turned up. Try the searches below on the stores.')+'</span></div>';
+  if(p.picks&&p.picks.length)h+='<h3 class="dh">Good options to check</h3>'+p.picks.map(function(x,i){
+   return '<div class="card dpick"><div class="dpt"><span class="dno">'+(i+1)+'</span><div class="dpn">'+esc(x.name)+'</div></div>'+
+    (x.price_low>0?'<div style="margin-top:8px"><span class="pl2">Rough estimate: '+dRangeTxt(x)+'</span></div>':'')+
+    (x.why?'<p style="margin:8px 0 0">'+esc(x.why)+'</p>':'')+(x.tradeoff?'<p class="hint" style="margin:4px 0 0"><b>Trade-off:</b> '+esc(x.tradeoff)+'</p>':'')+
+    dBtns(x.search||x.name)+'<div class="dch" style="margin-top:10px"><button class="btn sm" type="button" data-use="'+i+'">Add a price I found</button></div></div>';}).join('');}
+ if(p.queries&&p.queries.length)h+='<h3 class="dh">'+(live?'Want to look further?':'Search the stores yourself')+'</h3><div class="card">'+p.queries.map(function(q){return '<div class="dq"><span>'+esc(q)+'</span>'+dBtns(q)+'</div>';}).join('')+'</div>';
+ if(p.avoid&&p.avoid.length)h+='<h3 class="dh">Watch out for</h3><div class="card"><ul class="dul">'+p.avoid.map(function(a){return '<li>'+esc(a)+'</li>';}).join('')+'</ul></div>';
  if(p.timing)h+='<div class="msg good" style="margin-top:12px"><span class="dotk"></span><span><b>Buying tip.</b> '+esc(p.timing)+'</span></div>';
  return h;}
 function dFind(){if(DS.state==='busy')return;
@@ -1496,7 +1507,7 @@ function dAct(){var el=$$('dact');if(!el)return;
    (j.tips.length?'<p class="hint" style="margin:12px 0 2px"><b>Tips</b></p><ul class="dul">'+j.tips.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'')+'</div>';}}
  el.innerHTML=h;}
 function dJudge(){if(DS.jstate==='busy'||!DS.offers.length)return;var run=++DS.run;DS.jstate='busy';dAct();
- var picks=((DS.plan&&DS.plan.picks)||[]).map(function(p){return {name:p.name,low:p.price_low,high:p.price_high};});
+ var picks=dItems().map(function(p){return {name:p.name,low:p.price_low,high:p.price_high};});
  dCall('/judge',{need:DS.need,priority:DPRIN[DS.pri],picks:picks,offers:DS.offers.map(function(o){return {pick:o.pick,store:o.store,price:o.price,delivery:o.del,discount:o.disc,warranty:o.war,returns:o.ret,total:o.total};})}).then(function(d){if(run!==DS.run)return;DS.judge=d;DS.jstate='ok';},function(e){if(run!==DS.run)return;DS.jstate='err';DS.jerr=dErr(e.code);}).then(function(){if(run!==DS.run)return;dAct();});}
 
 /* ---------- QR Code Generator ---------- */
