@@ -1386,78 +1386,101 @@ function dQ(q){return encodeURIComponent(String(q).slice(0,120));}
 function dLinks(q){var e=dQ(q);return {main:[['Amazon.in','https://www.amazon.in/s?k='+e],['Flipkart','https://www.flipkart.com/search?q='+e]],
  more:[['Croma','https://www.croma.com/searchB?q='+e+'%3Arelevance&text='+e],['Reliance Digital','https://www.reliancedigital.in/products?q='+e],['Vijay Sales','https://www.vijaysales.com/search/'+e]]};}
 function dBtns(q){var L=dLinks(q),a=function(x,c){return '<a class="btn sm'+c+'" href="'+x[1]+'" target="_blank" rel="noopener noreferrer">Search '+esc(x[0])+'</a>';};
- return '<div class="dst">'+L.main.map(function(x){return a(x,'');}).join('')+'</div><details class="dmore"><summary>More stores</summary><div class="dst">'+L.more.map(function(x){return a(x,'');}).join('')+'</div></details>';}
+ return '<div class="dl-bt">'+L.main.map(function(x){return a(x,'');}).join('')+L.more.map(function(x){return a(x,' dl-xm');}).join('')+'<button class="btn sm dl-mb" type="button" data-more="1" aria-expanded="false">More stores</button></div>';}
 function dItems(){var p=DS.plan;return p?((p.products&&p.products.length)?p.products:(p.picks||[])):[];}
 function dRange(name){var p=dItems().filter(function(x){return x.name===name;})[0];return p&&p.price_low>0?p:null;}
 function dRangeTxt(p){return p.price_high>p.price_low?inr(p.price_low)+' to '+inr(p.price_high):'about '+inr(p.price_low);}
+function dRangeShort(p){return p.price_high>p.price_low?inr(p.price_low)+' – '+inr(p.price_high):inr(p.price_low);}
 function dVerdict(total,p){if(!p)return null;var lo=p.price_low,hi=p.price_high||lo;
  if(total<lo*.75)return {k:'warn',t:'Too good to be true?',m:'This is far below the usual price ('+dRangeTxt(p)+'). Check that it is the same model, brand new, and sold by a trusted seller.'};
  if(total<=lo+(hi-lo)*.25)return {k:'good',t:'Deal',m:'This is at the low end of the usual price ('+dRangeTxt(p)+').'};
  if(total<=hi*1.05)return {k:'',t:'Fair price',m:'This is within the usual price ('+dRangeTxt(p)+'). A sale or a bank offer could bring it down.'};
  return {k:'bad',t:'No deal',m:'This is about '+inr(total-hi)+' above the usual price ('+dRangeTxt(p)+'). Try another store or wait for a sale.'};}
 function dMsg(t,k){var e=$$('dmsg');if(e)e.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span></div>':'';}
+function dSync(s){if(s&&s._cs&&s._cs.sync)s._cs.sync();}
+function dChoice(box,attr,val){box.querySelectorAll('.dl-c').forEach(function(b){var on=b.getAttribute(attr)===val;b.classList.toggle('on',on);b.setAttribute('aria-checked',on?'true':'false');});}
+function dChips(id,lab,attr,list,cur,one){return '<div class="dl-ch'+(one?' one':'')+'" id="'+id+'" role="radiogroup" aria-labelledby="'+lab+'">'+list.map(function(x){return '<button type="button" class="dl-c'+(cur===x[0]?' on':'')+'" role="radio" aria-checked="'+(cur===x[0])+'" '+attr+'="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</div>';}
+var DSTEPS=[['dform','Describe'],['dres','Matches'],['dcmp','Compare']];
 
 function dealPage(){nav('deal');
- app.innerHTML='<h1 style="font-size:2.2rem">Deal or No Deal</h1><p class="lead" style="font-size:1rem">Tell Eve what you want to buy. She suggests what to look for, takes you to the top stores, and works out which price is the real best deal after delivery and discounts.</p>'+
- '<div class="card" style="margin-top:16px" id="dform">'+
- '<label class="qfl" for="dnd" style="margin-top:0">What do you need?<textarea id="dnd" rows="3" maxlength="400" placeholder="For example: a laptop for engineering with an Intel i7 and a good graphics card">'+esc(DS.need)+'</textarea></label>'+
- '<div class="dex">'+DEX.map(function(x,i){return '<button class="pl2 dxb" data-ex="'+i+'" type="button">'+esc(x)+'</button>';}).join('')+'</div>'+
- '<label class="qfl" for="dbd">Your budget in rupees (optional)<input type="text" id="dbd" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="For example: 80000" value="'+esc(DS.budget)+'"></label>'+
- '<p class="qfl" style="margin-bottom:0">What matters most to you?</p><div class="dpk" id="dpri">'+DPRI.map(function(x){return '<button type="button" class="btn'+(DS.pri===x[0]?' pri':'')+'" data-p="'+x[0]+'">'+x[1]+'</button>';}).join('')+'</div>'+
- '<p class="qfl" style="margin-bottom:0">New or refurbished?</p><div class="dpk" id="dcond"><button type="button" class="btn'+(DS.cond==='new'?' pri':'')+'" data-c="new">New only</button><button type="button" class="btn'+(DS.cond==='refurb'?' pri':'')+'" data-c="refurb">Refurbished is fine</button></div>'+
- '<div class="dch" style="margin-top:16px"><button class="btn pri" id="dgo" type="button">Find my deals</button></div><div id="dmsg"></div></div>'+
+ app.innerHTML='<div class="dl-hd"><div class="ic i10">'+ico('tag',26)+'</div><h1>Deal or No Deal</h1></div>'+
+ '<p class="lead dl-lead">Tell Eve what you want to buy. She suggests what to look for, takes you to the top stores, and works out which price is the real best deal after delivery and discounts.</p>'+
+ '<div class="dl-steps" id="dsteps">'+DSTEPS.map(function(x,i){return '<button type="button" class="dl-sp" data-go="'+x[0]+'"><b>'+(i+1)+'</b><span>'+x[1]+'</span></button>';}).join('')+'</div>'+
+ '<section class="card dl-sec dl-f" id="dform"><div class="dl-sh"><span class="dl-n">1</span><div><h2>What do you need?</h2><span class="hint">The more you tell Eve, the better her picks.</span></div></div>'+
+ '<textarea id="dnd" rows="3" maxlength="400" aria-label="What do you need?" placeholder="For example: a laptop for engineering with an Intel i7 and a good graphics card">'+esc(DS.need)+'</textarea>'+
+ '<div class="dl-ex"><span>Try:</span>'+DEX.map(function(x,i){return '<button class="dl-xb" data-ex="'+i+'" type="button">'+esc(x)+'</button>';}).join('')+'</div>'+
+ '<div class="dl-opts">'+
+ '<div><label class="dl-ol" for="dbd">Your budget in rupees (optional)</label><div class="dl-cur"><input type="text" id="dbd" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="80000" value="'+esc(DS.budget)+'"></div></div>'+
+ '<div><div class="dl-ol" id="dprii">What matters most to you?</div>'+dChips('dpri','dprii','data-p',DPRI,DS.pri,false)+'</div>'+
+ '<div><div class="dl-ol" id="dcondi">New or refurbished?</div>'+dChips('dcond','dcondi','data-c',[['new','New only'],['refurb','Refurbished is fine']],DS.cond,true)+'</div>'+
+ '</div>'+
+ '<div class="dl-cta"><button class="btn pri dl-big" id="dgo" type="button">'+ico('search',18,2.4)+'Find my deals</button></div><div id="dmsg"></div></section>'+
  '<div id="dres"></div>'+
- '<div class="card" style="margin-top:18px" id="dcmp"><h3 style="margin:0">Compare the prices you find</h3><p class="hint" style="margin:4px 0 0">Open the stores, find the same product and type each price here. Eve works out the real final price: price plus delivery and other charges, minus discounts.</p>'+
- '<label class="qfl" for="dpk">Which product?<select class="sel" id="dpk"></select></label><label class="qfl" id="dptw" for="dpt" style="display:none">Product name<input type="text" id="dpt" maxlength="100" autocomplete="off" placeholder="For example: Laptop with i7 and RTX 4050"></label>'+
- '<label class="qfl" for="dsk">Which store?<select class="sel" id="dsk">'+DSTORES.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></label><label class="qfl" id="dsow" for="dso" style="display:none">Store name<input type="text" id="dso" maxlength="40" autocomplete="off" placeholder="Store name"></label>'+
- '<div class="qg2"><label class="qfl" for="dpp">Price (₹)<input type="text" id="dpp" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="74990"></label><label class="qfl" for="dch">Delivery and other charges (₹)<input type="text" id="dch" inputmode="numeric" maxlength="7" autocomplete="off" placeholder="0"></label></div>'+
- '<div class="qg2"><label class="qfl" for="dds">Discounts, coupons, bank offers (₹)<input type="text" id="dds" inputmode="numeric" maxlength="7" autocomplete="off" placeholder="0"></label><div class="qg2" style="gap:0 12px"><label class="qfl" for="dwr">Warranty (years)<input type="text" id="dwr" inputmode="numeric" maxlength="2" autocomplete="off" placeholder="1"></label><label class="qfl" for="drt">Returns (days)<input type="text" id="drt" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="7"></label></div></div>'+
- '<div class="dch"><button class="btn pri" id="dadd" type="button">Add this price</button></div><div id="dmsg2"></div>'+
- '<div id="doffers"></div><div id="dact"></div></div>'+
- '<p class="hint" style="margin:16px 4px 0">Eve gives rough price estimates, not live prices. Always check the final price, the seller, the warranty and the return rules on the store’s own page before you pay. Eve Sandbox does not sell anything and is not connected to any of these stores.</p>';
+ '<section class="card dl-sec dl-f" id="dcmp"><div class="dl-sh"><span class="dl-n">3</span><div><h2>Compare the prices you find</h2><span class="hint">Open the stores, find the same product and type each price here. Eve works out the real final price: price plus delivery and other charges, minus discounts, coupons and bank offers.</span></div></div>'+
+ '<div class="dl-cw"><div class="dl-cf">'+
+ '<label class="qfl" id="dpkw" for="dpk">Which product?<select class="sel" id="dpk"></select></label>'+
+ '<label class="qfl" id="dptw" for="dpt" style="display:none">Product name<input type="text" id="dpt" maxlength="100" autocomplete="off" placeholder="For example: Laptop with i7 and RTX 4050"></label>'+
+ '<div class="dl-g2 stk"><label class="qfl" for="dsk">Which store?<select class="sel" id="dsk">'+DSTORES.map(function(s){return '<option>'+s+'</option>';}).join('')+'</select></label>'+
+ '<label class="qfl" for="dpp">Price (₹)<input type="text" id="dpp" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="74990"></label></div>'+
+ '<label class="qfl" id="dsow" for="dso" style="display:none">Store name<input type="text" id="dso" maxlength="40" autocomplete="off" placeholder="Store name"></label>'+
+ '<div class="dl-g2"><label class="qfl" for="dch">Delivery &amp; charges (₹)<input type="text" id="dch" inputmode="numeric" maxlength="7" autocomplete="off" placeholder="0"></label>'+
+ '<label class="qfl" for="dds">Discounts &amp; offers (₹)<input type="text" id="dds" inputmode="numeric" maxlength="7" autocomplete="off" placeholder="0"></label></div>'+
+ '<div class="dl-g2"><label class="qfl" for="dwr">Warranty (years)<input type="text" id="dwr" inputmode="numeric" maxlength="2" autocomplete="off" placeholder="1"></label>'+
+ '<label class="qfl" for="drt">Returns (days)<input type="text" id="drt" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="7"></label></div>'+
+ '<div class="dl-add"><div class="dl-fin"><small>Final price</small><b id="dfin">'+inr(0)+'</b></div><button class="btn pri" id="dadd" type="button">Add this price</button></div><div id="dmsg2"></div>'+
+ '</div><div class="dl-co"><div id="doffers"></div><div id="dact"></div></div></div></section>'+
+ '<p class="dl-note">Eve gives rough price estimates, not live prices. Always check the final price, the seller, the warranty and the return rules on the store’s own page before you pay. Eve Sandbox does not sell anything and is not connected to any of these stores.</p>';
+ $$('dsteps').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(!t)return;var id=t.dataset.go,el=$$(id==='dres'&&!$$('dres').firstChild?'dform':id);if(el&&el.scrollIntoView)el.scrollIntoView({behavior:'smooth',block:'start'});};
  $$('dform').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(!t)return;
   if(t.dataset.ex!=null){$$('dnd').value=DEX[+t.dataset.ex];$$('dnd').focus();}
-  else if(t.dataset.p){DS.pri=t.dataset.p;$$('dpri').querySelectorAll('.btn').forEach(function(b){b.classList.toggle('pri',b.dataset.p===DS.pri);});}
-  else if(t.dataset.c){DS.cond=t.dataset.c;$$('dcond').querySelectorAll('.btn').forEach(function(b){b.classList.toggle('pri',b.dataset.c===DS.cond);});}
+  else if(t.dataset.p){DS.pri=t.dataset.p;dChoice($$('dpri'),'data-p',DS.pri);}
+  else if(t.dataset.c){DS.cond=t.dataset.c;dChoice($$('dcond'),'data-c',DS.cond);}
   else if(t.id==='dgo')dFind();};
  $$('dpk').onchange=dProdSync;$$('dsk').onchange=function(){$$('dsow').style.display=this.value==='Other'?'block':'none';};
+ ['dpp','dch','dds','dwr','drt'].forEach(function(id){var i=$$(id);i.oninput=function(){var v=this.value.replace(/[^\d.,]/g,'');if(v!==this.value)this.value=v;dFin();};i.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();dAdd();}};});
  $$('dadd').onclick=dAdd;
- $$('dres').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(!t||t.dataset.use==null)return;var p=dItems()[+t.dataset.use];if(!p)return;dProdOpts(p.name);dProdSync();
-  if(p.store){var sk=$$('dsk'),key=p.store==='Amazon.in'?'Amazon':p.store,hit=DSTORES.indexOf(key)>=0&&key!=='Other';sk.value=hit?key:'Other';$$('dsow').style.display=hit?'none':'block';if(!hit)$$('dso').value=p.store;}
-  $$('dpp').value=p.price>0?String(p.price):'';
+ $$('dres').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(!t)return;
+  if(t.dataset.more!=null){var bt=t.parentNode,o=bt.classList.toggle('open');t.textContent=o?'Fewer stores':'More stores';t.setAttribute('aria-expanded',o?'true':'false');return;}
+  if(t.dataset.use==null)return;var p=dItems()[+t.dataset.use];if(!p)return;dProdOpts(p.name);dProdSync();
+  if(p.store){var sk=$$('dsk'),key=p.store==='Amazon.in'?'Amazon':p.store,hit=DSTORES.indexOf(key)>=0&&key!=='Other';sk.value=hit?key:'Other';dSync(sk);$$('dsow').style.display=hit?'none':'block';if(!hit)$$('dso').value=p.store;}
+  $$('dpp').value=p.price>0?String(p.price):'';dFin();
   var c=$$('dcmp');if(c&&c.scrollIntoView)c.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(function(){$$('dpp').focus({preventScroll:true});},350);};
  $$('doffers').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(!t||t.dataset.rm==null)return;var id=+t.dataset.rm;DS.offers=DS.offers.filter(function(o){return o.id!==id;});DS.judge=null;DS.jstate='idle';dOffers();dAct();};
  $$('dact').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(t&&t.id==='djb')dJudge();};
- dProdOpts();dProdSync();dRender();dOffers();dAct();
+ dProdOpts();dProdSync();dRender();dOffers();dAct();dFin();
 }
+function dFin(){var e=$$('dfin');if(!e)return;e.textContent=inr(Math.max(0,dNum($$('dpp').value)+dNum($$('dch').value)-dNum($$('dds').value)));}
+function dSteps(){var b=$$('dsteps');if(!b)return;
+ var cur=DS.jstate==='ok'?4:DS.offers.length?3:(DS.state==='ok'||DS.state==='err')?2:1;
+ b.querySelectorAll('.dl-sp').forEach(function(e,i){var n=i+1;e.classList.toggle('on',n===cur);e.classList.toggle('done',n<cur);if(n===cur)e.setAttribute('aria-current','step');else e.removeAttribute('aria-current');e.firstChild.innerHTML=n<cur?ico('check',13,3.2):String(n);});}
 function dProdOpts(sel){var s=$$('dpk');if(!s)return;var names=[];dItems().forEach(function(p){names.push(p.name);});DS.offers.forEach(function(o){if(names.indexOf(o.pick)<0)names.push(o.pick);});
  var cur=sel||s.value;s.innerHTML=names.map(function(n){return '<option value="'+esc(n)+'">'+esc(n)+'</option>';}).join('')+'<option value="__o">Another product…</option>';
- s.value=(cur&&(names.indexOf(cur)>=0||cur==='__o'))?cur:(names.length?names[0]:'__o');}
-function dProdSync(){var s=$$('dpk'),w=$$('dptw');if(!s||!w)return;var o=s.value==='__o';w.style.display=o?'block':'none';}
+ s.value=(cur&&(names.indexOf(cur)>=0||cur==='__o'))?cur:(names.length?names[0]:'__o');dSync(s);}
+function dProdSync(){var s=$$('dpk'),w=$$('dptw'),k=$$('dpkw');if(!s||!w)return;var only=s.options.length<2,o=s.value==='__o'||only;if(k)k.style.display=only?'none':'block';w.style.display=o?'block':'none';}
 function dRender(){var h='',el=$$('dres');if(!el)return;
- if(DS.state==='busy')h='<div class="card dwait"><span class="dd"></span><span class="dd"></span><span class="dd"></span><p style="margin:10px 0 0"><b>Eve is looking for good options…</b><br><span class="hint">This can take up to half a minute.</span></p></div>';
- else if(DS.state==='err')h='<div class="msg bad"><span class="dotk"></span><span>'+esc(DS.err)+'</span></div><div class="card" style="margin-top:12px"><b>You can still search the stores yourself</b><p class="hint" style="margin:4px 0 0">Searching for: '+esc(DS.need)+'</p>'+dBtns(DS.need)+'</div>';
+ if(DS.state==='busy')h='<div class="card dl-wait"><div class="dl-dots"><i></i><i></i><i></i></div><div><b>Eve is looking for good options…</b><div class="hint">This can take up to half a minute.</div></div></div>';
+ else if(DS.state==='err')h='<div class="msg bad dl-er"><span class="dotk"></span><span>'+esc(DS.err)+'</span></div><div class="card dl-sec"><div class="dl-tl">You can still search the stores yourself</div><div class="hint" style="display:block;margin:6px 0 12px">Searching for: '+esc(DS.need)+'</div>'+dBtns(DS.need)+'</div>';
  else if(DS.state==='ok'&&DS.plan)h=dPlanHtml(DS.plan);
- el.innerHTML=h;}
-function dPlanHtml(p){var h='',live=p.products&&p.products.length;
- if(p.summary)h+='<div class="card dsum" style="margin-top:16px"><div class="dsh">'+ico('spark',18)+'<b>Eve’s take</b></div><p style="margin:6px 0 0">'+esc(p.summary)+'</p></div>';
- if(p.specs&&p.specs.length)h+='<h3 class="dh">What to look for</h3><div class="dsp">'+p.specs.map(function(s){return '<div class="card dsc"><b>'+esc(s.name)+'</b><div>'+esc(s.want)+'</div>'+(s.why?'<div class="hint">'+esc(s.why)+'</div>':'')+'</div>';}).join('')+'</div>';
- if(live){h+='<h3 class="dh">Best matches we found</h3><p class="hint" style="margin:-4px 4px 0">Real product pages from Amazon.in, Flipkart, Croma, Reliance Digital and Vijay Sales. A price shown here comes from the search result and may be out of date, so always check the store page.</p>'+p.products.map(function(x,i){
-  return '<div class="card dpick"><div class="dpt"><span class="dno">'+(i+1)+'</span><div class="dpn">'+esc(x.name)+'</div></div>'+
-   '<div class="dtags"><span class="pl2 dstore">'+esc(x.store)+'</span><span class="pl2">'+(x.price>0?'Seen in search: '+inr(x.price):'Price: check the page')+'</span></div>'+
-   (x.why?'<p style="margin:8px 0 0">'+esc(x.why)+'</p>':'')+(x.tradeoff?'<p class="hint" style="margin:4px 0 0"><b>Check:</b> '+esc(x.tradeoff)+'</p>':'')+
-   '<div class="dst"><a class="btn sm pri" href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer nofollow">Open on '+esc(x.store)+'</a><button class="btn sm" type="button" data-use="'+i+'">Add a price I found</button></div></div>';}).join('');}
+ el.innerHTML=h;dSteps();}
+function dRt(t,sub){return '<div class="dl-rt"><h3>'+t+'</h3>'+(sub?'<span class="hint">'+sub+'</span>':'')+'</div>';}
+function dNotes(x,lab){return (x.why||x.tradeoff)?'<div class="dl-nt">'+(x.why?'<div class="dl-nx"><b>Why it fits</b>'+esc(x.why)+'</div>':'')+(x.tradeoff?'<div class="dl-nx c"><b>'+lab+'</b>'+esc(x.tradeoff)+'</div>':'')+'</div>':'<div class="dl-nt"></div>';}
+function dProd(x,i,live,top){
+ var pr=live?(x.price>0?'<div class="dl-pv">'+inr(x.price)+'</div><span class="hint">Seen in search</span>':'<div class="dl-pv q">Check the price</div><span class="hint">on the store page</span>'):(x.price_low>0?'<div class="dl-pv r">'+dRangeShort(x)+'</div><span class="hint">Rough estimate</span>':'');
+ return '<article class="card dl-p'+(top?' top':'')+'"><div class="dl-hd2"><div class="dl-ph"><span class="dl-no">'+(i+1)+'</span>'+(live?'<span class="dl-sb">'+esc(x.store)+'</span>':'')+(top?'<span class="dl-tp">Top pick</span>':'')+'</div><h4 class="dl-pn">'+esc(x.name)+'</h4></div>'+
+  '<div class="dl-pr">'+pr+'</div>'+
+  '<div class="dl-nw">'+dNotes(x,live?'Check first':'Trade-off')+(live?'':'<div class="dl-gs">'+dBtns(x.search||x.name)+'</div>')+'</div>'+
+  '<div class="dl-ac">'+(live?'<a class="btn pri" href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer nofollow">Open on '+esc(x.store)+ico('ext',14,2.4)+'</a>':'')+'<button class="btn" type="button" data-use="'+i+'">Add a price I found</button></div></article>';}
+function dPlanHtml(p){var live=p.products&&p.products.length,multi=dItems().length>1,h='<div class="dl-res2"><div class="dl-sh"><span class="dl-n">2</span><div><h2>Eve’s picks for you</h2></div></div>';
+ if(p.summary)h+='<div class="card dl-sum"><div class="dl-sl">'+ico('spark',16)+'Eve’s take</div><div class="dl-sx">'+esc(p.summary)+'</div></div>';
+ if(p.specs&&p.specs.length)h+=dRt('What to look for')+'<div class="card dl-spec">'+p.specs.map(function(s){return '<div class="dl-sr"><b>'+esc(s.name)+'</b><div><span class="w">'+esc(s.want)+'</span>'+(s.why?'<span class="y">'+esc(s.why)+'</span>':'')+'</div></div>';}).join('')+'</div>';
+ if(live)h+=dRt('Best matches we found','Real product pages from Amazon.in, Flipkart, Croma, Reliance Digital and Vijay Sales. A price shown here comes from the search result and may be out of date, so always check the store page.')+p.products.map(function(x,i){return dProd(x,i,true,multi&&i===0);}).join('');
  else{
-  if(p.mode==='guide'&&p.queries&&p.queries.length)h+='<div class="msg warn" style="margin-top:12px"><span class="dotk"></span><span>'+(p.capped?'Eve has used today’s product searches, so here are searches you can open on the stores. Product links are back tomorrow.':p.searchFailed?'Eve could not reach the store search just now, so here are searches you can open on the stores.':'No matching product pages turned up. Try the searches below on the stores.')+'</span></div>';
-  if(p.picks&&p.picks.length)h+='<h3 class="dh">Good options to check</h3>'+p.picks.map(function(x,i){
-   return '<div class="card dpick"><div class="dpt"><span class="dno">'+(i+1)+'</span><div class="dpn">'+esc(x.name)+'</div></div>'+
-    (x.price_low>0?'<div style="margin-top:8px"><span class="pl2">Rough estimate: '+dRangeTxt(x)+'</span></div>':'')+
-    (x.why?'<p style="margin:8px 0 0">'+esc(x.why)+'</p>':'')+(x.tradeoff?'<p class="hint" style="margin:4px 0 0"><b>Trade-off:</b> '+esc(x.tradeoff)+'</p>':'')+
-    dBtns(x.search||x.name)+'<div class="dch" style="margin-top:10px"><button class="btn sm" type="button" data-use="'+i+'">Add a price I found</button></div></div>';}).join('');}
- if(p.queries&&p.queries.length)h+='<h3 class="dh">'+(live?'Want to look further?':'Search the stores yourself')+'</h3><div class="card">'+p.queries.map(function(q){return '<div class="dq"><span>'+esc(q)+'</span>'+dBtns(q)+'</div>';}).join('')+'</div>';
- if(p.avoid&&p.avoid.length)h+='<h3 class="dh">Watch out for</h3><div class="card"><ul class="dul">'+p.avoid.map(function(a){return '<li>'+esc(a)+'</li>';}).join('')+'</ul></div>';
- if(p.timing)h+='<div class="msg good" style="margin-top:12px"><span class="dotk"></span><span><b>Buying tip.</b> '+esc(p.timing)+'</span></div>';
- return h;}
+  if(p.mode==='guide'&&p.queries&&p.queries.length)h+='<div class="msg warn" style="margin-top:14px"><span class="dotk"></span><span>'+(p.capped?'Eve has used today’s product searches, so here are searches you can open on the stores. Product links are back tomorrow.':p.searchFailed?'Eve could not reach the store search just now, so here are searches you can open on the stores.':'No matching product pages turned up. Try the searches below on the stores.')+'</span></div>';
+  if(p.picks&&p.picks.length)h+=dRt('Good options to check')+p.picks.map(function(x,i){return dProd(x,i,false,false);}).join('');}
+ if(p.queries&&p.queries.length)h+=dRt(live?'Want to look further?':'Search the stores yourself')+'<div class="card dl-qs">'+p.queries.map(function(q){return '<div class="dl-qr"><span class="dl-qt">'+ico('search',16,2.2)+'<span>'+esc(q)+'</span></span>'+dBtns(q)+'</div>';}).join('')+'</div>';
+ var av=p.avoid&&p.avoid.length,tm=!!p.timing;
+ if(av||tm)h+='<div class="dl-2">'+(av?'<div class="card dl-tc"><div class="dl-tl"><span class="dl-bi">'+ico('alert',16,2.6)+'</span>Watch out for</div><ul class="dl-ul">'+p.avoid.map(function(a){return '<li>'+esc(a)+'</li>';}).join('')+'</ul></div>':'')+(tm?'<div class="card dl-tc"><div class="dl-tl"><span class="dl-bi g">'+ico('check',16,2.8)+'</span>Buying tip</div><div class="dl-tx">'+esc(p.timing)+'</div></div>':'')+'</div>';
+ return h+'</div>';}
 function dFind(){if(DS.state==='busy')return;
  var need=$$('dnd').value.replace(/\s+/g,' ').trim(),bud=dNum($$('dbd').value);DS.need=need;DS.budget=bud?String(bud):'';
  if(need.length<4){dMsg('Tell Eve what you need first, for example: a laptop with an Intel i7 and a good graphics card.','warn');return;}
@@ -1465,7 +1488,7 @@ function dFind(){if(DS.state==='busy')return;
  if(!CFG.dealApi){DS.state='err';DS.err='Eve’s suggestions are not open yet. Please check back soon.';dRender();return;}
  var run=++DS.run;DS.state='busy';DS.plan=null;DS.judge=null;DS.jstate='idle';dRender();dAct();var b=$$('dgo');if(b){b.disabled=true;b.classList.add('busy');}
  dCall('/plan',{need:need,budget:bud,priority:DS.pri,condition:DS.cond}).then(function(d){if(run!==DS.run)return;DS.plan=d;DS.state='ok';},function(e){if(run!==DS.run)return;DS.state='err';DS.err=dErr(e.code);}).then(function(){if(run!==DS.run)return;
-  var b=$$('dgo');if(b){b.disabled=false;b.classList.remove('busy');}dProdOpts();dProdSync();dRender();dAct();
+  var b=$$('dgo');if(b){b.disabled=false;b.classList.remove('busy');}var f=dItems()[0],pk=$$('dpk'),pt=$$('dpt');dProdOpts(f&&pk&&pk.value==='__o'&&!(pt&&pt.value.trim())?f.name:undefined);dProdSync();dRender();dAct();
   var r=$$('dres');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:'smooth',block:'start'});});}
 function dAdd(){var s=$$('dpk'),m=$$('dmsg2'),say=function(t){m.innerHTML='<div class="msg warn"><span class="dotk"></span><span>'+esc(t)+'</span></div>';};
  var prod=(s.value==='__o'?$$('dpt').value:s.value).replace(/\s+/g,' ').trim().slice(0,100);
@@ -1476,36 +1499,36 @@ function dAdd(){var s=$$('dpk'),m=$$('dmsg2'),say=function(t){m.innerHTML='<div 
  if(DS.offers.length>=14){say('That is plenty to compare. Remove one before you add another.');return;}
  var del=dNum($$('dch').value),disc=dNum($$('dds').value),war=Math.min(10,dNum($$('dwr').value)),ret=Math.min(365,dNum($$('drt').value));
  m.innerHTML='';DS.offers.push({id:++DS.seq,pick:prod,store:store,price:price,del:del,disc:disc,war:war,ret:ret,total:Math.max(0,price+del-disc)});
- DS.judge=null;DS.jstate='idle';['dpp','dch','dds','dwr','drt'].forEach(function(i){$$(i).value='';});
+ DS.judge=null;DS.jstate='idle';['dpp','dch','dds','dwr','drt'].forEach(function(i){$$(i).value='';});dFin();
  if(s.value==='__o'){dProdOpts(prod);dProdSync();$$('dpt').value='';}
  dOffers();dAct();$$('dpp').focus({preventScroll:true});}
 function dOffers(){var el=$$('doffers');if(!el)return;
- if(!DS.offers.length){el.innerHTML='<p class="hint" style="margin:14px 0 0">No prices added yet.</p>';return;}
+ if(!DS.offers.length){el.innerHTML='<div class="dl-empty">'+ico('tag',28)+'<div><b>No prices added yet</b><br>Prices you add appear here, cheapest first.</div></div>';dSteps();return;}
  var groups=[],map={};DS.offers.forEach(function(o){var k=o.pick.toLowerCase();if(!map[k]){map[k]={name:o.pick,list:[]};groups.push(map[k]);}map[k].list.push(o);});
  var h='';groups.forEach(function(g){g.list.sort(function(a,b){return a.total-b.total||b.war-a.war||b.ret-a.ret;});
   var rg=dRange(g.name),hi=g.list[g.list.length-1].total,multi=g.list.length>1;
-  h+='<h4 class="dgh">'+esc(g.name)+'</h4>';
+  h+='<div class="dl-gh">'+esc(g.name)+'</div>';
   g.list.forEach(function(o,i){var best=i===0,v=best?dVerdict(o.total,rg):null;
    var det=inr(o.price)+(o.del?' + '+inr(o.del)+' charges':'')+(o.disc?' − '+inr(o.disc)+' off':'');
    var ex=[];if(o.war)ex.push(o.war+' year'+(o.war===1?'':'s')+' warranty');if(o.ret)ex.push(o.ret+'-day returns');
-   h+='<div class="card dof'+(best&&multi?' best':'')+'"><div class="dof-t"><b>'+esc(o.store)+'</b>'+(best&&multi?'<span class="dbd">Best deal</span>':'')+'<span class="dof-p">'+inr(o.total)+'</span></div>'+
+   h+='<div class="dl-o'+(best&&multi?' best':'')+'"><div class="dl-ot"><b>'+esc(o.store)+'</b>'+(best&&multi?'<span class="dl-bd">Best deal</span>':'')+'<span class="dl-op">'+inr(o.total)+'</span></div>'+
     '<div class="hint">'+det+(ex.length?' · '+ex.join(' · '):'')+'</div>'+
-    (best&&multi&&hi>o.total?'<div class="dsv">Saves '+inr(hi-o.total)+' compared with the most expensive.</div>':'')+
+    (best&&multi&&hi>o.total?'<div class="dl-sv">Saves '+inr(hi-o.total)+' compared with the most expensive.</div>':'')+
     (v?'<div class="msg '+v.k+'"><span class="dotk"></span><span><b>'+v.t+'.</b> '+esc(v.m)+'</span></div>':'')+
-    '<button class="dxr" type="button" data-rm="'+o.id+'" aria-label="Remove this price">'+ico('x',14,2.6)+'</button></div>';});});
- el.innerHTML=h;}
+    '<button class="dl-x" type="button" data-rm="'+o.id+'" aria-label="Remove this price">'+ico('x',14,2.6)+'</button></div>';});});
+ el.innerHTML=h;dSteps();}
 function dAct(){var el=$$('dact');if(!el)return;
- if(!DS.offers.length){el.innerHTML='';return;}
+ if(!DS.offers.length){el.innerHTML='';dSteps();return;}
  var h='';
  if(!CFG.dealApi)h='';
- else if(DS.jstate==='busy')h='<div class="card dwait" style="margin-top:14px"><span class="dd"></span><span class="dd"></span><span class="dd"></span><p style="margin:10px 0 0"><b>Eve is thinking it over…</b></p></div>';
- else{h='<div class="dch"><button class="btn pri" id="djb" type="button">Ask Eve what she thinks</button></div>';
+ else if(DS.jstate==='busy')h='<div class="dl-wait sm"><div class="dl-dots"><i></i><i></i><i></i></div><b>Eve is thinking it over…</b></div>';
+ else{h='<button class="btn pri dl-ask" id="djb" type="button">'+ico('spark',16)+'Ask Eve what she thinks</button>';
   if(DS.jstate==='err')h+='<div class="msg bad"><span class="dotk"></span><span>'+esc(DS.jerr)+'</span></div>';
-  if(DS.jstate==='ok'&&DS.judge){var j=DS.judge;h+='<div class="card dsum" style="margin-top:14px"><div class="dsh">'+ico('spark',18)+'<b>Eve’s verdict</b></div><p style="margin:6px 0 0"><b>'+esc(j.headline)+'</b></p>'+
-   (j.reasons.length?'<ul class="dul">'+j.reasons.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'')+
+  if(DS.jstate==='ok'&&DS.judge){var j=DS.judge;h+='<div class="dl-v"><div class="dl-sl">'+ico('spark',16)+'Eve’s verdict</div><div class="dl-vh">'+esc(j.headline)+'</div>'+
+   (j.reasons.length?'<ul class="dl-ul">'+j.reasons.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'')+
    j.warnings.map(function(x){return '<div class="msg warn"><span class="dotk"></span><span>'+esc(x)+'</span></div>';}).join('')+
-   (j.tips.length?'<p class="hint" style="margin:12px 0 2px"><b>Tips</b></p><ul class="dul">'+j.tips.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'')+'</div>';}}
- el.innerHTML=h;}
+   (j.tips.length?'<div class="hint" style="display:block;margin:12px 0 2px"><b>Tips</b></div><ul class="dl-ul">'+j.tips.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul>':'')+'</div>';}}
+ el.innerHTML=h;dSteps();}
 function dJudge(){if(DS.jstate==='busy'||!DS.offers.length)return;var run=++DS.run;DS.jstate='busy';dAct();
  var picks=dItems().map(function(p){return {name:p.name,low:p.price_low,high:p.price_high};});
  dCall('/judge',{need:DS.need,priority:DPRIN[DS.pri],picks:picks,offers:DS.offers.map(function(o){return {pick:o.pick,store:o.store,price:o.price,delivery:o.del,discount:o.disc,warranty:o.war,returns:o.ret,total:o.total};})}).then(function(d){if(run!==DS.run)return;DS.judge=d;DS.jstate='ok';},function(e){if(run!==DS.run)return;DS.jstate='err';DS.jerr=dErr(e.code);}).then(function(){if(run!==DS.run)return;dAct();});}
