@@ -863,12 +863,12 @@ function aboutPage(){nav('about');
  (CFG.legalName?'<h2>Who runs it</h2><p>Eve Sandbox is operated by '+esc(CFG.legalName)+'. You can reach us on the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p>':'')+
  '<h2>Get involved</h2><p>Have an idea for a tool, or found something that does not work? <a href="#/contact" style="color:var(--brand)">Tell us</a>. If Eve Sandbox helps you, you can <a href="#/donate" style="color:var(--brand)">support its development</a>.</p></div>';}
 /* ---------- Cloudflare Turnstile (bot check for the Contact form). Off until turnstileKey is set in config.js ---------- */
-var TS={p:null};
+var TSQ={p:null};
 function tsOn(){return !!CFG.turnstileKey;}
-function tsLib(){if(TS.p)return TS.p;TS.p=new Promise(function(ok,no){
+function tsLib(){if(TSQ.p)return TSQ.p;TSQ.p=new Promise(function(ok,no){
  if(window.turnstile)return ok(window.turnstile);
  var sc=document.createElement('script');sc.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';sc.async=true;
- sc.onload=function(){window.turnstile?ok(window.turnstile):(TS.p=null,no(new Error('ts')));};sc.onerror=function(){TS.p=null;no(new Error('ts'));};document.head.appendChild(sc);});return TS.p;}
+ sc.onload=function(){window.turnstile?ok(window.turnstile):(TSQ.p=null,no(new Error('ts')));};sc.onerror=function(){TSQ.p=null;no(new Error('ts'));};document.head.appendChild(sc);});return TSQ.p;}
 function contactDetails(){
  var r=[];if(CFG.legalName)r.push(['Operated by',esc(CFG.legalName)]);
  if(CFG.email)r.push(['Email','<a href="mailto:'+esc(CFG.email)+'" style="color:var(--brand)">'+esc(CFG.email)+'</a>']);
@@ -939,12 +939,12 @@ function donatePage(){nav('donate');
  if(api){dInit(api);dThanks(api);}
 }
 function dAmt(){var t=($$('damt').value||'').replace(/[,\s]/g,'');return /^\d{1,6}$/.test(t)?parseInt(t,10):NaN;}
-function dSync(){var a=dAmt(),ok=a>=10&&a<=50000;
+function dnSync(){var a=dAmt(),ok=a>=10&&a<=50000;
  $$('dgo').disabled=!ok||DN.busy;$$('dgo').textContent=DN.busy?'Opening payment page...':(ok?'Donate '+inr(a):'Donate');
  document.querySelectorAll('#dch .btn').forEach(function(b){b.classList.toggle('pri',ok&&+b.dataset.v===a);});}
 function dInit(api){
- $$('dch').onclick=function(e){var v=e.target.dataset&&e.target.dataset.v;if(!v)return;$$('damt').value=v;$$('dmsg').textContent='';dSync();};
- $$('damt').oninput=function(){this.value=this.value.replace(/[^\d,\s]/g,'');$$('dmsg').textContent='';dSync();};
+ $$('dch').onclick=function(e){var v=e.target.dataset&&e.target.dataset.v;if(!v)return;$$('damt').value=v;$$('dmsg').textContent='';dnSync();};
+ $$('damt').oninput=function(){this.value=this.value.replace(/[^\d,\s]/g,'');$$('dmsg').textContent='';dnSync();};
  $$('dform').onsubmit=async function(e){e.preventDefault();if(DN.busy)return;
   var a=dAmt(),m=$$('dmsg');m.className='cfs';
   if(!(a>=10&&a<=50000)){m.className='cfs bad';m.textContent='Please enter an amount between ₹10 and ₹50,000.';return;}
@@ -952,20 +952,20 @@ function dInit(api){
   if(!/^[6-9]\d{9}$/.test(ph)){m.className='cfs bad';m.textContent='Please enter a valid 10-digit mobile number.';$$('dph').focus();return;}
   var em=$$('dem').value.trim();
   if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){m.className='cfs bad';m.textContent='That email address does not look right.';$$('dem').focus();return;}
-  DN.busy=true;dSync();m.textContent='';
+  DN.busy=true;dnSync();m.textContent='';
   try{
    var r=await fetch(api+'/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,phone:ph,name:$$('dnm').value,email:em,website:$$('dws').value})});
    var j=null;try{j=await r.json();}catch(x){}
    if(r.ok&&j&&/^session_/.test(j.session||'')){m.textContent='Taking you to the secure payment page...';
-    try{var CF=await cfSdk();CF({mode:j.mode==='production'?'production':'sandbox'}).checkout({paymentSessionId:j.session,redirectTarget:'_self'});setTimeout(function(){DN.busy=false;dSync();},5000);return;}
+    try{var CF=await cfSdk();CF({mode:j.mode==='production'?'production':'sandbox'}).checkout({paymentSessionId:j.session,redirectTarget:'_self'});setTimeout(function(){DN.busy=false;dnSync();},5000);return;}
     catch(x){console.warn('payment page could not open:',x);}
    }
    var er=(j&&j.error)||'';console.warn('donation not started:',r.status,er);
    m.className='cfs bad';
    m.textContent=er==='amount'?'Please enter an amount between ₹10 and ₹50,000.':er==='phone'?'Please enter a valid 10-digit mobile number.':er==='email'?'That email address does not look right.':er==='slow'?'That was a lot of tries. Please wait a little while and try again.':'We could not start the payment right now. Please try again in a little while.';
   }catch(x){console.warn('donation could not reach the server:',x);m.className='cfs bad';m.textContent='We could not start the payment right now. Please check your internet connection and try again.';}
-  DN.busy=false;dSync();};
- dSync();
+  DN.busy=false;dnSync();};
+ dnSync();
 }
 function cfSdk(){if(window.Cashfree)return Promise.resolve(window.Cashfree);
  if(!cfSdk.p)cfSdk.p=new Promise(function(ok,no){var sc=document.createElement('script');sc.src='https://sdk.cashfree.com/js/v3/cashfree.js';sc.async=true;
@@ -1454,24 +1454,9 @@ function tsLocName(k){var a=k.split('-'),l=a[0],r=a[1]||'',n=l;if(l==='und')retu
  try{n=new Intl.DisplayNames(['en'],{type:'language'}).of(l)||l;}catch(e){}
  if(r){var rn=r;try{rn=new Intl.DisplayNames(['en'],{type:'region'}).of(r)||r;}catch(e){}n+=' ('+rn+')';}
  return n;}
-/* the biggest countries by population, with their main language, so people can see which voices their device has and how to add the rest */
-var TSTOP=[['India','Hindi','hi'],['China','Chinese','zh'],['United States','English','en'],['Indonesia','Indonesian','id'],['Pakistan','Urdu','ur'],['Nigeria','English','en'],['Brazil','Portuguese','pt'],['Bangladesh','Bengali','bn'],['Russia','Russian','ru'],['Mexico','Spanish','es'],['Japan','Japanese','ja'],['Ethiopia','Amharic','am'],['Philippines','Filipino','fil'],['Egypt','Arabic','ar'],['Vietnam','Vietnamese','vi'],['Turkey','Turkish','tr'],['Iran','Persian','fa'],['Germany','German','de'],['Thailand','Thai','th'],['France','French','fr'],['South Korea','Korean','ko']];
-var TSAL={tl:'fil',nb:'no',nn:'no',iw:'he',in:'id',yue:'zh'};
-function tsHow(){var u=navigator.userAgent||'',p=navigator.platform||'';
- if(/Android/i.test(u))return 'On Android: Settings, then Languages (or System), then Text-to-speech output, and install the voice data for the language you want.';
- if(/iPhone|iPad|iPod/i.test(u)||(/Mac/i.test(p)&&navigator.maxTouchPoints>1))return 'On iPhone and iPad: Settings, then Accessibility, then Spoken Content, then Voices, and download a voice for the language you want.';
- if(/Mac/i.test(p)||/Macintosh/i.test(u))return 'On a Mac: System Settings, then Accessibility, then Spoken Content, then System voice, then Manage Voices, and add the language you want.';
- if(/Win/i.test(p)||/Windows/i.test(u))return 'On Windows: Settings, then Time & language, then Speech, then Manage voices (or Add voices), and add the language you want.';
- return 'In your device’s language or speech settings, add a voice for the language you want.';}
-function tsGuide(have){
- var ok=function(c){return !!have[c];},seen={},rows=TSTOP.map(function(x){var on=ok(x[2]);return '<li class="'+(on?'on':'')+'"><span>'+esc(x[0])+' · '+esc(x[1])+'</span><em>'+(on?'On this device':'Not added')+'</em></li>';});
- var miss=TSTOP.filter(function(x){return !ok(x[2]);}).length;
- return '<p>These are the biggest countries in the world and their main language. The voices in the list above come from your device, so a language shows up there once your device has a voice for it.</p><ul class="ts-cl">'+rows.join('')+'</ul>'+
-  (miss?'<p>'+esc(tsHow())+' Then reload this page and the new language appears in the Language list.</p>':'<p>Your device has a voice for every language listed here.</p>')+
-  '<p>No voice for a language yet? The audio file maker below can speak English, Chinese, Spanish, French, Japanese and Korean without anything installed.</p>';}
 function tsVoiceOpts(){var s=$$('tsv'),ls=$$('tsvl');if(!s||!ls)return;
  var r=aiRank();
- if(!r.length){ls.innerHTML='<option value="">Default</option>';s.innerHTML='<option value="">Default voice</option>';TS.loc='';TS.voice='';dSync(ls);dSync(s);var h0=$$('tsvh');if(h0)h0.textContent='Your device did not list any voices.';var g0=$$('tsmb');if(g0)g0.innerHTML=tsGuide({});return;}
+ if(!r.length){ls.innerHTML='<option value="">Default</option>';s.innerHTML='<option value="">Default voice</option>';TS.loc='';TS.voice='';dSync(ls);dSync(s);var h0=$$('tsvh');if(h0)h0.textContent='Your device did not list any voices.';return;}
  var map={},keys=[];
  r.forEach(function(x){var k=tsLocKey(x.v);if(!map[k]){map[k]=[];keys.push(k);}map[k].push(x.v);});
  var best=keys[0];
@@ -1484,9 +1469,8 @@ function tsVoiceOpts(){var s=$$('tsv'),ls=$$('tsvl');if(!s||!ls)return;
  var has=vs.some(function(v){return (v.voiceURI||v.name)===TS.voice;});
  if(!has)TS.voice=vs[0].voiceURI||vs[0].name;
  s.value=TS.voice;dSync(s);
- var n=0,seen={},have={};keys.forEach(function(k){var l=k.split('-')[0];l=TSAL[l]||l;have[l]=1;if(!seen[l]){seen[l]=1;n++;}});
- var h=$$('tsvh');if(h)h.textContent='These voices come from your device ('+n+' language'+(n===1?'':'s')+' found).';
- var g=$$('tsmb');if(g)g.innerHTML=tsGuide(have);}
+ var n=0,seen={};keys.forEach(function(k){var l=k.split('-')[0];if(!seen[l]){seen[l]=1;n++;}});
+ var h=$$('tsvh');if(h)h.textContent='These voices come from your device ('+n+' language'+(n===1?'':'s')+' found).';}
 function tsHi(){if(!tsCan())return;try{speechSynthesis.cancel();}catch(e){}TS.pend=0;var v=tsVoice(),l=String((v&&v.lang)||TS.loc||'en').split(/[-_]/)[0].toLowerCase();tsWord(TSHI[l]||'Hello');}
 function tsNoSpace(){var v=tsVoice();return !!v&&/^(zh|ja|th|lo|km|my|yue)/i.test(String(v.lang||''));}
 function tsUtter(text){var u=new SpeechSynthesisUtterance(text),v=tsVoice();if(v){try{u.voice=v;u.lang=v.lang;}catch(e){}}u.rate=TS.rate;u.pitch=1;u.volume=1;return u;}
@@ -1631,14 +1615,13 @@ function ttsPage(){nav('tts');
  '<label class="qfl" for="tsv">Voice<select class="sel" id="tsv"></select></label></div>'+
  '<div class="ts-bar full"><label class="qfl" for="tsr">Speed <span class="ts-rv" id="tsrv"></span><input type="range" id="tsr" min="0.6" max="1.6" step="0.01" data-ks="0.05" value="'+TS.rate+'"></label></div>'+
  '<p class="hint ts-vh" id="tsvh"></p>'+
- '<details class="ts-more" id="tsmore"><summary>Voices from more countries</summary><div class="ts-mb" id="tsmb"></div></details>'+
  '<label class="qck"><input type="checkbox" id="tslive"'+(TS.live?' checked':'')+'> Speak each word as I type</label>'+
  '<div class="dl-cta"><button class="btn pri dl-big" id="tsall" type="button"></button><button class="btn" id="tsclr" type="button">Clear</button></div><div id="tsm1"></div></section>'+
  '<section class="card dl-sec dl-f" id="tsl2"><div class="dl-sh"><span class="dl-n">2</span><div><h2>Paragraph to audio file</h2><span class="hint">Write or paste a paragraph. Nothing is spoken while you write. When you are ready, make the audio and download it.</span></div></div>'+
  '<textarea id="tst" rows="8" maxlength="'+TMAX+'" aria-label="Your paragraph" placeholder="Write or paste your paragraph here">'+esc(TS.para)+'</textarea>'+
  '<div class="ts-count" id="tsc"></div>'+
  '<div class="ts-bar one"><label class="qfl" for="tsl">Language<select class="sel" id="tsl">'+TLANGS.map(function(l){return '<option value="'+l[0]+'"'+(TS.lang===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join('')+'</select></label></div>'+
- '<p class="hint ts-vh">Languages such as Hindi, Portuguese, Russian and Arabic are in the first section whenever your device has a voice for them. Open “Voices from more countries” there to see how to add them.</p>'+
+ '<p class="hint ts-vh">Languages such as Hindi, Portuguese, Russian and Arabic are in the first section whenever your device has a voice for them.</p>'+
  '<div class="dl-cta"><button class="btn pri dl-big" id="tsmk" type="button">'+ico('speaker',18,2.2)+'Make audio</button><button class="btn" id="tsstop" type="button" style="display:none">Cancel</button></div>'+
  '<div id="tsprog"></div><div id="tsm2"></div><div id="tsout"></div></section>'+
  '<p class="dl-note">The voices are automated, so names and unusual words may not sound perfect. Audio files are made from the text you type and are not kept by this website. Please do not type personal details.</p>';
