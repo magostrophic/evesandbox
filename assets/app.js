@@ -1437,30 +1437,77 @@ function dJudge(){if(DS.jstate==='busy'||!DS.offers.length)return;var run=++DS.r
  dCall('/judge',{need:DS.need,priority:DPRIN[DS.pri],picks:picks,offers:DS.offers.map(function(o){return {pick:o.pick,store:o.store,price:o.price,delivery:o.del,discount:o.disc,warranty:o.war,returns:o.ret,total:o.total};})}).then(function(d){if(run!==DS.run)return;DS.judge=d;DS.jstate='ok';},function(e){if(run!==DS.run)return;DS.jstate='err';DS.jerr=dErr(e.code);}).then(function(){if(run!==DS.run)return;dAct();});}
 
 /* ---------- Text to Speech ---------- */
-var TS={voice:'',rate:1,live:true,pend:0,spoken:0,rt:0,reading:false,run:0,ctl:null,busy:false,para:'',lang:'en',blob:null,url:'',vl:false};
-var TLANGS=[['en','English'],['es','Spanish'],['fr','French'],['zh','Chinese']];
+var TS={voice:'',loc:'',rate:1,live:true,pend:0,spoken:0,rt:0,nt:0,reading:false,run:0,ctl:null,busy:false,para:'',lang:'en',blob:null,ext:'mp3',url:'',vl:false};
+var TLANGS=[['en','English'],['zh','Chinese (Mandarin)'],['es','Spanish'],['fr','French'],['ja','Japanese'],['ko','Korean']];
 var TMAX=3000,TPIECE=380;
 var TERR={short:'Write something with a few words first.',slow:'That was a lot of requests in a short time. Please wait a few minutes and try again.',limit:'Eve has used up her free help for today. Please try again tomorrow.',busy:'Eve is busy right now. Please try again in a minute.',big:'That piece was too long. Please try again.',net:'Could not connect. Please check your internet and try again.',timeout:'That is taking too long. Please try again.'};
 function tsErr(c){return TERR[c]||'The audio could not be made right now. Please try again in a moment.';}
 function tsCan(){return 'speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';}
 function tsVoice(){var l=aiVoices(),v=l.filter(function(x){return (x.voiceURI||x.name)===TS.voice;})[0];return v||aiVoice();}
-function tsVoiceOpts(){var s=$$('tsv');if(!s)return;
+/* the voices belong to the device, so they are listed by language and country, with the world's most populous countries first */
+var TSRG=['IN','CN','US','ID','PK','NG','BR','BD','RU','MX','JP','ET','PH','EG','VN','CD','TR','IR','DE','TH','GB','FR','IT','ZA','TZ','KR','ES','CA','AU','AR','SA','PL','UA','MY'];
+var TSPR={hi:'IN',zh:'CN',en:'US',id:'ID',ur:'PK',pt:'BR',bn:'BD',ru:'RU',es:'MX',ja:'JP',fil:'PH',ar:'EG',vi:'VN',tr:'TR',fa:'IR',de:'DE',th:'TH',fr:'FR',it:'IT',sw:'TZ',ko:'KR',pl:'PL',uk:'UA',ms:'MY',am:'ET',ta:'IN',te:'IN',mr:'IN',gu:'IN',kn:'IN',ml:'IN',pa:'IN'};
+var TSHI={en:'Hello',hi:'नमस्ते',zh:'你好',es:'Hola',pt:'Olá',ru:'Привет',ja:'こんにちは',de:'Hallo',fr:'Bonjour',ar:'مرحبا',bn:'হ্যালো',id:'Halo',ur:'ہیلو',tr:'Merhaba',ko:'안녕하세요',it:'Ciao',vi:'Xin chào',th:'สวัสดี',fil:'Kumusta',fa:'سلام',sw:'Habari',pl:'Cześć',uk:'Привіт',nl:'Hallo',ta:'வணக்கம்',te:'నమస్కారం',mr:'नमस्कार',ms:'Halo',gu:'નમસ્તે',kn:'ನಮಸ್ಕಾರ',ml:'ഹലോ',pa:'ਸਤ ਸ੍ਰੀ ਅਕਾਲ'};
+function tsLocKey(v){var p=String(v.lang||'').replace(/_/g,'-').split('-').filter(Boolean),l=(p[0]||'und').toLowerCase(),r='';for(var i=1;i<p.length;i++)if(/^[A-Za-z]{2}$/.test(p[i]))r=p[i].toUpperCase();return r?l+'-'+r:l;}
+function tsLocRank(k){var a=k.split('-'),r=a[1]||TSPR[a[0]]||'',i=TSRG.indexOf(r);return i<0?99:i;}
+function tsLocName(k){var a=k.split('-'),l=a[0],r=a[1]||'',n=l;if(l==='und')return 'Other voices';
+ try{n=new Intl.DisplayNames(['en'],{type:'language'}).of(l)||l;}catch(e){}
+ if(r){var rn=r;try{rn=new Intl.DisplayNames(['en'],{type:'region'}).of(r)||r;}catch(e){}n+=' ('+rn+')';}
+ return n;}
+/* the biggest countries by population, with their main language, so people can see which voices their device has and how to add the rest */
+var TSTOP=[['India','Hindi','hi'],['China','Chinese','zh'],['United States','English','en'],['Indonesia','Indonesian','id'],['Pakistan','Urdu','ur'],['Nigeria','English','en'],['Brazil','Portuguese','pt'],['Bangladesh','Bengali','bn'],['Russia','Russian','ru'],['Mexico','Spanish','es'],['Japan','Japanese','ja'],['Ethiopia','Amharic','am'],['Philippines','Filipino','fil'],['Egypt','Arabic','ar'],['Vietnam','Vietnamese','vi'],['Turkey','Turkish','tr'],['Iran','Persian','fa'],['Germany','German','de'],['Thailand','Thai','th'],['France','French','fr'],['South Korea','Korean','ko']];
+var TSAL={tl:'fil',nb:'no',nn:'no',iw:'he',in:'id',yue:'zh'};
+function tsHow(){var u=navigator.userAgent||'',p=navigator.platform||'';
+ if(/Android/i.test(u))return 'On Android: Settings, then Languages (or System), then Text-to-speech output, and install the voice data for the language you want.';
+ if(/iPhone|iPad|iPod/i.test(u)||(/Mac/i.test(p)&&navigator.maxTouchPoints>1))return 'On iPhone and iPad: Settings, then Accessibility, then Spoken Content, then Voices, and download a voice for the language you want.';
+ if(/Mac/i.test(p)||/Macintosh/i.test(u))return 'On a Mac: System Settings, then Accessibility, then Spoken Content, then System voice, then Manage Voices, and add the language you want.';
+ if(/Win/i.test(p)||/Windows/i.test(u))return 'On Windows: Settings, then Time & language, then Speech, then Manage voices (or Add voices), and add the language you want.';
+ return 'In your device’s language or speech settings, add a voice for the language you want.';}
+function tsGuide(have){
+ var ok=function(c){return !!have[c];},seen={},rows=TSTOP.map(function(x){var on=ok(x[2]);return '<li class="'+(on?'on':'')+'"><span>'+esc(x[0])+' · '+esc(x[1])+'</span><em>'+(on?'On this device':'Not added')+'</em></li>';});
+ var miss=TSTOP.filter(function(x){return !ok(x[2]);}).length;
+ return '<p>These are the biggest countries in the world and their main language. The voices in the list above come from your device, so a language shows up there once your device has a voice for it.</p><ul class="ts-cl">'+rows.join('')+'</ul>'+
+  (miss?'<p>'+esc(tsHow())+' Then reload this page and the new language appears in the Language list.</p>':'<p>Your device has a voice for every language listed here.</p>')+
+  '<p>No voice for a language yet? The audio file maker below can speak English, Chinese, Spanish, French, Japanese and Korean without anything installed.</p>';}
+function tsVoiceOpts(){var s=$$('tsv'),ls=$$('tsvl');if(!s||!ls)return;
  var r=aiRank();
- if(!r.length){s.innerHTML='<option value="">Default voice</option>';s.value='';dSync(s);return;}
- s.innerHTML=r.map(function(x){var v=x.v;return '<option value="'+esc(v.voiceURI||v.name)+'">'+esc(v.name)+(v.lang?' ('+esc(v.lang)+')':'')+'</option>';}).join('');
- var has=r.some(function(x){return (x.v.voiceURI||x.v.name)===TS.voice;});
- if(!has)TS.voice=r[0].v.voiceURI||r[0].v.name;
- s.value=TS.voice;dSync(s);}
+ if(!r.length){ls.innerHTML='<option value="">Default</option>';s.innerHTML='<option value="">Default voice</option>';TS.loc='';TS.voice='';dSync(ls);dSync(s);var h0=$$('tsvh');if(h0)h0.textContent='Your device did not list any voices.';var g0=$$('tsmb');if(g0)g0.innerHTML=tsGuide({});return;}
+ var map={},keys=[];
+ r.forEach(function(x){var k=tsLocKey(x.v);if(!map[k]){map[k]=[];keys.push(k);}map[k].push(x.v);});
+ var best=keys[0];
+ keys.sort(function(a,b){var d=tsLocRank(a)-tsLocRank(b);if(d)return d;var na=tsLocName(a),nb=tsLocName(b);return na<nb?-1:na>nb?1:0;});
+ if(!map[TS.loc])TS.loc=best;
+ ls.innerHTML=keys.map(function(k){return '<option value="'+esc(k)+'">'+esc(tsLocName(k))+'</option>';}).join('');
+ ls.value=TS.loc;dSync(ls);
+ var vs=map[TS.loc];
+ s.innerHTML=vs.map(function(v){return '<option value="'+esc(v.voiceURI||v.name)+'">'+esc(v.name)+'</option>';}).join('');
+ var has=vs.some(function(v){return (v.voiceURI||v.name)===TS.voice;});
+ if(!has)TS.voice=vs[0].voiceURI||vs[0].name;
+ s.value=TS.voice;dSync(s);
+ var n=0,seen={},have={};keys.forEach(function(k){var l=k.split('-')[0];l=TSAL[l]||l;have[l]=1;if(!seen[l]){seen[l]=1;n++;}});
+ var h=$$('tsvh');if(h)h.textContent='These voices come from your device ('+n+' language'+(n===1?'':'s')+' found).';
+ var g=$$('tsmb');if(g)g.innerHTML=tsGuide(have);}
+function tsHi(){if(!tsCan())return;try{speechSynthesis.cancel();}catch(e){}TS.pend=0;var v=tsVoice(),l=String((v&&v.lang)||TS.loc||'en').split(/[-_]/)[0].toLowerCase();tsWord(TSHI[l]||'Hello');}
+function tsNoSpace(){var v=tsVoice();return !!v&&/^(zh|ja|th|lo|km|my|yue)/i.test(String(v.lang||''));}
 function tsUtter(text){var u=new SpeechSynthesisUtterance(text),v=tsVoice();if(v){try{u.voice=v;u.lang=v.lang;}catch(e){}}u.rate=TS.rate;u.pitch=1;u.volume=1;return u;}
 function tsWord(w){if(!tsCan())return;var ss=speechSynthesis;
  if(TS.pend>=3){ss.cancel();TS.pend=0;}
  var u=tsUtter(w),d=function(){TS.pend=Math.max(0,TS.pend-1);};u.onend=d;u.onerror=d;TS.pend++;ss.speak(u);}
 function tsM1(t,k){var e=$$('tsm1');if(e)e.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span></div>':'';}
+function tsSay(t){t=String(t).replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,'');if(t)tsWord(t);}
 function tsInput(e){var t=e.target,v=t.value,c=t.selectionStart==null?v.length:t.selectionStart,it=e.inputType||'';
  if(TS.reading){try{speechSynthesis.cancel();}catch(x){}TS.reading=false;TS.rt++;tsAllUI();}
+ clearTimeout(TS.nt);
+ if(e.isComposing)return;
  if(/^(insertFromPaste|insertFromDrop|insertReplacementText|historyUndo|historyRedo|deleteByCut)/.test(it)){TS.spoken=c;return;}
  if(c<TS.spoken){var s=v.slice(0,c).search(/\S+$/);TS.spoken=s<0?c:s;}
  if(!TS.live){TS.spoken=c;return;}
+ if(tsNoSpace()){
+  /* Chinese, Japanese and similar scripts have no spaces between words: say what was typed at a pause or at punctuation */
+  var seg2=v.slice(TS.spoken,c),mm=seg2.match(/^[\s\S]*[\s,.!?;:、。，！？；：]/);
+  if(mm){TS.spoken+=mm[0].length;tsSay(mm[0]);return;}
+  if(seg2)TS.nt=setTimeout(function(){var a=$$('tsa');if(!a)return;var cc=a.selectionStart==null?a.value.length:a.selectionStart;if(cc<=TS.spoken)return;var x=a.value.slice(TS.spoken,cc);TS.spoken=cc;tsSay(x);},700);
+  return;}
  var seg=v.slice(TS.spoken,c),m=seg.match(/^[\s\S]*\s/);if(!m)return;
  TS.spoken+=m[0].length;
  m[0].split(/\s+/).forEach(function(w){w=w.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,'');if(w)tsWord(w);});}
@@ -1492,10 +1539,74 @@ function tsBusy(on,done,total){TS.busy=on;var m=$$('tsmk'),c=$$('tsstop'),p=$$('
  m.disabled=on;m.classList.toggle('busy',on);c.style.display=on?'inline-flex':'none';
  p.innerHTML=on?'<div class="ts-prog"><i style="width:'+Math.max(4,Math.round(100*done/total))+'%"></i></div><div class="hint" style="display:block;margin-top:8px">Making your audio… '+Math.min(total,done+1)+' of '+total+'</div>':'';}
 function tsM2(t,k){var e=$$('tsm2');if(e)e.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span></div>':'';}
-function tsResult(){var o=$$('tsout');if(!o)return;
+/* our own player: play, seek, speed and volume, and no Download item or menu, so the Download audio button is the way to save the file */
+var TSP={au:null,raf:0,drag:false,ri:0,rates:[1,1.25,1.5,2,0.75]};
+var TSI={play:'<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z"/></svg>',
+ pause:'<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="4.4" height="15" rx="1.4"/><rect x="13.6" y="4.5" width="4.4" height="15" rx="1.4"/></svg>',
+ vol:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>',
+ mute:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="m22 9-6 6M16 9l6 6"/></svg>'};
+function tsT(x){x=isFinite(x)&&x>0?x:0;var m=Math.floor(x/60),y=Math.floor(x%60);return m+':'+(y<10?'0':'')+y;}
+function tsStop(){cancelAnimationFrame(TSP.raf);if(TSP.au){try{TSP.au.pause();TSP.au.removeAttribute('src');TSP.au.load();}catch(e){}TSP.au=null;}TSP.drag=false;}
+function tsPlayerHTML(){return '<div class="ap" role="group" aria-label="Audio player">'+
+ '<button class="ap-b" id="tsapp" type="button" aria-label="Play">'+TSI.play+'</button>'+
+ '<span class="ap-t" id="tsapc">0:00</span>'+
+ '<input class="ap-s" id="tsaps" type="range" min="0" max="1000" step="1" value="0" aria-label="Seek">'+
+ '<span class="ap-t" id="tsapd">0:00</span>'+
+ '<button class="ap-r" id="tsapr" type="button" aria-label="Playback speed">1×</button>'+
+ '<span class="ap-v"><button class="ap-m" id="tsapm" type="button" aria-label="Mute">'+TSI.vol+'</button><input class="ap-vs" id="tsapv" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume"></span></div>';}
+function tsPlayerInit(){
+ tsStop();
+ var au=TSP.au=new Audio(),b=$$('tsapp'),sk=$$('tsaps'),ct=$$('tsapc'),dt=$$('tsapd'),rt=$$('tsapr'),mt=$$('tsapm'),vl=$$('tsapv');
+ if(!b)return;
+ au.preload='auto';au.src=TS.url;TSP.ri=0;
+ function dur(){var x=au.duration;return isFinite(x)&&x>0?x:0;}
+ function paint(){var d=dur(),p=d?Math.min(1,au.currentTime/d):0;
+  if(!TSP.drag){sk.value=String(Math.round(p*1000));sk.style.setProperty('--r',String(p));}
+  ct.textContent=tsT(TSP.drag?sk.value/1000*d:au.currentTime);dt.textContent=tsT(d);
+  sk.setAttribute('aria-valuetext',tsT(au.currentTime)+' of '+tsT(d));}
+ function tick(){paint();if(!au.paused&&!au.ended)TSP.raf=requestAnimationFrame(tick);}
+ function icon(){var on=!au.paused&&!au.ended;b.innerHTML=on?TSI.pause:TSI.play;b.setAttribute('aria-label',on?'Pause':'Play');}
+ function toggle(){if(au.paused||au.ended){if(au.ended)au.currentTime=0;var p=au.play();if(p&&p.catch)p.catch(function(){});}else au.pause();}
+ b.onclick=toggle;
+ au.addEventListener('play',function(){icon();cancelAnimationFrame(TSP.raf);tick();});
+ au.addEventListener('pause',function(){icon();paint();});
+ au.addEventListener('ended',function(){icon();paint();});
+ ['loadedmetadata','durationchange','timeupdate','seeked'].forEach(function(n){au.addEventListener(n,function(){if(au.paused)paint();});});
+ sk.addEventListener('pointerdown',function(){TSP.drag=true;});
+ ['pointerup','pointercancel','change','blur'].forEach(function(n){sk.addEventListener(n,function(){TSP.drag=false;paint();});});
+ sk.addEventListener('input',function(){var d=dur();if(!d)return;TSP.drag=true;au.currentTime=sk.value/1000*d;ct.textContent=tsT(au.currentTime);});
+ sk.addEventListener('keydown',function(e){var d=dur(),k=e.key,x=null;
+  if(k==='ArrowRight'||k==='ArrowUp')x=au.currentTime+5;else if(k==='ArrowLeft'||k==='ArrowDown')x=au.currentTime-5;else if(k==='Home')x=0;else if(k==='End')x=d;
+  else if(k===' '||k==='Enter'){e.preventDefault();toggle();return;}
+  if(x===null)return;e.preventDefault();au.currentTime=Math.max(0,Math.min(d||0,x));paint();});
+ rt.onclick=function(){TSP.ri=(TSP.ri+1)%TSP.rates.length;var r=TSP.rates[TSP.ri];au.playbackRate=r;rt.textContent=r+'×';};
+ mt.onclick=function(){au.muted=!au.muted;mt.innerHTML=au.muted?TSI.mute:TSI.vol;mt.setAttribute('aria-label',au.muted?'Unmute':'Mute');};
+ vl.addEventListener('input',function(){au.volume=+vl.value;au.muted=+vl.value===0;mt.innerHTML=au.muted?TSI.mute:TSI.vol;});
+ paint();}
+function tsResult(){var o=$$('tsout');if(!o)return;tsStop();
  if(!TS.blob){o.innerHTML='';return;}
- o.innerHTML='<div class="ts-res"><div class="dl-sl">'+ico('speaker',16)+'Your audio is ready</div><audio controls preload="auto" src="'+TS.url+'"></audio><div class="hint" style="display:block;margin-top:8px">MP3 · '+fb(TS.blob.size)+'</div><div class="dl-cta"><button class="btn pri" id="tsdl" type="button">Download audio</button><button class="btn" id="tsnew" type="button">Start over</button></div></div>';}
-function tsDrop(){if(TS.url){try{URL.revokeObjectURL(TS.url);}catch(e){}}TS.url='';TS.blob=null;}
+ o.innerHTML='<div class="ts-res"><div class="dl-sl">'+ico('speaker',16)+'Your audio is ready</div>'+tsPlayerHTML()+'<div class="hint" style="display:block;margin-top:8px">'+(TS.ext==='wav'?'WAV':'MP3')+' · '+fb(TS.blob.size)+'</div><div class="dl-cta"><button class="btn pri" id="tsdl" type="button">Download audio</button><button class="btn" id="tsnew" type="button">Start over</button></div></div>';
+ tsPlayerInit();}
+function tsDrop(){tsStop();if(TS.url){try{URL.revokeObjectURL(TS.url);}catch(e){}}TS.url='';TS.blob=null;}
+/* the speech service may send each piece as WAV or as MP3: tell them apart by their first bytes, and join WAV pieces properly so the file plays all the way through */
+function tsIsWav(u){return u.length>44&&u[0]===82&&u[1]===73&&u[2]===70&&u[3]===70&&u[8]===87&&u[9]===65&&u[10]===86&&u[11]===69;}
+function tsWavParts(u){var dv=new DataView(u.buffer,u.byteOffset,u.byteLength),p=12,fmt=null;
+ while(p+8<=u.length){var id=String.fromCharCode(u[p],u[p+1],u[p+2],u[p+3]),sz=dv.getUint32(p+4,true);
+  if(id==='fmt ')fmt=u.subarray(p+8,Math.min(u.length,p+8+sz));
+  else if(id==='data'){var e=(sz===0||sz===4294967295||p+8+sz>u.length)?u.length:p+8+sz;return fmt&&fmt.length>=16?{fmt:fmt,data:u.subarray(p+8,e)}:null;}
+  p+=8+sz+(sz&1);}
+ return null;}
+async function tsJoin(blobs){
+ var bufs=[];for(var i=0;i<blobs.length;i++)bufs.push(new Uint8Array(await blobs[i].arrayBuffer()));
+ if(bufs.length&&bufs.every(tsIsWav)){var ps=bufs.map(tsWavParts);
+  if(ps.every(Boolean)){var f=ps[0].fmt,fv=new DataView(f.buffer,f.byteOffset,f.byteLength),sr=fv.getUint32(4,true),ba=fv.getUint16(12,true),bits=fv.getUint16(14,true);
+   if(sr>0&&ba>0){var gap=new Uint8Array(Math.round(sr*0.12)*ba);if(bits===8)gap.fill(128);
+    var parts=[],n=0;ps.forEach(function(q,k){if(k){parts.push(gap);n+=gap.length;}parts.push(q.data);n+=q.data.length;});
+    var fl=f.length+(f.length&1),h=new Uint8Array(12+8+fl+8),hv=new DataView(h.buffer);
+    var w4=function(o,t){for(var j=0;j<4;j++)h[o+j]=t.charCodeAt(j);};
+    w4(0,'RIFF');hv.setUint32(4,h.length+n-8,true);w4(8,'WAVE');w4(12,'fmt ');hv.setUint32(16,f.length,true);h.set(f,20);w4(20+fl,'data');hv.setUint32(24+fl,n,true);
+    return {blob:new Blob([h].concat(parts),{type:'audio/wav'}),ext:'wav'};}}}
+ return {blob:new Blob(blobs,{type:'audio/mpeg'}),ext:'mp3'};}
 async function tsMake(){if(TS.busy)return;
  var txt=$$('tst').value;TS.para=txt;TS.lang=$$('tsl').value;tsM2('');
  if(txt.replace(/[^\p{L}\p{N}]/gu,'').length<2){tsM2('Write or paste a paragraph first.','warn');return;}
@@ -1506,7 +1617,7 @@ async function tsMake(){if(TS.busy)return;
  try{
   for(var i=0;i<parts.length;i++){if(run!==TS.run)return;tsBusy(true,i,parts.length);blobs.push(await tsPieceR(base,parts[i],TS.lang));}
   if(run!==TS.run)return;
-  TS.blob=new Blob(blobs,{type:'audio/mpeg'});TS.url=URL.createObjectURL(TS.blob);tsBusy(false);tsResult();
+  var jn=await tsJoin(blobs);if(run!==TS.run)return;TS.blob=jn.blob;TS.ext=jn.ext;TS.url=URL.createObjectURL(TS.blob);tsBusy(false);tsResult();
   var r=$$('tsout');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:'smooth',block:'nearest'});
  }catch(e){if(run!==TS.run)return;tsBusy(false);tsM2(tsErr(e&&e.code),'bad');}}
 function tsCancel(){TS.run++;try{if(TS.ctl)TS.ctl.abort();}catch(e){}tsBusy(false);tsM2('');}
@@ -1516,14 +1627,18 @@ function ttsPage(){nav('tts');
  '<p class="lead dl-lead">Hear your words read out loud as you type them, or turn a whole paragraph into an audio file you can download.</p>'+
  '<section class="card dl-sec dl-f" id="tsl1"><div class="dl-sh"><span class="dl-n">1</span><div><h2>Speak as you type</h2><span class="hint">Each word is read out loud the moment you finish it. Press space after a word to hear it.</span></div></div>'+
  '<textarea id="tsa" rows="3" maxlength="600" aria-label="Type here to hear each word" placeholder="Start typing here"></textarea>'+
- '<div class="ts-bar"><label class="qfl" for="tsv">Voice<select class="sel" id="tsv"></select></label>'+
- '<label class="qfl" for="tsr">Speed <span class="ts-rv" id="tsrv"></span><input type="range" id="tsr" min="0.6" max="1.6" step="0.01" data-ks="0.05" value="'+TS.rate+'"></label></div>'+
+ '<div class="ts-bar"><label class="qfl" for="tsvl">Language<select class="sel" id="tsvl"></select></label>'+
+ '<label class="qfl" for="tsv">Voice<select class="sel" id="tsv"></select></label></div>'+
+ '<div class="ts-bar full"><label class="qfl" for="tsr">Speed <span class="ts-rv" id="tsrv"></span><input type="range" id="tsr" min="0.6" max="1.6" step="0.01" data-ks="0.05" value="'+TS.rate+'"></label></div>'+
+ '<p class="hint ts-vh" id="tsvh"></p>'+
+ '<details class="ts-more" id="tsmore"><summary>Voices from more countries</summary><div class="ts-mb" id="tsmb"></div></details>'+
  '<label class="qck"><input type="checkbox" id="tslive"'+(TS.live?' checked':'')+'> Speak each word as I type</label>'+
  '<div class="dl-cta"><button class="btn pri dl-big" id="tsall" type="button"></button><button class="btn" id="tsclr" type="button">Clear</button></div><div id="tsm1"></div></section>'+
  '<section class="card dl-sec dl-f" id="tsl2"><div class="dl-sh"><span class="dl-n">2</span><div><h2>Paragraph to audio file</h2><span class="hint">Write or paste a paragraph. Nothing is spoken while you write. When you are ready, make the audio and download it.</span></div></div>'+
  '<textarea id="tst" rows="8" maxlength="'+TMAX+'" aria-label="Your paragraph" placeholder="Write or paste your paragraph here">'+esc(TS.para)+'</textarea>'+
  '<div class="ts-count" id="tsc"></div>'+
  '<div class="ts-bar one"><label class="qfl" for="tsl">Language<select class="sel" id="tsl">'+TLANGS.map(function(l){return '<option value="'+l[0]+'"'+(TS.lang===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join('')+'</select></label></div>'+
+ '<p class="hint ts-vh">Languages such as Hindi, Portuguese, Russian and Arabic are in the first section whenever your device has a voice for them. Open “Voices from more countries” there to see how to add them.</p>'+
  '<div class="dl-cta"><button class="btn pri dl-big" id="tsmk" type="button">'+ico('speaker',18,2.2)+'Make audio</button><button class="btn" id="tsstop" type="button" style="display:none">Cancel</button></div>'+
  '<div id="tsprog"></div><div id="tsm2"></div><div id="tsout"></div></section>'+
  '<p class="dl-note">The voices are automated, so names and unusual words may not sound perfect. Audio files are made from the text you type and are not kept by this website. Please do not type personal details.</p>';
@@ -1532,7 +1647,9 @@ function ttsPage(){nav('tts');
  a.addEventListener('pointerdown',function(){if(unlocked||!tsCan())return;unlocked=true;try{var u=new SpeechSynthesisUtterance(' ');u.volume=0;speechSynthesis.speak(u);}catch(e){}});
  $$('tsr').oninput=function(){TS.rate=parseFloat(this.value)||1;$$('tsrv').textContent=TS.rate.toFixed(2).replace(/0$/,'')+'×';};$$('tsr').oninput();
  $$('tslive').onchange=function(){TS.live=this.checked;TS.spoken=$$('tsa').selectionStart||0;};
- $$('tsv').onchange=function(){TS.voice=this.value;if(tsCan()){speechSynthesis.cancel();TS.pend=0;tsWord('Hello');}};
+ $$('tsvl').onchange=function(){TS.loc=this.value;TS.voice='';tsVoiceOpts();tsHi();};
+ $$('tsv').onchange=function(){TS.voice=this.value;tsHi();};
+ a.addEventListener('compositionend',function(){tsInput({target:a,inputType:'insertText'});});
  $$('tsall').onclick=tsAll;
  $$('tsclr').onclick=function(){try{speechSynthesis.cancel();}catch(e){}TS.reading=false;TS.rt++;TS.pend=0;TS.spoken=0;a.value='';tsAllUI();tsM1('');a.focus();};
  var t=$$('tst'),cnt=function(){$$('tsc').textContent=t.value.length+' / '+TMAX;};cnt();
@@ -1540,11 +1657,11 @@ function ttsPage(){nav('tts');
  $$('tsl').onchange=function(){TS.lang=this.value;};
  $$('tsmk').onclick=tsMake;$$('tsstop').onclick=tsCancel;
  $$('tsout').onclick=function(e){var b=e.target.closest?e.target.closest('button'):null;if(!b)return;
-  if(b.id==='tsdl'&&TS.blob)saveBlob(TS.blob,'eve-speech.mp3');
+  if(b.id==='tsdl'&&TS.blob)saveBlob(TS.blob,'eve-speech.'+TS.ext);
   else if(b.id==='tsnew'){tsDrop();tsResult();t.value='';TS.para='';cnt();t.focus();}};
  tsAllUI();tsResult();
  if(tsCan()){tsVoiceOpts();aiVoicesReady(tsVoiceOpts);if(!TS.vl){TS.vl=true;try{speechSynthesis.addEventListener('voiceschanged',tsVoiceOpts);}catch(e){}}}
- else{$$('tsv').innerHTML='<option value="">Not available</option>';tsM1('Speaking out loud is not available in this browser, but you can still make an audio file below.','warn');}
+ else{$$('tsv').innerHTML='<option value="">Not available</option>';$$('tsvl').innerHTML='<option value="">Not available</option>';tsM1('Speaking out loud is not available in this browser, but you can still make an audio file below.','warn');}
 }
 
 /* ---------- QR Code Generator ---------- */
@@ -2808,7 +2925,7 @@ function idePage(){nav('ide');
 window.addEventListener('hashchange',function(){if(curR()!=='eve')aiLeave();if(curR()!=='ide'&&IDE.w){ideWd(false);try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;IDE.busy=false;}});
 
 
-function route(){var r=curR();menu(false);app.onclick=null;
+function route(){var r=curR();menu(false);app.onclick=null;tsStop();
  var known=r===''||r==='home'||r==='404'||ROUTES.indexOf(r)>=0;if(!known)r=PM?'404':'';
  setTitle(r===''?'home':r);
  app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||!!LOCKED[r]||(['planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve'].indexOf(r)<0));

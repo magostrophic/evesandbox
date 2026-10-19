@@ -324,8 +324,22 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 @media (max-width:520px){.dl-sec{padding:16px}.dl-hd .ic{width:44px;height:44px;border-radius:13px}.dl-g2.stk{grid-template-columns:minmax(0,1fr)}.dl-sp{font-size:.8rem;gap:6px;padding:9px 6px}.dl-big{width:100%}.dl-cta{margin-top:18px}.dl-co{padding:12px}}
 /* Text to Speech */
 .ic.i11{background:linear-gradient(135deg,#32d4c8,#0a84ff)}
-.ts-bar{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px;margin-top:14px;align-items:end}
-.ts-bar.one{grid-template-columns:minmax(0,320px)}
+.ts-bar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:14px;margin-top:14px;align-items:end}
+.ts-bar.one{grid-template-columns:minmax(0,320px)}.ts-bar.full{grid-template-columns:minmax(0,1fr)}
+.ts-vh{margin:10px 0 0;line-height:1.45}
+.ts-more{margin-top:10px;background:var(--fill);border-radius:14px;padding:2px 14px}
+.ts-more summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;color:var(--brand);font-weight:600;font-size:.92rem;-webkit-user-select:none;user-select:none}
+.ts-more summary::-webkit-details-marker{display:none}
+.ts-more summary::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .2s}
+.ts-more[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+.ts-more summary:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:8px}
+.ts-mb{padding:0 0 12px;font-size:.88rem;line-height:1.5;color:var(--mute)}
+.ts-mb p{margin:0 0 10px}
+.ts-cl{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px 14px;margin:0 0 12px;padding:0;list-style:none}
+.ts-cl li{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:.5px solid var(--line);color:var(--ink);min-width:0}
+.ts-cl li span{min-width:0;overflow-wrap:anywhere}
+.ts-cl li em{flex:none;font-style:normal;font-size:.76rem;font-weight:700;color:var(--mute)}
+.ts-cl li.on em{color:var(--ok)}
 .ts-bar .qfl{min-width:0}
 .ts-rv{float:right;color:var(--ink);font-weight:700}
 .ts-bar input[type=range]{display:block;width:100%;margin:8px 0 0}
@@ -333,7 +347,17 @@ input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-sel
 .ts-count{margin-top:6px;text-align:right;font-size:.8rem;color:var(--mute)}
 .ts-prog{height:8px;border-radius:99px;background:var(--fill);overflow:hidden;margin-top:16px}.ts-prog i{display:block;height:100%;width:0;background:var(--brand);border-radius:99px;transition:width .3s}
 .ts-res{margin-top:18px;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(10,132,255,.14),rgba(191,90,242,.12))}
-.ts-res audio{display:block;width:100%;margin-top:10px}
+.ap{display:flex;align-items:center;gap:10px;margin-top:12px;padding:8px 14px 8px 8px;border-radius:99px;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.ap-b{flex:none;width:42px;height:42px;padding:0;border:0;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .12s}
+.ap-b:active{transform:scale(.92)}
+.ap-t{flex:none;min-width:34px;font-size:.82rem;font-weight:600;color:var(--mute);font-variant-numeric:tabular-nums;text-align:center}
+.ap input.ap-s{flex:1 1 auto;width:auto;min-width:0;--th:18px;--tr:5px;height:26px}
+.ap-r{flex:none;min-width:50px;padding:6px 10px;border:0;border-radius:99px;background:var(--fill);color:var(--ink);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;font-variant-numeric:tabular-nums}
+.ap-v{display:flex;align-items:center;gap:4px;flex:none}
+.ap-m{display:flex;padding:4px;border:0;background:none;color:var(--mute);cursor:pointer}
+.ap input.ap-vs{width:76px;--th:16px;--tr:4px;height:24px}
+.ap-b:focus-visible,.ap-r:focus-visible,.ap-m:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+@media (max-width:620px){.ap-v{display:none}.ap{gap:8px;padding-right:10px}}
 .ts-res .dl-cta{margin-top:14px}
 .ts-play{display:inline-flex;align-items:center;gap:8px}
 @media (max-width:620px){.ts-bar{grid-template-columns:minmax(0,1fr)}.ts-bar.one{grid-template-columns:minmax(0,1fr)}}
