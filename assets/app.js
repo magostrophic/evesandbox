@@ -45,9 +45,13 @@ var EVE_BASE=(function(){
    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeP();t.focus({preventScroll:true});return;}
    if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();var n=hi+(e.key==='ArrowDown'?1:-1);while(opts[n]&&opts[n].disabled)n+=e.key==='ArrowDown'?1:-1;if(opts[n])mark(n);return;}
    if(e.key==='Home'||e.key==='End'){e.preventDefault();mark(e.key==='Home'?0:opts.length-1);return;}
-   if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(hi);return;}
+   if(e.key==='Enter'||(e.key===' '&&!(ta&&Date.now()-tt<700))){e.preventDefault();pick(hi);return;}
    if(e.key==='Tab'){closeP();return;}
-   if(e.key.length===1&&!e.ctrlKey&&!e.metaKey){var now=Date.now();ta=(now-tt<700?ta:'')+e.key.toLowerCase();tt=now;for(var i=0;i<opts.length;i++){if(!opts[i].disabled&&opts[i].textContent.trim().toLowerCase().indexOf(ta)===0){mark(i);break;}}}
+   if(e.key.length===1&&!e.ctrlKey&&!e.metaKey){e.preventDefault();var now=Date.now();ta=(now-tt<700?ta:'')+e.key.toLowerCase();tt=now;var hit=-1,i,kk;
+    for(i=0;i<opts.length&&hit<0;i++){kk=opts[i].getAttribute('data-a');if(kk&&!opts[i].disabled&&(' '+kk+' ').indexOf(' '+ta+' ')>=0)hit=i;}
+    for(i=0;i<opts.length&&hit<0;i++)if(!opts[i].disabled&&opts[i].textContent.trim().toLowerCase().indexOf(ta)===0)hit=i;
+    for(i=0;i<opts.length&&hit<0;i++){kk=opts[i].getAttribute('data-k');if(kk&&!opts[i].disabled&&(' '+kk).indexOf(' '+ta)>=0)hit=i;}
+    if(hit>=0)mark(hit);}
   };
   var dn=function(e){if(!p.contains(e.target)&&!t.contains(e.target))closeP();};
   var sc=function(e){if(!p.contains(e.target))closeP();};
@@ -63,7 +67,7 @@ var EVE_BASE=(function(){
   t.innerHTML='<span class="cs-v"></span>'+CH;
   s.parentNode.insertBefore(t,s.nextSibling);
   s.classList.add('cs-h');s.tabIndex=-1;s.setAttribute('aria-hidden','true');
-  var api={sync:function(){var o=s.options[s.selectedIndex];t.firstChild.textContent=o?o.textContent:'';if(!t.firstChild.textContent)t.firstChild.innerHTML='&nbsp;';t.disabled=s.disabled;}};
+  var api={sync:function(){var o=s.options[s.selectedIndex];t.firstChild.textContent=o?(o.getAttribute('data-short')||o.textContent):'';if(!t.firstChild.textContent)t.firstChild.innerHTML='&nbsp;';t.disabled=s.disabled;}};
   s._cs=api;api.sync();
   t.addEventListener('click',function(e){e.preventDefault();if(OPEN&&OPEN.t===t)closeP();else{api.sync();openP(s,t);}});
   t.addEventListener('keydown',function(e){if(OPEN&&OPEN.t===t)return;if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();api.sync();openP(s,t);}});
@@ -924,7 +928,7 @@ function donatePage(){nav('donate');
   box='<div id="dnote"></div><h3 style="margin:0 0 4px">Support Eve Sandbox</h3><p style="margin:0 0 6px">Choose an amount, or type your own. You will pay on a secure page run by our payment partner.</p>'+
    '<form id="dform" novalidate autocomplete="on"><div class="dch" id="dch">'+DQ.map(function(v){return '<button type="button" class="btn" data-v="'+v+'">'+inr(v)+'</button>';}).join('')+'</div>'+
    '<label class="qfl" for="damt">Amount in rupees (₹)<input type="text" id="damt" inputmode="numeric" maxlength="6" placeholder="Enter an amount" autocomplete="off"></label>'+
-   '<label class="qfl" for="dph">Mobile number<input type="text" id="dph" inputmode="tel" maxlength="16" placeholder="10-digit mobile number" autocomplete="tel-national"></label>'+
+   '<div class="qfl dph-w"><label for="dph">Mobile number</label><div class="dph-r"><select class="sel" id="dcc" aria-label="Country code">'+dcOpts()+'</select><input type="text" id="dph" inputmode="tel" maxlength="24" autocomplete="tel-national" aria-describedby="dphh"></div><span class="dph-h" id="dphh"></span></div>'+
    '<div class="qg2"><label class="qfl" for="dnm">Name (optional)<input type="text" id="dnm" maxlength="60" autocomplete="name"></label><label class="qfl" for="dem">Email (optional)<input type="text" id="dem" inputmode="email" maxlength="120" autocomplete="email" autocapitalize="off" spellcheck="false"></label></div>'+
    '<div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" id="dws" tabindex="-1" autocomplete="off"></label></div>'+
    '<p class="hint" style="margin:10px 0 0">Our payment partner needs a mobile number to start a payment. Your details go to our payment partner and are not stored by Eve Sandbox. Donations are optional and every tool stays free.</p>'+
@@ -942,19 +946,63 @@ function dAmt(){var t=($$('damt').value||'').replace(/[,\s]/g,'');return /^\d{1,
 function dnSync(){var a=dAmt(),ok=a>=10&&a<=50000;
  $$('dgo').disabled=!ok||DN.busy;$$('dgo').textContent=DN.busy?'Opening payment page...':(ok?'Donate '+inr(a):'Donate');
  document.querySelectorAll('#dch .btn').forEach(function(b){b.classList.toggle('pri',ok&&+b.dataset.v===a);});}
+/* country code + number: each country has its own allowed length (ISO country, name, calling code, shortest, longest, trunk prefix) */
+var DCN='IN|India|91|10|10|0;AF|Afghanistan|93|9|9|0;AX|Åland Islands|358|7|10|0;AL|Albania|355|9|9|0;DZ|Algeria|213|9|9|0;AS|American Samoa|1|10|10|1;AD|Andorra|376|6|9|;AO|Angola|244|9|9|;AI|Anguilla|1|10|10|1;AG|Antigua & Barbuda|1|10|10|1;AR|Argentina|54|10|11|0;AM|Armenia|374|8|8|0;AW|Aruba|297|7|7|;AC|Ascension Island|247|5|5|;AU|Australia|61|9|9|0;AT|Austria|43|10|13|0;AZ|Azerbaijan|994|9|9|0;BS|Bahamas|1|10|10|1;BH|Bahrain|973|8|8|;BD|Bangladesh|880|10|10|0;BB|Barbados|1|10|10|1;BY|Belarus|375|9|9|8;BE|Belgium|32|9|9|0;BZ|Belize|501|7|7|;BJ|Benin|229|8|10|;BM|Bermuda|1|10|10|1;BT|Bhutan|975|8|8|;BO|Bolivia|591|8|8|0;BA|Bosnia & Herzegovina|387|8|9|0;BW|Botswana|267|8|8|;BR|Brazil|55|10|11|0;IO|British Indian Ocean Territory|246|7|7|;VG|British Virgin Islands|1|10|10|1;BN|Brunei|673|7|7|;BG|Bulgaria|359|8|9|0;BF|Burkina Faso|226|8|8|;BI|Burundi|257|8|8|;KH|Cambodia|855|8|9|0;CM|Cameroon|237|9|9|;CA|Canada|1|10|10|1;CV|Cape Verde|238|7|7|;BQ|Caribbean Netherlands|599|7|7|;KY|Cayman Islands|1|10|10|1;CF|Central African Republic|236|8|8|;TD|Chad|235|8|8|;CL|Chile|56|9|9|;CN|China|86|11|11|0;CX|Christmas Island|61|9|9|0;CC|Cocos (Keeling) Islands|61|9|9|0;CO|Colombia|57|10|10|0;KM|Comoros|269|7|7|;CG|Congo - Brazzaville|242|9|9|;CD|Congo - Kinshasa|243|7|9|0;CK|Cook Islands|682|5|5|;CR|Costa Rica|506|8|8|;CI|Côte d’Ivoire|225|10|10|;HR|Croatia|385|8|9|0;CU|Cuba|53|8|8|0;CW|Curaçao|599|7|8|;CY|Cyprus|357|8|8|;CZ|Czechia|420|9|9|;DK|Denmark|45|8|8|;DJ|Djibouti|253|8|8|;DM|Dominica|1|10|10|1;DO|Dominican Republic|1|10|10|1;EC|Ecuador|593|9|9|0;EG|Egypt|20|10|10|0;SV|El Salvador|503|8|8|;GQ|Equatorial Guinea|240|9|9|;ER|Eritrea|291|7|7|0;EE|Estonia|372|7|8|;SZ|Eswatini|268|8|8|;ET|Ethiopia|251|9|9|0;FK|Falkland Islands|500|5|5|;FO|Faroe Islands|298|6|6|;FJ|Fiji|679|7|7|;FI|Finland|358|7|10|0;FR|France|33|9|9|0;GF|French Guiana|594|9|9|0;PF|French Polynesia|689|8|8|;GA|Gabon|241|7|8|;GM|Gambia|220|7|7|;GE|Georgia|995|9|9|0;DE|Germany|49|10|11|0;GH|Ghana|233|9|9|0;GI|Gibraltar|350|8|8|;GR|Greece|30|10|10|;GL|Greenland|299|6|6|;GD|Grenada|1|10|10|1;GP|Guadeloupe|590|9|9|0;GU|Guam|1|10|10|1;GT|Guatemala|502|8|8|;GG|Guernsey|44|10|10|0;GN|Guinea|224|9|9|;GW|Guinea-Bissau|245|9|9|;GY|Guyana|592|7|7|;HT|Haiti|509|8|8|;HN|Honduras|504|8|8|;HK|Hong Kong SAR China|852|8|8|;HU|Hungary|36|9|9|06;IS|Iceland|354|7|9|;ID|Indonesia|62|9|12|0;IR|Iran|98|10|10|0;IQ|Iraq|964|10|10|0;IE|Ireland|353|9|9|0;IM|Isle of Man|44|10|10|0;IL|Israel|972|9|9|0;IT|Italy|39|9|10|;JM|Jamaica|1|10|10|1;JP|Japan|81|10|10|0;JE|Jersey|44|10|10|0;JO|Jordan|962|9|9|0;KZ|Kazakhstan|7|10|10|8;KE|Kenya|254|9|9|0;KI|Kiribati|686|8|8|0;XK|Kosovo|383|8|8|0;KW|Kuwait|965|8|8|;KG|Kyrgyzstan|996|9|9|0;LA|Laos|856|9|10|0;LV|Latvia|371|8|8|;LB|Lebanon|961|7|8|0;LS|Lesotho|266|8|8|;LR|Liberia|231|7|9|0;LY|Libya|218|9|9|0;LI|Liechtenstein|423|7|9|0;LT|Lithuania|370|8|8|0;LU|Luxembourg|352|9|9|;MO|Macao SAR China|853|8|8|;MG|Madagascar|261|9|9|0;MW|Malawi|265|9|9|0;MY|Malaysia|60|9|10|0;MV|Maldives|960|7|7|;ML|Mali|223|8|8|;MT|Malta|356|8|8|;MH|Marshall Islands|692|7|7|1;MQ|Martinique|596|9|9|0;MR|Mauritania|222|8|8|;MU|Mauritius|230|8|8|;YT|Mayotte|262|9|9|0;MX|Mexico|52|10|10|;FM|Micronesia|691|7|7|;MD|Moldova|373|8|8|0;MC|Monaco|377|8|9|0;MN|Mongolia|976|8|8|0;ME|Montenegro|382|8|8|0;MS|Montserrat|1|10|10|1;MA|Morocco|212|9|9|0;MZ|Mozambique|258|9|9|;MM|Myanmar (Burma)|95|7|10|0;NA|Namibia|264|9|9|0;NR|Nauru|674|7|7|;NP|Nepal|977|10|10|0;NL|Netherlands|31|9|11|0;NC|New Caledonia|687|6|6|;NZ|New Zealand|64|8|10|0;NI|Nicaragua|505|8|8|;NE|Niger|227|8|8|;NG|Nigeria|234|10|10|0;NU|Niue|683|4|7|;NF|Norfolk Island|672|6|6|;KP|North Korea|850|10|10|0;MK|North Macedonia|389|8|8|0;MP|Northern Mariana Islands|1|10|10|1;NO|Norway|47|8|8|;OM|Oman|968|8|8|;PK|Pakistan|92|10|10|0;PW|Palau|680|7|7|;PS|Palestinian Territories|970|9|9|0;PA|Panama|507|7|8|;PG|Papua New Guinea|675|8|8|;PY|Paraguay|595|9|9|0;PE|Peru|51|9|9|0;PH|Philippines|63|10|10|0;PL|Poland|48|9|9|;PT|Portugal|351|9|9|;PR|Puerto Rico|1|10|10|1;QA|Qatar|974|8|8|;RE|Réunion|262|9|9|0;RO|Romania|40|9|9|0;RU|Russia|7|10|10|8;RW|Rwanda|250|9|9|0;WS|Samoa|685|7|10|;SM|San Marino|378|8|8|;ST|São Tomé & Príncipe|239|7|7|;SA|Saudi Arabia|966|9|9|0;SN|Senegal|221|9|9|;RS|Serbia|381|8|10|0;SC|Seychelles|248|7|7|;SL|Sierra Leone|232|8|8|0;SG|Singapore|65|8|8|;SX|Sint Maarten|1|10|10|1;SK|Slovakia|421|9|9|0;SI|Slovenia|386|8|8|0;SB|Solomon Islands|677|5|7|;SO|Somalia|252|7|9|0;ZA|South Africa|27|6|9|0;KR|South Korea|82|9|10|0;SS|South Sudan|211|9|9|0;ES|Spain|34|9|9|;LK|Sri Lanka|94|9|9|0;BL|St. Barthélemy|590|9|9|0;SH|St. Helena|290|5|5|;KN|St. Kitts & Nevis|1|10|10|1;LC|St. Lucia|1|10|10|1;MF|St. Martin|590|9|9|0;PM|St. Pierre & Miquelon|508|6|9|0;VC|St. Vincent & Grenadines|1|10|10|1;SD|Sudan|249|9|9|0;SR|Suriname|597|7|7|;SJ|Svalbard & Jan Mayen|47|8|8|;SE|Sweden|46|9|9|0;CH|Switzerland|41|9|9|0;SY|Syria|963|9|9|0;TW|Taiwan|886|9|9|0;TJ|Tajikistan|992|9|9|;TZ|Tanzania|255|9|9|0;TH|Thailand|66|9|9|0;TL|Timor-Leste|670|8|8|;TG|Togo|228|8|8|;TK|Tokelau|690|4|7|;TO|Tonga|676|7|7|;TT|Trinidad & Tobago|1|10|10|1;TA|Tristan da Cunha|290|4|4|;TN|Tunisia|216|8|8|;TR|Türkiye|90|10|10|0;TM|Turkmenistan|993|8|8|8;TC|Turks & Caicos Islands|1|10|10|1;TV|Tuvalu|688|6|7|;VI|U.S. Virgin Islands|1|10|10|1;UG|Uganda|256|9|9|0;UA|Ukraine|380|9|9|0;AE|United Arab Emirates|971|9|9|0;GB|United Kingdom|44|10|10|0;US|United States|1|10|10|1;UY|Uruguay|598|8|8|0;UZ|Uzbekistan|998|9|9|;VU|Vanuatu|678|7|7|;VA|Vatican City|39|9|10|;VE|Venezuela|58|10|10|0;VN|Vietnam|84|9|9|0;WF|Wallis & Futuna|681|6|6|;EH|Western Sahara|212|9|9|0;YE|Yemen|967|9|9|0;ZM|Zambia|260|9|9|0;ZW|Zimbabwe|263|9|9|0';
+var DCM={"1":"US","7":"RU","39":"IT","44":"GB","47":"NO","61":"AU","212":"MA","262":"RE","290":"SH","358":"FI","590":"GP","599":"CW"};
+var DCK={GB:'uk',US:'usa america',AE:'uae emirates',TR:'turkey',CZ:'czech republic',CI:'ivory coast',SZ:'swaziland',CV:'cape verde',TL:'east timor',MK:'macedonia',PS:'palestine'};
+var DCL=null;
+function dcList(){if(DCL)return DCL;DCL=DCN.split(';').map(function(r){var a=r.split('|');return {c:a[0],n:a[1],d:a[2],mn:+a[3],mx:+a[4],np:a[5]||''};});return DCL;}
+function dcOpts(){return dcList().map(function(c){var k=(c.c+' '+c.n+' +'+c.d+' '+c.d+(DCK[c.c]?' '+DCK[c.c]:'')).toLowerCase();
+ return '<option value="'+c.c+'" data-short="'+c.c+' +'+c.d+'" data-k="'+esc(k)+'"'+(DCK[c.c]?' data-a="'+esc(DCK[c.c])+'"':'')+(c.c==='IN'?' selected':'')+'>'+esc(c.n)+' (+'+c.d+')</option>';}).join('');}
+function dcCur(){var e=$$('dcc'),v=e?e.value:'',L=dcList();for(var i=0;i<L.length;i++)if(L[i].c===v)return L[i];return L[0];}
+/* keep only the digits, whatever alphabet they were typed in */
+function dcDigits(s){var o='',z=[0x660,0x6F0,0x966,0x9E6,0xA66,0xAE6,0xB66,0xBE6,0xC66,0xCE6,0xD66,0xE50,0xFF10];s=String(s==null?'':s);
+ for(var i=0;i<s.length;i++){var k=s.charCodeAt(i);if(k>=48&&k<=57){o+=s.charAt(i);continue;}
+  for(var j=0;j<z.length;j++)if(k>=z[j]&&k<z[j]+10){o+=String(k-z[j]);break;}}
+ return o;}
+/* "+44 7700 900123" pasted or typed: find the calling code at the front (they never overlap) */
+function dcByDial(d,cur){var L=dcList();
+ for(var n=1;n<=3;n++){var p=d.slice(0,n);if(p.length<n)break;if(cur.d===p)return {c:cur,len:n};
+  var hit=null;for(var i=0;i<L.length;i++)if(L[i].d===p&&(!hit||L[i].c===DCM[p]))hit=L[i];
+  if(hit)return {c:hit,len:n};}
+ return null;}
+/* drop a repeated country code or trunk prefix when the number is too long for the country, then stop at the longest allowed */
+function dcTrim(d,c){var k=c.d.length;
+ if(d.length>c.mx&&d.indexOf(c.d)===0&&d.length-k>=c.mn&&d.length-k<=c.mx)d=d.slice(k);
+ if(c.np&&d.length>c.mx&&d.indexOf(c.np)===0)d=d.slice(c.np.length);
+ return d.slice(0,c.mx);}
+function dcRange(c){return c.mn===c.mx?c.mx+' digits':c.mn+' to '+c.mx+' digits';}
+function dcHint(){var c=dcCur(),h=$$('dphh'),p=$$('dph');
+ if(h)h.textContent=c.n+' (+'+c.d+'): '+dcRange(c)+', without the country code.';
+ if(p)p.placeholder=c.mn===c.mx?c.mx+'-digit number':dcRange(c);}
+function dcFinal(raw){var c=dcCur(),d=dcTrim(dcDigits(raw),c);
+ if(c.np==='0'&&d.charAt(0)==='0')d=d.slice(1);
+ var ok=d.length>=c.mn&&d.length<=c.mx&&(c.c!=='IN'||/^[6-9]/.test(d));
+ return {c:c,d:d,ok:ok};}
+function dcMsg(c){return c.c==='IN'?'Please enter a valid 10-digit mobile number.':'Please enter a valid mobile number for '+c.n+': '+dcRange(c)+', without the country code.';}
+function dcInput(){var el=$$('dph'),raw=el.value,c=dcCur(),d=dcDigits(raw);
+ if(/^\s*\+/.test(raw)){var f=dcByDial(d,c);
+  if(f){if(f.c.c!==c.c){$$('dcc').value=f.c.c;c=f.c;dcHint();}d=d.slice(f.len);}
+  else if(d.length<3){$$('dmsg').textContent='';dnSync();return;}}
+ d=dcTrim(d,c);if(el.value!==d)el.value=d;
+ $$('dmsg').textContent='';dnSync();}
 function dInit(api){
+ dcHint();
  $$('dch').onclick=function(e){var v=e.target.dataset&&e.target.dataset.v;if(!v)return;$$('damt').value=v;$$('dmsg').textContent='';dnSync();};
  $$('damt').oninput=function(){this.value=this.value.replace(/[^\d,\s]/g,'');$$('dmsg').textContent='';dnSync();};
+ $$('dph').oninput=dcInput;
+ $$('dcc').onchange=function(){dcHint();dcInput();};
+ $$('dnm').oninput=$$('dem').oninput=function(){$$('dmsg').textContent='';};
  $$('dform').onsubmit=async function(e){e.preventDefault();if(DN.busy)return;
   var a=dAmt(),m=$$('dmsg');m.className='cfs';
   if(!(a>=10&&a<=50000)){m.className='cfs bad';m.textContent='Please enter an amount between ₹10 and ₹50,000.';return;}
-  var ph=$$('dph').value.replace(/[\s\-()]/g,'').replace(/^(\+91|91|0)(?=\d{10}$)/,'');
-  if(!/^[6-9]\d{9}$/.test(ph)){m.className='cfs bad';m.textContent='Please enter a valid 10-digit mobile number.';$$('dph').focus();return;}
+  var pn=dcFinal($$('dph').value);
+  if(!pn.ok){m.className='cfs bad';m.textContent=dcMsg(pn.c);$$('dph').focus();return;}
   var em=$$('dem').value.trim();
   if(em&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){m.className='cfs bad';m.textContent='That email address does not look right.';$$('dem').focus();return;}
   DN.busy=true;dnSync();m.textContent='';
   try{
-   var r=await fetch(api+'/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,phone:ph,name:$$('dnm').value,email:em,website:$$('dws').value})});
+   var r=await fetch(api+'/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:a,cc:pn.c.d,phone:pn.d,name:$$('dnm').value,email:em,website:$$('dws').value})});
    var j=null;try{j=await r.json();}catch(x){}
    if(r.ok&&j&&/^session_/.test(j.session||'')){m.textContent='Taking you to the secure payment page...';
     try{var CF=await cfSdk();CF({mode:j.mode==='production'?'production':'sandbox'}).checkout({paymentSessionId:j.session,redirectTarget:'_self'});setTimeout(function(){DN.busy=false;dnSync();},5000);return;}
@@ -962,7 +1010,7 @@ function dInit(api){
    }
    var er=(j&&j.error)||'';console.warn('donation not started:',r.status,er);
    m.className='cfs bad';
-   m.textContent=er==='amount'?'Please enter an amount between ₹10 and ₹50,000.':er==='phone'?'Please enter a valid 10-digit mobile number.':er==='email'?'That email address does not look right.':er==='slow'?'That was a lot of tries. Please wait a little while and try again.':'We could not start the payment right now. Please try again in a little while.';
+   m.textContent=er==='amount'?'Please enter an amount between ₹10 and ₹50,000.':er==='phone'?dcMsg(pn.c):er==='email'?'That email address does not look right.':er==='slow'?'That was a lot of tries. Please wait a little while and try again.':'We could not start the payment right now. Please try again in a little while.';
   }catch(x){console.warn('donation could not reach the server:',x);m.className='cfs bad';m.textContent='We could not start the payment right now. Please check your internet connection and try again.';}
   DN.busy=false;dnSync();};
  dnSync();
@@ -1440,7 +1488,8 @@ function dJudge(){if(DS.jstate==='busy'||!DS.offers.length)return;var run=++DS.r
 var TS={voice:'',loc:'',rate:1,live:true,pend:0,spoken:0,rt:0,nt:0,reading:false,run:0,ctl:null,busy:false,para:'',lang:'en',blob:null,ext:'mp3',url:'',vl:false};
 var TLANGS=[['en','English'],['zh','Chinese (Mandarin)'],['es','Spanish'],['fr','French'],['ja','Japanese'],['ko','Korean']];
 var TMAX=3000,TPIECE=380;
-var TERR={short:'Write something with a few words first.',slow:'That was a lot of requests in a short time. Please wait a few minutes and try again.',limit:'Eve has used up her free help for today. Please try again tomorrow.',busy:'Eve is busy right now. Please try again in a minute.',big:'That piece was too long. Please try again.',net:'Could not connect. Please check your internet and try again.',timeout:'That is taking too long. Please try again.'};
+var TSC={tok:'',id:null,want:false};
+var TERR={short:'Write something with a few words first.',slow:'That was a lot of requests in a short time. Please wait a few minutes and try again.',limit:'Eve has used up her free help for today. Please try again tomorrow.',busy:'Eve is busy right now. Please try again in a minute.',big:'That piece was too long. Please try again.',net:'Could not connect. Please check your internet and try again.',timeout:'That is taking too long. Please try again.',captcha:'The security check did not pass or has run out. Please complete it again and press Make audio.'};
 function tsErr(c){return TERR[c]||'The audio could not be made right now. Please try again in a moment.';}
 function tsCan(){return 'speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';}
 function tsVoice(){var l=aiVoices(),v=l.filter(function(x){return (x.voiceURI||x.name)===TS.voice;})[0];return v||aiVoice();}
@@ -1513,12 +1562,20 @@ function tsChunks(t,max){
   if(cur&&(cur+' '+x).length>max){out.push(cur);cur=x;}else cur=cur?cur+' '+x:x;});
  if(cur)out.push(cur);
  return out.filter(function(p){return /[\p{L}\p{N}]/u.test(p);});}
-function tsPiece(base,text,lang){return new Promise(function(res,rej){var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},50000);TS.ctl=ctl;
- fetch(base+'/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,lang:lang}),signal:ctl.signal}).then(function(r){
+function tsPiece(base,text,lang,pass){return new Promise(function(res,rej){var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},50000);TS.ctl=ctl;
+ fetch(base+'/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:text,lang:lang,pass:pass||''}),signal:ctl.signal}).then(function(r){
   if(r.ok)return r.blob().then(function(b){clearTimeout(tm);if(!b.size){var e=new Error('x');e.code='down';throw e;}res(b);});
   return r.json().catch(function(){return {};}).then(function(j){clearTimeout(tm);var e=new Error('x');e.code=(j&&j.error)||'down';rej(e);});
  },function(e){clearTimeout(tm);var x=new Error('net');x.code=(e&&e.name==='AbortError')?'timeout':'net';rej(x);}).catch(rej);});}
-function tsPieceR(base,text,lang){return tsPiece(base,text,lang).catch(function(e){if(e&&(e.code==='busy'||e.code==='down')){return new Promise(function(r){setTimeout(r,1500);}).then(function(){return tsPiece(base,text,lang);});}throw e;});}
+function tsPieceR(base,text,lang,pass){return tsPiece(base,text,lang,pass).catch(function(e){if(e&&(e.code==='busy'||e.code==='down')){return new Promise(function(r){setTimeout(r,1500);}).then(function(){return tsPiece(base,text,lang,pass);});}throw e;});}
+/* security check: a solved check works once, so it is swapped for a short-lived pass that covers every piece of this one paragraph */
+function tsCapReset(){TSC.tok='';try{if(TSC.id!=null&&window.turnstile)turnstile.reset(TSC.id);}catch(e){}}
+function tsCapDrop(){TSC.tok='';TSC.want=false;try{if(TSC.id!=null&&window.turnstile)turnstile.remove(TSC.id);}catch(e){}TSC.id=null;}
+function tsPass(base,tok){return new Promise(function(res,rej){var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},20000);TS.ctl=ctl;
+ fetch(base+'/tts-pass',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:tok}),signal:ctl.signal}).then(function(r){
+  if(r.status===404){clearTimeout(tm);res('');return;}
+  return r.json().catch(function(){return {};}).then(function(j){clearTimeout(tm);if(r.ok&&j&&typeof j.pass==='string'){res(j.pass);return;}var e=new Error('x');e.code=(j&&j.error)||'down';rej(e);});
+ },function(e){clearTimeout(tm);var x=new Error('net');x.code=(e&&e.name==='AbortError')?'timeout':'net';rej(x);}).catch(rej);});}
 function tsBusy(on,done,total){TS.busy=on;var m=$$('tsmk'),c=$$('tsstop'),p=$$('tsprog');if(!m)return;
  m.disabled=on;m.classList.toggle('busy',on);c.style.display=on?'inline-flex':'none';
  p.innerHTML=on?'<div class="ts-prog"><i style="width:'+Math.max(4,Math.round(100*done/total))+'%"></i></div><div class="hint" style="display:block;margin-top:8px">Making your audio… '+Math.min(total,done+1)+' of '+total+'</div>':'';}
@@ -1597,14 +1654,19 @@ async function tsMake(){if(TS.busy)return;
  if(!CFG.aiApi){tsM2('Audio files are not open yet. Please check back soon.','warn');return;}
  var base=String(CFG.aiApi).replace(/\/+$/,''),parts=tsChunks(txt,TPIECE),run=++TS.run,blobs=[];
  if(!parts.length){tsM2('Write or paste a paragraph first.','warn');return;}
+ var cap=tsOn()&&!!$$('tscap');
+ if(cap&&!TSC.tok){TSC.want=true;tsM2('Please complete the security check above. Your audio starts as soon as it is done.','warn');var ch=$$('tscap');if(ch&&ch.scrollIntoView)ch.scrollIntoView({behavior:'smooth',block:'center'});return;}
+ TSC.want=false;
  tsDrop();tsResult();tsBusy(true,0,parts.length);
  try{
-  for(var i=0;i<parts.length;i++){if(run!==TS.run)return;tsBusy(true,i,parts.length);blobs.push(await tsPieceR(base,parts[i],TS.lang));}
+  var pass='';
+  if(cap){var tk=TSC.tok;tsCapReset();pass=await tsPass(base,tk);if(run!==TS.run)return;}
+  for(var i=0;i<parts.length;i++){if(run!==TS.run)return;tsBusy(true,i,parts.length);blobs.push(await tsPieceR(base,parts[i],TS.lang,pass));}
   if(run!==TS.run)return;
   var jn=await tsJoin(blobs);if(run!==TS.run)return;TS.blob=jn.blob;TS.ext=jn.ext;TS.url=URL.createObjectURL(TS.blob);tsBusy(false);tsResult();
   var r=$$('tsout');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:'smooth',block:'nearest'});
- }catch(e){if(run!==TS.run)return;tsBusy(false);tsM2(tsErr(e&&e.code),'bad');}}
-function tsCancel(){TS.run++;try{if(TS.ctl)TS.ctl.abort();}catch(e){}tsBusy(false);tsM2('');}
+ }catch(e){if(run!==TS.run)return;tsBusy(false);if(cap&&e&&e.code==='captcha')tsCapReset();tsM2(tsErr(e&&e.code),'bad');}}
+function tsCancel(){TSC.want=false;TS.run++;try{if(TS.ctl)TS.ctl.abort();}catch(e){}tsBusy(false);tsM2('');}
 
 function ttsPage(){nav('tts');
  app.innerHTML='<div class="dl-hd"><div class="ic i11">'+ico('speaker',26)+'</div><h1>Text to Speech</h1></div>'+
@@ -1622,7 +1684,7 @@ function ttsPage(){nav('tts');
  '<div class="ts-count" id="tsc"></div>'+
  '<div class="ts-bar one"><label class="qfl" for="tsl">Language<select class="sel" id="tsl">'+TLANGS.map(function(l){return '<option value="'+l[0]+'"'+(TS.lang===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join('')+'</select></label></div>'+
  '<p class="hint ts-vh">Languages such as Hindi, Portuguese, Russian and Arabic are in the first section whenever your device has a voice for them.</p>'+
- '<div class="dl-cta"><button class="btn pri dl-big" id="tsmk" type="button">'+ico('speaker',18,2.2)+'Make audio</button><button class="btn" id="tsstop" type="button" style="display:none">Cancel</button></div>'+
+ (tsOn()&&CFG.aiApi?'<div class="cts ts-cap" id="tscap"></div>':'')+'<div class="dl-cta"><button class="btn pri dl-big" id="tsmk" type="button">'+ico('speaker',18,2.2)+'Make audio</button><button class="btn" id="tsstop" type="button" style="display:none">Cancel</button></div>'+
  '<div id="tsprog"></div><div id="tsm2"></div><div id="tsout"></div></section>'+
  '<p class="dl-note">The voices are automated, so names and unusual words may not sound perfect. Audio files are made from the text you type and are not kept by this website. Please do not type personal details.</p>';
  var a=$$('tsa'),unlocked=false;
@@ -1639,6 +1701,10 @@ function ttsPage(){nav('tts');
  t.addEventListener('input',function(){cnt();TS.para=t.value;});
  $$('tsl').onchange=function(){TS.lang=this.value;};
  $$('tsmk').onclick=tsMake;$$('tsstop').onclick=tsCancel;
+ tsCapDrop();
+ if($$('tscap')){tsLib().then(function(T){var h=$$('tscap');if(!h||TSC.id!=null)return;
+  TSC.id=T.render(h,{sitekey:CFG.turnstileKey,theme:'auto',callback:function(x){TSC.tok=x;if(TSC.want&&$$('tsmk')){TSC.want=false;tsMake();}},'expired-callback':function(){TSC.tok='';},'error-callback':function(){TSC.tok='';}});},
+  function(){tsM2('The security check could not load. Please reload the page.','bad');});}
  $$('tsout').onclick=function(e){var b=e.target.closest?e.target.closest('button'):null;if(!b)return;
   if(b.id==='tsdl'&&TS.blob)saveBlob(TS.blob,'eve-speech.'+TS.ext);
   else if(b.id==='tsnew'){tsDrop();tsResult();t.value='';TS.para='';cnt();t.focus();}};
