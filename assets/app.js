@@ -928,7 +928,7 @@ function donatePage(){nav('donate');
   box='<div id="dnote"></div><h3 style="margin:0 0 4px">Support Eve Sandbox</h3><p style="margin:0 0 6px">Choose an amount, or type your own. You will pay on a secure page run by our payment partner.</p>'+
    '<form id="dform" novalidate autocomplete="on"><div class="dch" id="dch">'+DQ.map(function(v){return '<button type="button" class="btn" data-v="'+v+'">'+inr(v)+'</button>';}).join('')+'</div>'+
    '<label class="qfl" for="damt">Amount in rupees (₹)<input type="text" id="damt" inputmode="numeric" maxlength="6" placeholder="Enter an amount" autocomplete="off"></label>'+
-   '<div class="qfl dph-w"><label for="dph">Mobile number</label><div class="dph-r"><select class="sel" id="dcc" aria-label="Country code">'+dcOpts()+'</select><input type="text" id="dph" inputmode="tel" maxlength="24" autocomplete="tel-national" aria-describedby="dphh"></div><span class="dph-h" id="dphh"></span></div>'+
+   '<div class="qfl dph-w"><label for="dph">Mobile number</label><div class="dph-r"><select class="sel" id="dcc" aria-label="Country code">'+dcOpts()+'</select><input type="text" id="dph" inputmode="tel" maxlength="24" autocomplete="tel-national"></div></div>'+
    '<div class="qg2"><label class="qfl" for="dnm">Name (optional)<input type="text" id="dnm" maxlength="60" autocomplete="name"></label><label class="qfl" for="dem">Email (optional)<input type="text" id="dem" inputmode="email" maxlength="120" autocomplete="email" autocapitalize="off" spellcheck="false"></label></div>'+
    '<div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" id="dws" tabindex="-1" autocomplete="off"></label></div>'+
    '<p class="hint" style="margin:10px 0 0">Our payment partner needs a mobile number to start a payment. Your details go to our payment partner and are not stored by Eve Sandbox. Donations are optional and every tool stays free.</p>'+
@@ -972,8 +972,7 @@ function dcTrim(d,c){var k=c.d.length;
  if(c.np&&d.length>c.mx&&d.indexOf(c.np)===0)d=d.slice(c.np.length);
  return d.slice(0,c.mx);}
 function dcRange(c){return c.mn===c.mx?c.mx+' digits':c.mn+' to '+c.mx+' digits';}
-function dcHint(){var c=dcCur(),h=$$('dphh'),p=$$('dph');
- if(h)h.textContent=c.n+' (+'+c.d+'): '+dcRange(c)+', without the country code.';
+function dcHint(){var c=dcCur(),p=$$('dph');
  if(p)p.placeholder=c.mn===c.mx?c.mx+'-digit number':dcRange(c);}
 function dcFinal(raw){var c=dcCur(),d=dcTrim(dcDigits(raw),c);
  if(c.np==='0'&&d.charAt(0)==='0')d=d.slice(1);
@@ -1321,7 +1320,7 @@ function grabPage(){nav('grab');
  $$('gbgo').onclick=function(){gbGo();};$$('gbu').onkeydown=function(e){if(e.key==='Enter')gbGo();};
 }
 /* ---------- Deal or No Deal ---------- */
-var DS={need:'',budget:'',pri:'value',cond:'new',state:'idle',err:'',plan:null,offers:[],judge:null,jstate:'idle',jerr:'',seq:0,run:0};
+var DS={need:'',budget:'',pri:'value',cond:'new',state:'idle',err:'',plan:null,offers:[],judge:null,jstate:'idle',jerr:'',seq:0,run:0,fq:'',flt:{min:'',max:'',sort:'rel',rate:false,fast:false}};
 var DPRI=[['price','Lowest price'],['value','Best value'],['quality','Quality'],['speed','Fast delivery']];
 var DPRIN={price:'lowest price',value:'best value for money',quality:'quality and long life',speed:'fast delivery'};
 var DSTORES=['Amazon','Flipkart','Croma','Reliance Digital','Vijay Sales','Other'];
@@ -1334,10 +1333,58 @@ function dCall(path,body){var base=String(CFG.dealApi||'').replace(/\/+$/,''),ct
   return r.json().catch(function(){return {};}).then(function(j){clearTimeout(tm);if(r.ok&&j&&j.ok&&j.data)return j.data;var e=new Error('x');e.code=(j&&j.error)||'down';throw e;});
  },function(e){clearTimeout(tm);var x=new Error('net');x.code=(e&&e.name==='AbortError')?'timeout':'net';throw x;});}
 function dQ(q){return encodeURIComponent(String(q).slice(0,120));}
-function dLinks(q){var e=dQ(q);return {main:[['Amazon.in','https://www.amazon.in/s?k='+e],['Flipkart','https://www.flipkart.com/search?q='+e]],
- more:[['Croma','https://www.croma.com/searchB?q='+e+'%3Arelevance&text='+e],['Reliance Digital','https://www.reliancedigital.in/products?q='+e],['Vijay Sales','https://www.vijaysales.com/search/'+e]]};}
-function dBtns(q){var L=dLinks(q),a=function(x,c){return '<a class="btn sm'+c+'" href="'+x[1]+'" target="_blank" rel="noopener noreferrer">Search '+esc(x[0])+'</a>';};
- return '<div class="dl-bt">'+L.main.map(function(x){return a(x,'');}).join('')+L.more.map(function(x){return a(x,' dl-xm');}).join('')+'<button class="btn sm dl-mb" type="button" data-more="1" aria-expanded="false">More stores</button></div>';}
+var DST=[['amazon','Amazon.in'],['flipkart','Flipkart'],['croma','Croma'],['reliance','Reliance Digital'],['vijay','Vijay Sales']];
+/* the address of a store's own results page, with the student's filters already set where the store accepts them in the link
+   (Amazon.in and Flipkart do; the others only take the words) */
+function dStoreUrl(id,q){var f=DS.flt||{},mn=dNum(f.min),mx=dNum(f.max),w=String(q||DS.fq||DS.need||'').replace(/\s+/g,' ').trim();
+ if(DS.cond==='refurb'&&!/refurb|renewed|used|pre-?owned/i.test(w))w+=' refurbished';
+ var e=dQ(w);if(mn&&mx&&mn>mx){var t=mn;mn=mx;mx=t;}
+ if(id==='amazon'){var u='https://www.amazon.in/s?k='+e;
+  if(mn)u+='&low-price='+mn;if(mx)u+='&high-price='+mx;
+  var so={low:'price-asc-rank',high:'price-desc-rank',rate:'review-rank',new:'date-desc-rank'}[f.sort];if(so)u+='&s='+so;
+  var rh=[];if(f.fast)rh.push('p_85:10440599031');if(f.rate)rh.push('p_72:1318476031');
+  if(rh.length)u+='&rh='+encodeURIComponent(rh.join(','));
+  return u;}
+ if(id==='flipkart'){var u2='https://www.flipkart.com/search?q='+e,P=function(k){u2+='&p%5B%5D='+k;};
+  var s2={low:'price_asc',high:'price_desc',rate:'popularity',new:'recency_desc'}[f.sort];if(s2)u2+='&sort='+s2;
+  if(mn||mx){P('facets.price_range.from%3D'+(mn||'Min'));P('facets.price_range.to%3D'+(mx||'Max'));}
+  if(f.rate)P('facets.rating%255B%255D%3D4%25E2%2598%2585%2B%2526%2Babove');
+  if(f.fast)P('facets.fulfilled_by%255B%255D%3DFlipkart%2BAssured');
+  return u2;}
+ if(id==='croma')return 'https://www.croma.com/searchB?q='+e+'%3Arelevance&text='+e;
+ if(id==='reliance')return 'https://www.reliancedigital.in/products?q='+e;
+ return 'https://www.vijaysales.com/search/'+e;}
+function dBtns(q){var a=function(x,c){return '<a class="btn sm'+c+'" data-st="'+x[0]+'" data-q="'+esc(q)+'" href="'+esc(dStoreUrl(x[0],q))+'" target="_blank" rel="noopener noreferrer">Search '+esc(x[1])+'</a>';};
+ return '<div class="dl-bt">'+DST.slice(0,2).map(function(x){return a(x,'');}).join('')+DST.slice(2).map(function(x){return a(x,' dl-xm');}).join('')+'<button class="btn sm dl-mb" type="button" data-more="1" aria-expanded="false">More stores</button></div>';}
+function dStoreBtns(){return '<div class="dl-bt">'+DST.map(function(x,i){return '<a class="btn sm'+(i<2?' pri':'')+'" data-st="'+x[0]+'" href="'+esc(dStoreUrl(x[0],DS.fq))+'" target="_blank" rel="noopener noreferrer">'+esc(x[1])+ico('ext',14,2.4)+'</a>';}).join('')+'</div>';}
+function dQueries(p){var q=(p&&p.queries&&p.queries.length)?p.queries.slice():(p&&p.words&&p.words.length)?p.words.slice():[];
+ if(!q.length)((p&&p.picks)||[]).forEach(function(x){var t=String((x&&(x.search||x.name))||'').trim();if(t&&q.indexOf(t)<0)q.push(t);});
+ return q.slice(0,4);}
+/* starting filters come from what the student said they care about */
+function dFltInit(p){var q=dQueries(p),pr=DS.pri;DS.fq=q[0]||DS.need;
+ DS.flt={min:'',max:DS.budget||'',sort:pr==='price'?'low':pr==='quality'?'rate':'rel',rate:pr==='quality'||pr==='value',fast:pr==='speed'};}
+function dFltNote(){var f=DS.flt,mn=dNum(f.min),mx=dNum(f.max),a=[];if(mn&&mx&&mn>mx){var t=mn;mn=mx;mx=t;}
+ if(mn&&mx)a.push(inr(mn)+' to '+inr(mx));else if(mx)a.push('up to '+inr(mx));else if(mn)a.push(inr(mn)+' and above');
+ var so={low:'lowest price first',high:'highest price first',rate:'top rated first',new:'newest first'}[f.sort];if(so)a.push(so);
+ if(f.rate)a.push('4★ and above');if(f.fast)a.push('Prime / Flipkart Assured');
+ return a.length?'Amazon.in and Flipkart will open with: '+a.join(' · ')+'.':'No filters set. Amazon.in and Flipkart will open with just your search words.';}
+/* every store button on the page follows the filters */
+function dFltApply(){var r=$$('dres');if(!r)return;
+ r.querySelectorAll('a[data-st]').forEach(function(a){a.href=dStoreUrl(a.dataset.st,a.dataset.q||DS.fq);});
+ var n=$$('dfn');if(n)n.textContent=dFltNote();}
+function dPanel(p){var qs=dQueries(p),f=DS.flt,SO=[['rel','Best match'],['low','Price: low to high'],['high','Price: high to low'],['rate','Customer rating'],['new','Newest first']];
+ var tg=function(k,t){var on=!!f[k];return '<button type="button" class="dl-tg'+(on?' on':'')+'" data-tg="'+k+'" aria-pressed="'+(on?'true':'false')+'">'+t+'</button>';};
+ return dRt('Search the stores with your filters','Change the words or the filters and the store buttons update. Amazon.in and Flipkart open with your filters already applied.')+
+ '<section class="card dl-sec dl-f dl-fl" id="dfl">'+
+ '<label class="qfl" for="dfq">Search words<input type="text" id="dfq" maxlength="120" autocomplete="off" autocapitalize="off" spellcheck="false" value="'+esc(DS.fq)+'"></label>'+
+ (qs.length>1?'<div class="dl-ex"><span>Eve’s searches:</span>'+qs.map(function(q,i){return '<button class="dl-xb" type="button" data-fq="'+i+'">'+esc(q)+'</button>';}).join('')+'</div>':'')+
+ '<div class="dl-g3"><label class="qfl" for="dfmin">Lowest price (₹)<input type="text" id="dfmin" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="0" value="'+esc(f.min)+'"></label>'+
+ '<label class="qfl" for="dfmax">Highest price (₹)<input type="text" id="dfmax" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="No limit" value="'+esc(f.max)+'"></label>'+
+ '<label class="qfl" for="dfs">Sort by<select class="sel" id="dfs">'+SO.map(function(x){return '<option value="'+x[0]+'"'+(f.sort===x[0]?' selected':'')+'>'+x[1]+'</option>';}).join('')+'</select></label></div>'+
+ '<div class="dl-tgs">'+tg('rate','4★ and above')+tg('fast','Fast delivery: Prime / Flipkart Assured')+'</div>'+
+ dStoreBtns()+
+ '<p class="hint dl-fn" id="dfn">'+esc(dFltNote())+'</p>'+
+ '<p class="hint dl-fn">Croma, Reliance Digital and Vijay Sales do not take filters in the link, so they open with your search words only.</p></section>';}
 function dItems(){var p=DS.plan;return p?((p.products&&p.products.length)?p.products:(p.picks||[])):[];}
 function dRange(name){var p=dItems().filter(function(x){return x.name===name;})[0];return p&&p.price_low>0?p:null;}
 function dRangeTxt(p){return p.price_high>p.price_low?inr(p.price_low)+' to '+inr(p.price_high):'about '+inr(p.price_low);}
@@ -1392,10 +1439,18 @@ function dealPage(){nav('deal');
  $$('dadd').onclick=dAdd;
  $$('dres').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(!t)return;
   if(t.dataset.more!=null){var bt=t.parentNode,o=bt.classList.toggle('open');t.textContent=o?'Fewer stores':'More stores';t.setAttribute('aria-expanded',o?'true':'false');return;}
+  if(t.dataset.tg){var k=t.dataset.tg;DS.flt[k]=!DS.flt[k];t.classList.toggle('on',!!DS.flt[k]);t.setAttribute('aria-pressed',DS.flt[k]?'true':'false');dFltApply();return;}
+  if(t.dataset.fq!=null){var qq=dQueries(DS.plan)[+t.dataset.fq];if(qq){DS.fq=qq;var fi=$$('dfq');if(fi)fi.value=qq;dFltApply();}return;}
   if(t.dataset.use==null)return;var p=dItems()[+t.dataset.use];if(!p)return;dProdOpts(p.name);dProdSync();
   if(p.store){var sk=$$('dsk'),key=p.store==='Amazon.in'?'Amazon':p.store,hit=DSTORES.indexOf(key)>=0&&key!=='Other';sk.value=hit?key:'Other';dSync(sk);$$('dsow').style.display=hit?'none':'block';if(!hit)$$('dso').value=p.store;}
   $$('dpp').value=p.price>0?String(p.price):'';dFin();
   var c=$$('dcmp');if(c&&c.scrollIntoView)c.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(function(){$$('dpp').focus({preventScroll:true});},350);};
+ $$('dres').oninput=function(e){var t=e.target;if(!t||!t.id)return;
+  if(t.id==='dfq')DS.fq=t.value;
+  else if(t.id==='dfmin'||t.id==='dfmax'){var v=t.value.replace(/\D/g,'');if(v!==t.value)t.value=v;DS.flt[t.id==='dfmin'?'min':'max']=v;}
+  else if(t.id==='dfs')DS.flt.sort=t.value;
+  else return;
+  dFltApply();};
  $$('doffers').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(!t||t.dataset.rm==null)return;var id=+t.dataset.rm;DS.offers=DS.offers.filter(function(o){return o.id!==id;});DS.judge=null;DS.jstate='idle';dOffers();dAct();};
  $$('dact').onclick=function(e){var t=e.target.closest?e.target.closest('button'):null;if(t&&t.id==='djb')dJudge();};
  dProdOpts();dProdSync();dRender();dOffers();dAct();dFin();
@@ -1428,7 +1483,7 @@ function dPlanHtml(p){var live=p.products&&p.products.length,multi=dItems().leng
  else{
   if(p.mode==='guide'&&p.queries&&p.queries.length)h+='<div class="msg warn" style="margin-top:14px"><span class="dotk"></span><span>'+(p.capped?'Eve has used today’s product searches, so here are searches you can open on the stores. Product links are back tomorrow.':p.searchFailed?'Eve could not reach the store search just now, so here are searches you can open on the stores.':'No matching product pages turned up. Try the searches below on the stores.')+'</span></div>';
   if(p.picks&&p.picks.length)h+=dRt('Good options to check')+p.picks.map(function(x,i){return dProd(x,i,false,false);}).join('');}
- if(p.queries&&p.queries.length)h+=dRt(live?'Want to look further?':'Search the stores yourself')+'<div class="card dl-qs">'+p.queries.map(function(q){return '<div class="dl-qr"><span class="dl-qt">'+ico('search',16,2.2)+'<span>'+esc(q)+'</span></span>'+dBtns(q)+'</div>';}).join('')+'</div>';
+ if(dQueries(p).length)h+=dPanel(p);
  var av=p.avoid&&p.avoid.length,tm=!!p.timing;
  if(av||tm)h+='<div class="dl-2">'+(av?'<div class="card dl-tc"><div class="dl-tl"><span class="dl-bi">'+ico('alert',16,2.6)+'</span>Watch out for</div><ul class="dl-ul">'+p.avoid.map(function(a){return '<li>'+esc(a)+'</li>';}).join('')+'</ul></div>':'')+(tm?'<div class="card dl-tc"><div class="dl-tl"><span class="dl-bi g">'+ico('check',16,2.8)+'</span>Buying tip</div><div class="dl-tx">'+esc(p.timing)+'</div></div>':'')+'</div>';
  return h+'</div>';}
@@ -1438,7 +1493,7 @@ function dFind(){if(DS.state==='busy')return;
  dMsg('');
  if(!CFG.dealApi){DS.state='err';DS.err='Eve’s suggestions are not open yet. Please check back soon.';dRender();return;}
  var run=++DS.run;DS.state='busy';DS.plan=null;DS.judge=null;DS.jstate='idle';dRender();dAct();var b=$$('dgo');if(b){b.disabled=true;b.classList.add('busy');}
- dCall('/plan',{need:need,budget:bud,priority:DS.pri,condition:DS.cond}).then(function(d){if(run!==DS.run)return;DS.plan=d;DS.state='ok';},function(e){if(run!==DS.run)return;DS.state='err';DS.err=dErr(e.code);}).then(function(){if(run!==DS.run)return;
+ dCall('/plan',{need:need,budget:bud,priority:DS.pri,condition:DS.cond}).then(function(d){if(run!==DS.run)return;DS.plan=d;DS.state='ok';dFltInit(d);},function(e){if(run!==DS.run)return;DS.state='err';DS.err=dErr(e.code);}).then(function(){if(run!==DS.run)return;
   var b=$$('dgo');if(b){b.disabled=false;b.classList.remove('busy');}var f=dItems()[0],pk=$$('dpk'),pt=$$('dpt');dProdOpts(f&&pk&&pk.value==='__o'&&!(pt&&pt.value.trim())?f.name:undefined);dProdSync();dRender();dAct();
   var r=$$('dres');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:'smooth',block:'start'});});}
 function dAdd(){var s=$$('dpk'),m=$$('dmsg2'),say=function(t){m.innerHTML='<div class="msg warn"><span class="dotk"></span><span>'+esc(t)+'</span></div>';};
@@ -1487,10 +1542,35 @@ function dJudge(){if(DS.jstate==='busy'||!DS.offers.length)return;var run=++DS.r
 /* ---------- Text to Speech ---------- */
 var TS={voice:'',loc:'',rate:1,live:true,pend:0,spoken:0,rt:0,nt:0,reading:false,run:0,ctl:null,busy:false,para:'',lang:'en',blob:null,ext:'mp3',url:'',vl:false};
 var TLANGS=[['en','English'],['zh','Chinese (Mandarin)'],['es','Spanish'],['fr','French'],['ja','Japanese'],['ko','Korean']];
+/* Japanese and Korean only come out as real sound when the voice service has them switched on, so they are listed only when it says so (null = not asked yet) */
+var TSJK=null;
+function tsLangs(){return TLANGS.filter(function(l){return (l[0]!=='ja'&&l[0]!=='ko')||TSJK===true;});}
+function tsLangOpts(){return tsLangs().map(function(l){return '<option value="'+l[0]+'"'+(TS.lang===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join('');}
+function tsAsk(){var s=$$('tsl');if(!s||!CFG.aiApi||TSJK!==null)return;
+ var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},8000);
+ fetch(String(CFG.aiApi).replace(/\/+$/,'')+'/health',{signal:ctl.signal}).then(function(r){return r.json();}).then(function(j){TSJK=!!(j&&j.ttsJaKo);},function(){}).then(function(){clearTimeout(tm);
+  var e=$$('tsl');if(!e||TSJK!==true)return;e.innerHTML=tsLangOpts();e.value=TS.lang;if(e.value!==TS.lang)e.selectedIndex=0;if(e._cs)e._cs.sync();});}
 var TMAX=3000,TPIECE=380;
 var TSC={tok:'',id:null,want:false};
 var TERR={short:'Write something with a few words first.',slow:'That was a lot of requests in a short time. Please wait a few minutes and try again.',limit:'Eve has used up her free help for today. Please try again tomorrow.',busy:'Eve is busy right now. Please try again in a minute.',big:'That piece was too long. Please try again.',net:'Could not connect. Please check your internet and try again.',timeout:'That is taking too long. Please try again.',captcha:'The security check did not pass or has run out. Please complete it again and press Make audio.'};
-function tsErr(c){return TERR[c]||'The audio could not be made right now. Please try again in a moment.';}
+function tsErr(c){
+ if(c==='empty'){var n=(TLANGS.filter(function(l){return l[0]===TS.lang;})[0]||[])[1];
+  return (TS.lang==='ja'||TS.lang==='ko')?n+' audio is not coming through from our voice service right now, so no sound was made. Please try again later, or choose another language.':'No sound came back for that text. Please try different wording, or try again in a moment.';}
+ return TERR[c]||'The audio could not be made right now. Please try again in a moment.';}
+/* Japanese and Korean need text in their own writing; romaji or English gives the voice nothing to say */
+var TSOWN={ja:/[\u3040-\u30ff\u3400-\u9fff]/,ko:/[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af]/};
+/* how long is this audio? 0 = it would not decode, -1 = could not tell */
+function tsProbe(b){return new Promise(function(res){var a=new Audio(),u=URL.createObjectURL(b),done=false;
+ function fin(d){if(done)return;done=true;try{a.removeAttribute('src');a.load();}catch(e){}try{URL.revokeObjectURL(u);}catch(e){}res(d);}
+ a.preload='metadata';a.onloadedmetadata=function(){fin(isFinite(a.duration)?a.duration:-1);};a.onerror=function(){fin(0);};
+ setTimeout(function(){fin(-1);},6000);a.src=u;});}
+/* the real length and loudness of finished audio, read by decoding it. null = this browser could not decode it, {sec:-1} = this browser cannot check */
+async function tsMeasure(b){var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return {sec:-1,peak:-1};var ac=new AC();
+ try{var ab=await b.arrayBuffer(),buf=await new Promise(function(res,rej){var p=ac.decodeAudioData(ab,res,rej);if(p&&p.catch)p.catch(rej);}),pk=0;
+  for(var c=0;c<buf.numberOfChannels;c++){var d=buf.getChannelData(c);for(var i=0;i<d.length;i+=5){var v=d[i]<0?-d[i]:d[i];if(v>pk)pk=v;}}
+  return {sec:buf.duration,peak:pk};}
+ catch(e){return null;}
+ finally{try{ac.close();}catch(x){}}}
 function tsCan(){return 'speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';}
 function tsVoice(){var l=aiVoices(),v=l.filter(function(x){return (x.voiceURI||x.name)===TS.voice;})[0];return v||aiVoice();}
 /* the voices belong to the device, so they are listed by language and country, with the world's most populous countries first */
@@ -1600,7 +1680,7 @@ function tsPlayerInit(){
  var au=TSP.au=new Audio(),b=$$('tsapp'),sk=$$('tsaps'),ct=$$('tsapc'),dt=$$('tsapd'),rt=$$('tsapr'),mt=$$('tsapm'),vl=$$('tsapv');
  if(!b)return;
  au.preload='auto';au.src=TS.url;TSP.ri=0;
- function dur(){var x=au.duration;return isFinite(x)&&x>0?x:0;}
+ function dur(){var x=au.duration;return isFinite(x)&&x>0?x:(TS.dur>0?TS.dur:0);}
  function paint(){var d=dur(),p=d?Math.min(1,au.currentTime/d):0;
   if(!TSP.drag){sk.value=String(Math.round(p*1000));sk.style.setProperty('--r',String(p));}
   ct.textContent=tsT(TSP.drag?sk.value/1000*d:au.currentTime);dt.textContent=tsT(d);
@@ -1651,6 +1731,7 @@ async function tsJoin(blobs){
 async function tsMake(){if(TS.busy)return;
  var txt=$$('tst').value;TS.para=txt;TS.lang=$$('tsl').value;tsM2('');
  if(txt.replace(/[^\p{L}\p{N}]/gu,'').length<2){tsM2('Write or paste a paragraph first.','warn');return;}
+ if(TSOWN[TS.lang]&&!TSOWN[TS.lang].test(txt)){tsM2('Write the text in '+(TS.lang==='ja'?'Japanese':'Korean')+' so the voice can read it, or choose another language.','warn');return;}
  if(!CFG.aiApi){tsM2('Audio files are not open yet. Please check back soon.','warn');return;}
  var base=String(CFG.aiApi).replace(/\/+$/,''),parts=tsChunks(txt,TPIECE),run=++TS.run,blobs=[];
  if(!parts.length){tsM2('Write or paste a paragraph first.','warn');return;}
@@ -1663,7 +1744,12 @@ async function tsMake(){if(TS.busy)return;
   if(cap){var tk=TSC.tok;tsCapReset();pass=await tsPass(base,tk);if(run!==TS.run)return;}
   for(var i=0;i<parts.length;i++){if(run!==TS.run)return;tsBusy(true,i,parts.length);blobs.push(await tsPieceR(base,parts[i],TS.lang,pass));}
   if(run!==TS.run)return;
-  var jn=await tsJoin(blobs);if(run!==TS.run)return;TS.blob=jn.blob;TS.ext=jn.ext;TS.url=URL.createObjectURL(TS.blob);tsBusy(false);tsResult();
+  var jn=await tsJoin(blobs);if(run!==TS.run)return;
+  var dur=await tsProbe(jn.blob);if(run!==TS.run)return;
+  var ms=await tsMeasure(jn.blob);if(run!==TS.run)return;
+  if((dur>=0&&dur<0.25)||(ms&&ms.sec>=0&&(ms.sec<0.25||ms.peak<0.004))||(!ms&&dur<=0)){var e0=new Error('x');e0.code='empty';throw e0;}
+  TS.dur=ms&&ms.sec>0?ms.sec:(dur>0?dur:0);
+  TS.blob=jn.blob;TS.ext=jn.ext;TS.url=URL.createObjectURL(TS.blob);tsBusy(false);tsResult();
   var r=$$('tsout');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:'smooth',block:'nearest'});
  }catch(e){if(run!==TS.run)return;tsBusy(false);if(cap&&e&&e.code==='captcha')tsCapReset();tsM2(tsErr(e&&e.code),'bad');}}
 function tsCancel(){TSC.want=false;TS.run++;try{if(TS.ctl)TS.ctl.abort();}catch(e){}tsBusy(false);tsM2('');}
@@ -1682,8 +1768,7 @@ function ttsPage(){nav('tts');
  '<section class="card dl-sec dl-f" id="tsl2"><div class="dl-sh"><span class="dl-n">2</span><div><h2>Paragraph to audio file</h2><span class="hint">Write or paste a paragraph. Nothing is spoken while you write. When you are ready, make the audio and download it.</span></div></div>'+
  '<textarea id="tst" rows="8" maxlength="'+TMAX+'" aria-label="Your paragraph" placeholder="Write or paste your paragraph here">'+esc(TS.para)+'</textarea>'+
  '<div class="ts-count" id="tsc"></div>'+
- '<div class="ts-bar one"><label class="qfl" for="tsl">Language<select class="sel" id="tsl">'+TLANGS.map(function(l){return '<option value="'+l[0]+'"'+(TS.lang===l[0]?' selected':'')+'>'+l[1]+'</option>';}).join('')+'</select></label></div>'+
- '<p class="hint ts-vh">Languages such as Hindi, Portuguese, Russian and Arabic are in the first section whenever your device has a voice for them.</p>'+
+ '<div class="ts-bar one"><label class="qfl" for="tsl">Language<select class="sel" id="tsl">'+tsLangOpts()+'</select></label></div>'+
  (tsOn()&&CFG.aiApi?'<div class="cts ts-cap" id="tscap"></div>':'')+'<div class="dl-cta"><button class="btn pri dl-big" id="tsmk" type="button">'+ico('speaker',18,2.2)+'Make audio</button><button class="btn" id="tsstop" type="button" style="display:none">Cancel</button></div>'+
  '<div id="tsprog"></div><div id="tsm2"></div><div id="tsout"></div></section>'+
  '<p class="dl-note">The voices are automated, so names and unusual words may not sound perfect. Audio files are made from the text you type and are not kept by this website. Please do not type personal details.</p>';
@@ -1700,7 +1785,7 @@ function ttsPage(){nav('tts');
  var t=$$('tst'),cnt=function(){$$('tsc').textContent=t.value.length+' / '+TMAX;};cnt();
  t.addEventListener('input',function(){cnt();TS.para=t.value;});
  $$('tsl').onchange=function(){TS.lang=this.value;};
- $$('tsmk').onclick=tsMake;$$('tsstop').onclick=tsCancel;
+ $$('tsmk').onclick=tsMake;$$('tsstop').onclick=tsCancel;tsAsk();
  tsCapDrop();
  if($$('tscap')){tsLib().then(function(T){var h=$$('tscap');if(!h||TSC.id!=null)return;
   TSC.id=T.render(h,{sitekey:CFG.turnstileKey,theme:'auto',callback:function(x){TSC.tok=x;if(TSC.want&&$$('tsmk')){TSC.want=false;tsMake();}},'expired-callback':function(){TSC.tok='';},'error-callback':function(){TSC.tok='';}});},
