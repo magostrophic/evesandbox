@@ -170,7 +170,11 @@ var IC={
  code:'<path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/>',
  dlbox:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
- speaker:'<path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>'};
+ speaker:'<path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',
+ globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+ mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+ screen:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+ stop:'<rect x="6" y="6" width="12" height="12" rx="2"/>'};
 function ico(n,z,w){z=z||20;return '<svg class="i" viewBox="0 0 24 24" width="'+z+'" height="'+z+'" fill="none" stroke="currentColor" stroke-width="'+(w||2)+'" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>';}
 var COLORS=['#fde68a','#bfdbfe','#fbcfe8','#bbf7d0','#ddd6fe','#fed7aa','#a5f3fc','#fecaca','#d9f99d','#e9d5ff'];
 var ALLDAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -186,7 +190,7 @@ function colorOf(n){for(var i=0;i<S.subjects.length;i++)if(S.subjects[i].n===n)r
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var app=document.getElementById('app');
 
-function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',deal:'tools',tts:'tools',qr:'tools',grab:'tools',convert:'tools',ide:'tools',eve:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
+function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',deal:'tools',tts:'tools',qr:'tools',grab:'tools',convert:'tools',ide:'tools',eve:'tools',translate:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
 
 function planner(){
  nav('planner');
@@ -835,6 +839,7 @@ var TL=[
  {r:'convert',c:'i8',ic:'swap',n:'File Converter',d:'Turn pictures, PDFs, documents, spreadsheets and audio into another format, right on your device.'},
  {r:'grab',c:'i7',ic:'dlbox',lock:1,n:'Grab Box',d:'Paste a link to a file or a page and download the video, audio or document on it.'},
   {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop and remove plain backgrounds from images.'},
+ {r:'translate',c:'i12',ic:'globe',n:'Live Translate',d:'Speak in one language and read it in another as you talk, or share your screen and see it translated in real time.'},
  {r:'pdf',c:'i3',ic:'pdf',n:'PDF Tool',d:'Make, merge, split and compress PDFs, and add or remove passwords.'},
  {r:'qr',c:'i9',ic:'qr',n:'QR Code Generator',d:'Make a QR code for a link, text, Wi-Fi, email, phone number or contact card, and download it as PNG or SVG.'},
  {r:'planner',c:'',ic:'calendar',n:'Study Planner',d:'Plan your week with subjects and time slots, then print it or save it as an image.'},
@@ -1055,6 +1060,7 @@ function privacyPage(){nav('privacy');
  '<li><b>Eve AI:</b> the messages you send Eve, and any notes you attach, are sent to an AI service so it can write a reply. They are not stored by this website. Your chat history and saved flashcards stay on your device. Please do not share passwords or private personal details.</li>'+
  '<li><b>Deal or No Deal:</b> what you type about the item you want, your budget, and any prices you add are sent to an AI service so it can write its suggestions, and to a web search service that looks for matching product pages. They are not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Text to Speech:</b> the Speak as you type section runs on your device and sends nothing. When you make an audio file, the paragraph you wrote is sent to a speech service so it can create the audio. It is not stored by this website. Please do not type personal details.</li>'+
+ '<li><b>Live Translate:</b> in Speak, your browser’s own speech service turns what you say into text. In Screen, the picture of your screen never leaves your device; the words on it are read on your device. The words are then translated on your device when your browser can do that, or sent to a translation service so they can be translated. They are not stored by this website. Please do not share private personal details.</li>'+
  '<li><b>Links you open</b> take you to other websites with their own policies.</li>'+
  '<li><b>Contact form:</b> the form uses a security check to tell people from automated programs, and the check provider may look at technical details of your browser to do this. The name, email and message you type are sent to us by email so they reach us. We use them only to read and answer your message.</li>'+
  '<li><b>Donations:</b> if you donate, the amount and the mobile number you type (plus the name and email, if you give them) are sent to our payment partner to start the payment, and you pay on their page under their own privacy policy. Eve Sandbox does not store your payment details or your mobile number.</li></ul>'+
@@ -1200,8 +1206,8 @@ var FULL={tools:toolsPage,about:aboutPage,contact:contactPage,donate:donatePage,
 
 /* ---------- pages and addresses ---------- */
 var PAGE=EVE_PAGE,PM=!!PAGE,BASEP=EVE_BASE,INIT404=PAGE==='404';
-var ROUTES=['tools','about','contact','donate','terms','privacy','planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve'];
-var TITLES={home:'Home',tools:'Tools',about:'About',contact:'Contact',donate:'Donate',terms:'Terms of Service',privacy:'Privacy',planner:'Study Planner',image:'Image Tool',pdf:'PDF Tool',virus:'Virus Checker',calc:'Complex Calculator',deal:'Deal or No Deal',tts:'Text to Speech',qr:'QR Code Generator',grab:'Grab Box',convert:'File Converter',ide:'Eve IDE',eve:'Eve AI','404':'Page Not Found'};
+var ROUTES=['tools','about','contact','donate','terms','privacy','planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve','translate'];
+var TITLES={home:'Home',tools:'Tools',about:'About',contact:'Contact',donate:'Donate',terms:'Terms of Service',privacy:'Privacy',planner:'Study Planner',image:'Image Tool',pdf:'PDF Tool',virus:'Virus Checker',calc:'Complex Calculator',deal:'Deal or No Deal',tts:'Text to Speech',qr:'QR Code Generator',grab:'Grab Box',convert:'File Converter',ide:'Eve IDE',eve:'Eve AI',translate:'Live Translate','404':'Page Not Found'};
 function U(r){r=(!r||r==='home')?'':r;return PM?BASEP+(r?r+'/':''):'#/'+r;}
 function curR(){
  if(!PM)return location.hash.replace('#/','');
@@ -1797,6 +1803,218 @@ function ttsPage(){nav('tts');
  if(tsCan()){tsVoiceOpts();aiVoicesReady(tsVoiceOpts);if(!TS.vl){TS.vl=true;try{speechSynthesis.addEventListener('voiceschanged',tsVoiceOpts);}catch(e){}}}
  else{$$('tsv').innerHTML='<option value="">Not available</option>';$$('tsvl').innerHTML='<option value="">Not available</option>';tsM1('Speaking out loud is not available in this browser, but you can still make an audio file below.','warn');}
 }
+
+/* ---------- Live Translate ---------- */
+/* code, name, speech-recognition code, text-reader code, flag ('dev' = only a device translator can do it) */
+var LLANGS=[['en','English','en-US','eng'],['hi','Hindi','hi-IN','hin'],['bn','Bengali','bn-IN','ben'],['ta','Tamil','ta-IN','tam'],['te','Telugu','te-IN','tel','dev'],['mr','Marathi','mr-IN','mar'],['gu','Gujarati','gu-IN','guj'],['kn','Kannada','kn-IN','kan'],['ml','Malayalam','ml-IN','mal'],['pa','Punjabi','pa-IN','pan'],['ur','Urdu','ur-PK','urd'],['ne','Nepali','ne-NP','nep'],
+ ['es','Spanish','es-ES','spa'],['fr','French','fr-FR','fra'],['de','German','de-DE','deu'],['it','Italian','it-IT','ita'],['pt','Portuguese','pt-BR','por'],['nl','Dutch','nl-NL','nld'],['ru','Russian','ru-RU','rus'],['uk','Ukrainian','uk-UA','ukr'],['pl','Polish','pl-PL','pol'],['tr','Turkish','tr-TR','tur'],['ar','Arabic','ar-SA','ara'],['fa','Persian','fa-IR','fas'],['he','Hebrew','he-IL','heb'],
+ ['ja','Japanese','ja-JP','jpn'],['ko','Korean','ko-KR','kor'],['zh','Chinese (Simplified)','zh-CN','chi_sim'],['id','Indonesian','id-ID','ind'],['ms','Malay','ms-MY','msa'],['vi','Vietnamese','vi-VN','vie'],['th','Thai','th-TH','tha'],['tl','Filipino','fil-PH','fil'],['sv','Swedish','sv-SE','swe'],['el','Greek','el-GR','ell'],['cs','Czech','cs-CZ','ces'],['ro','Romanian','ro-RO','ron'],['hu','Hungarian','hu-HU','hun'],['da','Danish','da-DK','dan'],['fi','Finnish','fi-FI','fin'],['no','Norwegian','nb-NO','nor'],['sw','Swahili','sw-KE','swa']]
+ .sort(function(a,b){return a[1]<b[1]?-1:a[1]>b[1]?1:0;});
+var LRTL={ar:1,he:1,fa:1,ur:1};
+var LT={mode:'speak',from:'en',to:'hi',dev:true,say:false,over:true,rec:null,listening:false,hold:0,lines:[],id:0,interim:'',itr:'',itBusy:false,itNext:null,via:'',scr:null,sr:0};
+URLS.tesseract=['https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js'];
+ALT.tesseract='https://unpkg.com/tesseract.js@5.1.1/dist/tesseract.min.js';
+var LTERR={setup:'Live Translate is not switched on yet. Please check back soon.',slow:'That was a lot of translating in a short time. Please wait a few minutes and try again.',limit:'Eve has used up her free translating for today. Please try again tomorrow.',busy:'The translator is busy right now. Please try again in a moment.',big:'That was too long to translate in one go.',net:'Could not connect. Please check your internet and try again.',timeout:'That is taking too long. Please try again.',lang:'That pair of languages is not available.',devonly:'This language can only be translated by Chrome on a computer for now. Please choose another language.',devwait:'The translator for this language is still getting ready on this device. Please try again in a moment.',down:'The translator could not answer right now. Please try again in a moment.'};
+function ltErr(c){return LTERR[c]||LTERR.down;}
+function ltE(c){var e=new Error('x');e.code=c;return e;}
+function ltL(c){for(var i=0;i<LLANGS.length;i++)if(LLANGS[i][0]===c)return LLANGS[i];return LLANGS[0];}
+function ltOpts(sel){return LLANGS.map(function(l){return '<option value="'+l[0]+'"'+(l[0]===sel?' selected':'')+'>'+l[1]+'</option>';}).join('');}
+/* ---- the translator: this device's own (Chrome on a computer) when it can do the pair, otherwise Eve's online one ---- */
+var LTD={},LTDR={},LTDM={},LTDP={};
+function ltDevReset(){Object.keys(LTD).forEach(function(k){if(!LTDR[k]){delete LTD[k];delete LTDM[k];}});}
+function ltDevCan(){return typeof self!=='undefined'&&('Translator' in self);}
+function ltDevKey(){return LT.from+'>'+LT.to;}
+/* starts (once) getting this device's own translator for a pair of languages; never throws, gives null when it cannot */
+function ltDevGet(from,to,onprog){var k=from+'>'+to;if(!LT.dev||!ltDevCan())return Promise.resolve(null);if(onprog)LTDP[k]=onprog;if(LTD[k])return LTD[k];
+ LTD[k]=(async function(){try{var a=await Translator.availability({sourceLanguage:from,targetLanguage:to});LTDM[k]=a;if(a==='unavailable')return null;
+  var t=await Translator.create({sourceLanguage:from,targetLanguage:to,monitor:function(m){m.addEventListener('downloadprogress',function(e){var f=LTDP[k];if(f)f(Math.round((e.loaded||0)*100));});}});
+  LTDR[k]=t;return t;}catch(e){LTDM[k]='unavailable';return null;}})();return LTD[k];}
+function ltWeb(texts,from,to){var base=String(CFG.aiApi||'').replace(/\/+$/,'');if(!base)return Promise.reject(ltE('setup'));
+ var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},30000);
+ return fetch(base+'/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texts:texts,from:from,to:to}),signal:ctl.signal}).then(function(r){
+  return r.json().catch(function(){return {};}).then(function(j){clearTimeout(tm);if(r.ok&&j&&j.ok&&Array.isArray(j.out))return j.out;throw ltE((j&&j.error)||'down');});
+ },function(e){clearTimeout(tm);throw ltE(e&&e.name==='AbortError'?'timeout':'net');});}
+var LTC={},LTCN=0;
+async function ltTr(texts,from,to){if(from===to)return texts.slice();var out=new Array(texts.length),need=[],idx=[];
+ texts.forEach(function(t,i){var k=from+'|'+to+'|'+t;if(LTC[k])out[i]=LTC[k];else{need.push(t);idx.push(i);}});
+ if(need.length){var res=null,k=from+'>'+to,pr=ltDevGet(from,to),dev=LTDR[k]||null;
+  if(!dev&&LT.dev&&ltDevCan()&&!LTDM[k]){dev=await Promise.race([pr,ltWait(1500).then(function(){return null;})]);}
+  if(dev){try{res=[];for(var i=0;i<need.length;i++)res.push(await dev.translate(need[i]));LT.via='device';}catch(e){res=null;delete LTDR[k];LTD[k]=Promise.resolve(null);LTDM[k]='unavailable';}}
+  if(!res){if(ltL(from)[4]==='dev'||ltL(to)[4]==='dev')throw ltE(LTDM[k]==='downloadable'||LTDM[k]==='downloading'||!LTDM[k]&&LT.dev&&ltDevCan()?'devwait':'devonly');res=await ltWeb(need,from,to);LT.via='online';}
+  if(LTCN>1500){LTC={};LTCN=0;}
+  res.forEach(function(t,j){t=t||'';out[idx[j]]=t;if(t){LTC[from+'|'+to+'|'+need[j]]=t;LTCN++;}});}
+ return out;}
+function ltSt(t,k){var e=$$('ltst');if(e)e.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span></div>':'';}
+function ltViaNote(){return LT.via==='device'?'Translated on this device. Nothing is sent anywhere.':LT.via==='online'?'Only the words are sent for translation.':'';}
+function ltCopyText(t){try{if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);}catch(e){}
+ return new Promise(function(res,rej){try{var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();var ok=document.execCommand('copy');document.body.removeChild(a);ok?res():rej();}catch(e){rej(e);}});}
+function ltFlash(id,t){var b=$$(id);if(!b)return;var o=b.getAttribute('data-l')||b.textContent;b.setAttribute('data-l',o);b.textContent=t;setTimeout(function(){var x=$$(id);if(x)x.textContent=o;},1400);}
+/* ---- speaking and listening ---- */
+function ltSR(){return window.SpeechRecognition||window.webkitSpeechRecognition||null;}
+function ltMicUI(){var b=$$('ltmic');if(!b)return;b.classList.toggle('rec',LT.listening);b.innerHTML=(LT.listening?ico('stop',18,2.2)+'Stop listening':ico('mic',18,2.2)+'Start listening');b.setAttribute('aria-pressed',LT.listening?'true':'false');}
+function ltListRender(){var el=$$('ltlist');if(!el)return;
+ var near=el.scrollHeight-el.scrollTop-el.clientHeight<60,rtl=LRTL[LT.to]?' dir="rtl"':'',h='';
+ LT.lines.forEach(function(l){h+='<div class="lt-l"><div class="lt-o">'+esc(l.o)+'</div><div class="lt-t"'+rtl+'>'+(l.t?esc(l.t):l.err?'<span class="lt-x">Could not translate this part.</span>':'<span class="lt-w">Translating…</span>')+'</div></div>';});
+ if(LT.interim)h+='<div class="lt-l int"><div class="lt-o">'+esc(LT.interim)+'</div>'+(LT.itr?'<div class="lt-t"'+rtl+'>'+esc(LT.itr)+'</div>':'')+'</div>';
+ if(!h)h='<div class="lt-em">'+(LT.listening?'Listening… start speaking.':'Press Start listening and speak. What you say appears here with its translation under it.')+'</div>';
+ el.innerHTML=h;if(near)el.scrollTop=el.scrollHeight;}
+function ltAdd(t){t=String(t||'').replace(/\s+/g,' ').trim();if(!t)return;var L={o:t,t:'',err:'',id:++LT.id};LT.lines.push(L);if(LT.lines.length>200)LT.lines.shift();LT.interim='';LT.itr='';ltListRender();
+ var from=LT.from,to=LT.to;
+ ltTr([t],from,to).then(function(o){L.t=o[0]||'';if(!L.t)L.err='x';ltListRender();ltSt(L.t?'':'Could not translate that part.',L.t?'':'warn');if(L.t&&LT.say)ltSay(L.t);var n=$$('ltvia');if(n)n.textContent=ltViaNote();},
+  function(e){L.err=e.code||'down';ltListRender();ltSt(ltErr(e.code),'bad');});}
+function ltIntTr(t){var k=ltDevKey(),dv=LT.dev?LTDR[k]:null;if(!dv||!t){LT.itr='';return;}
+ if(LT.itBusy){LT.itNext=t;return;}LT.itBusy=true;
+ dv.translate(t).then(function(x){if(ltDevKey()===k&&LT.interim)LT.itr=x;},function(){}).then(function(){LT.itBusy=false;ltListRender();var n=LT.itNext;LT.itNext=null;if(n&&n!==t&&LT.interim)ltIntTr(n);});}
+function ltSay(t){if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined')return;
+ var u=new SpeechSynthesisUtterance(t),c=ltL(LT.to)[2];u.lang=c;
+ try{var vs=speechSynthesis.getVoices(),v=vs.filter(function(x){return x.lang===c||String(x.lang).replace('_','-')===c;})[0]||vs.filter(function(x){return String(x.lang).slice(0,2)===c.slice(0,2);})[0];if(v)u.voice=v;}catch(e){}
+ LT.hold++;try{if(LT.rec)LT.rec.abort();}catch(e){}
+ var done=function(){LT.hold=Math.max(0,LT.hold-1);if(!LT.hold&&LT.listening&&!LT.rec)setTimeout(function(){if(LT.listening&&!LT.hold&&!LT.rec)ltRecStart();},250);};
+ u.onend=done;u.onerror=done;try{speechSynthesis.speak(u);}catch(e){done();}}
+function ltRecStart(){var SR=ltSR();if(!SR||!LT.listening||LT.hold)return;var r=new SR();LT.rec=r;
+ r.lang=ltL(LT.from)[2];r.continuous=true;r.interimResults=true;r.maxAlternatives=1;
+ r.onresult=function(e){if(LT.rec!==r)return;var im='';for(var i=e.resultIndex;i<e.results.length;i++){var res=e.results[i],t=res[0]&&res[0].transcript||'';if(res.isFinal)ltAdd(t);else im+=t;}
+  if(im!==LT.interim){LT.interim=im;if(!im)LT.itr='';ltListRender();ltIntTr(im);}};
+ r.onerror=function(e){if(LT.rec!==r)return;var c=e&&e.error;
+  if(c==='no-speech'||c==='aborted')return;
+  var m=c==='not-allowed'||c==='service-not-allowed'?'The microphone is blocked. Allow the microphone for this website in your browser, then press Start listening again.':c==='audio-capture'?'No microphone was found on this device.':c==='language-not-supported'?'This browser cannot listen in '+ltL(LT.from)[1]+'. Please choose another language.':c==='network'?'The browser’s speech service could not be reached. Check your internet and try again.':'Listening stopped. Please try again.';
+  LT.listening=false;LT.rec=null;ltMicUI();ltListRender();ltSt(m,'bad');};
+ r.onend=function(){if(LT.rec!==r)return;LT.rec=null;if(LT.listening&&!LT.hold)setTimeout(function(){if(LT.listening&&!LT.rec&&!LT.hold)ltRecStart();},250);};
+ try{r.start();}catch(x){LT.rec=null;}}
+function ltMic(){if(LT.listening){ltMicStop();return;}
+ if(!ltSR()){ltSt('This browser cannot listen to the microphone. Please use Chrome, Edge or Safari.','warn');return;}
+ ltSt('');ltDevReset();LT.listening=true;LT.interim='';LT.itr='';ltMicUI();ltListRender();ltRecStart();
+ ltDevGet(LT.from,LT.to,function(p){if(LT.listening)ltSt('Getting the translator ready on this device… '+p+'%','');}).then(function(){var e=$$('ltst');if(e&&/Getting the translator/.test(e.textContent))ltSt('');});}
+function ltMicStop(){LT.listening=false;var r=LT.rec;LT.rec=null;try{if(r)r.abort();}catch(e){}try{if('speechSynthesis' in window)speechSynthesis.cancel();}catch(e){}LT.hold=0;LT.interim='';LT.itr='';ltMicUI();ltListRender();}
+function ltMicRestart(){if(!LT.listening)return;var r=LT.rec;LT.rec=null;try{if(r)r.abort();}catch(e){}LT.interim='';LT.itr='';ltListRender();setTimeout(function(){if(LT.listening&&!LT.rec&&!LT.hold)ltRecStart();},300);}
+/* ---- reading the screen ---- */
+function ltWait(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function ltSt2(t,k){var e=$$('ltst2');if(e)e.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span></div>':'';}
+function ltKey(t){return String(t).toLowerCase().replace(/[^\p{L}\p{N}]+/gu,'');}
+function ltDice(a,b){if(a===b)return 1;if(a.length<5||b.length<5)return 0;var m={},n=0,i;for(i=0;i<a.length-1;i++){var g=a.substr(i,2);m[g]=(m[g]||0)+1;}
+ for(i=0;i<b.length-1;i++){var h=b.substr(i,2);if(m[h]>0){m[h]--;n++;}}return 2*n/(a.length+b.length-2);}
+function ltLookup(S,key){if(S.tr[key])return S.tr[key];var best=0,hit='';for(var i=S.keys.length-1;i>=0&&i>S.keys.length-80;i--){var k=S.keys[i];if(Math.abs(k.length-key.length)>key.length*0.2)continue;var d=ltDice(k,key);if(d>best){best=d;hit=k;}}
+ return best>=0.88?S.tr[hit]:'';}
+/* the text reader gives lines; lines that sit right under each other and line up belong to one block of text */
+function ltBlocks(d,img,w,h){var ls=(d.lines||[]).filter(function(l){return l.confidence>=45&&/\p{L}/u.test(l.text)&&(l.bbox.x1-l.bbox.x0)>8&&(l.bbox.y1-l.bbox.y0)>5;}).map(function(l){return {t:l.text.replace(/\s+/g,' ').trim(),x0:l.bbox.x0,y0:l.bbox.y0,x1:l.bbox.x1,y1:l.bbox.y1};}).filter(function(l){return l.t.length>=2;});
+ ls.sort(function(a,b){return a.y0-b.y0||a.x0-b.x0;});var bl=[];
+ ls.forEach(function(l){var lh=l.y1-l.y0,best=null;
+  for(var i=bl.length-1;i>=0&&i>=bl.length-14;i--){var b=bl[i],gap=l.y0-b.y1,dx=Math.abs(l.x0-b.x0),hs=Math.min(lh,b.lh)/Math.max(lh,b.lh),ov=Math.min(l.x1,b.x1)-Math.max(l.x0,b.x0);
+   if(gap>=-b.lh*0.35&&gap<=b.lh*0.8&&hs>0.7&&(dx<=b.lh*1.6||ov>0.5*Math.min(l.x1-l.x0,b.x1-b.x0))&&b.n<14){best=b;break;}}
+  if(best){best.t+=' '+l.t;best.x0=Math.min(best.x0,l.x0);best.y0=Math.min(best.y0,l.y0);best.x1=Math.max(best.x1,l.x1);best.y1=Math.max(best.y1,l.y1);best.n++;best.lh=Math.max(best.lh,lh);}
+  else bl.push({t:l.t,x0:l.x0,y0:l.y0,x1:l.x1,y1:l.y1,lh:lh,n:1});});
+ bl=bl.filter(function(b){return (b.t.match(/\p{L}/gu)||[]).length>=2;}).slice(0,40);
+ bl.forEach(function(b){b.key=ltKey(b.t);ltBg(b,img,w,h);});
+ return bl.filter(function(b){return b.key;});}
+/* the colour around a block of text, so the translation can be painted over it in a matching colour */
+function ltBg(b,img,w,h){var p=3,x0=Math.max(0,b.x0-p),y0=Math.max(0,b.y0-p),x1=Math.min(w-1,b.x1+p),y1=Math.min(h-1,b.y1+p),R=[],G=[],B=[];
+ function at(x,y){x=Math.max(0,Math.min(w-1,Math.round(x)));y=Math.max(0,Math.min(h-1,Math.round(y)));var i=(y*w+x)*4;R.push(img[i]);G.push(img[i+1]);B.push(img[i+2]);}
+ for(var k=0;k<=16;k++){var fx=x0+(x1-x0)*k/16,fy=y0+(y1-y0)*k/16;at(fx,y0);at(fx,y1);at(x0,fy);at(x1,fy);}
+ var med=function(a){a.sort(function(x,y){return x-y;});return a[a.length>>1];};b.r=med(R);b.g=med(G);b.b=med(B);b.dark=(0.299*b.r+0.587*b.g+0.114*b.b)<140;}
+function ltFit(cx,text,W,H,rtl){var cjk=/[぀-ヿ㐀-鿿가-힯฀-๿]/.test(text),best=null;
+ function wrap(sz){cx.font=sz+'px Inter,system-ui,-apple-system,"Segoe UI",sans-serif';var u=cjk?Array.from(text):text.split(' '),sp=cjk?'':' ',ls=[],cur='';
+  u.forEach(function(x){var t=cur?cur+sp+x:x;if(cur&&cx.measureText(t).width>W){ls.push(cur);cur=x;}else cur=t;});if(cur)ls.push(cur);return ls;}
+ var lo=8,hi=Math.max(8,Math.min(Math.floor(H),64));
+ while(lo<=hi){var mid=(lo+hi)>>1,ls=wrap(mid),ok=ls.length*mid*1.2<=H&&ls.every(function(l){return cx.measureText(l).width<=W+1;});if(ok){best={sz:mid,ls:ls};lo=mid+1;}else hi=mid-1;}
+ return best||{sz:8,ls:wrap(8)};}
+function ltDraw(S){var c=$$('ltov');if(!c||!S||!S.w)return;if(c.width!==S.w||c.height!==S.h){c.width=S.w;c.height=S.h;}var x=c.getContext('2d');x.clearRect(0,0,S.w,S.h);if(!LT.over)return;var rtl=!!LRTL[LT.to];
+ (S.blocks||[]).forEach(function(b){var t=ltLookup(S,b.key);if(!t)return;var padX=Math.max(3,b.lh*0.25),padY=Math.max(2,b.lh*0.12),bx=Math.max(0,b.x0-padX),by=Math.max(0,b.y0-padY),bw=Math.min(S.w,b.x1+padX)-bx,bh=Math.min(S.h,b.y1+padY)-by;
+  x.fillStyle='rgb('+b.r+','+b.g+','+b.b+')';x.fillRect(bx,by,bw,bh);
+  var f=ltFit(x,t,bw-padX,bh-padY,rtl);x.fillStyle=b.dark?'#fff':'#111';x.textBaseline='top';x.direction=rtl?'rtl':'ltr';x.textAlign=rtl?'right':'left';x.font=f.sz+'px Inter,system-ui,-apple-system,"Segoe UI",sans-serif';
+  var ty=by+Math.max(0,(bh-f.ls.length*f.sz*1.2)/2),tx=rtl?bx+bw-padX/2:bx+padX/2;f.ls.forEach(function(l,i){x.fillText(l,tx,ty+i*f.sz*1.2);});});}
+function ltSideList(S){var el=$$('ltsl');if(!el)return;var rtl=LRTL[LT.to]?' dir="rtl"':'',h='';
+ (S.blocks||[]).forEach(function(b){var t=ltLookup(S,b.key);if(t)h+='<div class="lt-l"><div class="lt-o">'+esc(b.t)+'</div><div class="lt-t"'+rtl+'>'+esc(t)+'</div></div>';});
+ var sig=h.length+':'+h.slice(0,200);if(S.lsig===sig)return;S.lsig=sig;el.innerHTML=h||'<div class="lt-em">Text found on your screen will appear here with its translation.</div>';}
+function ltTrNeed(S){if(S.busy||Date.now()<S.errUntil)return;var from=LT.from,to=LT.to,need=[],seen={};
+ (S.blocks||[]).forEach(function(b){if(!seen[b.key]&&!ltLookup(S,b.key)&&!S.pend[b.key]){seen[b.key]=1;need.push(b);}});if(!need.length)return;need=need.slice(0,16);
+ need.forEach(function(b){S.pend[b.key]=1;});S.busy=true;ltSt2('Translating…','');
+ ltTr(need.map(function(b){return b.t.slice(0,690);}),from,to).then(function(o){if(S.pair!==from+'>'+to)return;need.forEach(function(b,i){delete S.pend[b.key];if(o[i]){S.tr[b.key]=o[i];S.keys.push(b.key);}});if(S.keys.length>400){S.keys.splice(0,200).forEach(function(k){delete S.tr[k];});}
+   ltDraw(S);ltSideList(S);ltSt2('');var n=$$('ltvia');if(n)n.textContent=ltViaNote();},
+  function(e){need.forEach(function(b){delete S.pend[b.key];});S.errUntil=Date.now()+12000;ltSt2(ltErr(e.code),'bad');}).then(function(){S.busy=false;});}
+async function ltOcrLoad(S,code){S.ready=false;if(S.worker){try{await S.worker.terminate();}catch(e){}S.worker=null;}
+ ltSt2('Loading the text reader for '+ltL(LT.from)[1]+'… the first time can take a little while.','');
+ await need('tesseract');
+ var w=await Tesseract.createWorker(code,1,{langPath:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/'+code+'/4.0.0_best_int',logger:function(m){if(LT.scr===S&&m&&/traineddata/.test(m.status||'')&&m.progress>0&&m.progress<1)ltSt2('Downloading the '+ltL(LT.from)[1]+' reading data… '+Math.round(m.progress*100)+'%','');}});
+ if(LT.scr!==S){try{await w.terminate();}catch(e){}return;}
+ S.worker=w;S.code=code;S.ready=true;ltSt2('');}
+function ltSig(cx,w,h){var s=document.createElement('canvas');s.width=48;s.height=27;var x=s.getContext('2d',{willReadFrequently:true});x.drawImage(cx.canvas,0,0,48,27);var d=x.getImageData(0,0,48,27).data,o=new Array(48*27);for(var i=0;i<o.length;i++)o[i]=(d[i*4]*0.3+d[i*4+1]*0.59+d[i*4+2]*0.11);return o;}
+function ltSigDiff(a,b){if(!a||!b)return 99;var t=0;for(var i=0;i<a.length;i++)t+=Math.abs(a[i]-b[i]);return t/a.length;}
+async function ltScrLoop(S){var cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true}),idle=0;
+ while(LT.scr===S){
+  try{
+   var v=$$('ltv');if(!v||v.videoWidth<2||v.readyState<2){await ltWait(250);continue;}
+   var code=ltL(LT.from)[3],pair=LT.from+'>'+LT.to;
+   if(S.code!==code){S.blocks=[];S.sig=null;S.tr={};S.keys=[];S.pend={};S.lsig='';ltDraw(S);ltSideList(S);await ltOcrLoad(S,code);if(LT.scr!==S)return;}
+   if(S.pair!==pair){S.pair=pair;S.tr={};S.keys=[];S.pend={};S.lsig='';S.sig=null;ltDraw(S);ltSideList(S);if(ltDevCan())ltDevGet(LT.from,LT.to);}
+   var sc=Math.min(1,1600/v.videoWidth),w=Math.round(v.videoWidth*sc),h=Math.round(v.videoHeight*sc);cv.width=w;cv.height=h;cx.drawImage(v,0,0,w,h);
+   var sig=ltSig(cx,w,h),ch=ltSigDiff(S.sig,sig)>2;
+   if(ch||(!S.blocks.length&&idle>6)){S.sig=sig;idle=0;
+    var img=cx.getImageData(0,0,w,h).data;ltSt2(S.blocks.length?'':'Reading your screen…','');
+    var res=await S.worker.recognize(cv,{},{blocks:true});if(LT.scr!==S)return;
+    S.w=w;S.h=h;S.blocks=ltBlocks(res.data,img,w,h);
+    ltDraw(S);ltSideList(S);
+    if(!S.blocks.length)ltSt2('No readable text found on this screen yet. Try a window with clearer text, and make sure the “From” language matches it.','warn');else ltSt2('');
+    ltTrNeed(S);
+   }else{idle++;ltTrNeed(S);}
+   await ltWait(ch?150:700);
+  }catch(e){if(LT.scr!==S)return;console.warn('screen translation step failed:',e);ltSt2('Something went wrong while reading the screen. Trying again…','warn');await ltWait(1500);}
+ }}
+function ltScrUI(){var b=$$('ltsh'),vw=$$('ltvw');if(!b)return;var on=!!LT.scr;b.classList.toggle('rec',on);b.innerHTML=on?ico('stop',18,2.2)+'Stop sharing':ico('screen',18,2.2)+'Share a screen or window';if(vw)vw.style.display=on?'block':'none';}
+async function ltScrStart(){if(LT.scr){ltScrStop('');return;}
+ if(!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia)){ltSt2('Your browser cannot share the screen. Please use Chrome, Edge or Firefox on a computer.','warn');return;}
+ ltSt2('');ltDevReset();ltDevGet(LT.from,LT.to,function(p){if(LT.scr)ltSt2('Getting the translator ready on this device… '+p+'%','');}).then(function(){var e=$$('ltst2');if(e&&/Getting the translator/.test(e.textContent))ltSt2('');});
+ var stream;try{stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:5,max:10}},audio:false,selfBrowserSurface:'exclude'});}
+ catch(e){ltSt2(e&&e.name==='NotAllowedError'?'Screen sharing was cancelled. Press Share a screen or window and choose what to share.':'Screen sharing could not start in this browser.','warn');return;}
+ var S=LT.scr={stream:stream,worker:null,code:'',pair:'',sig:null,blocks:[],tr:{},keys:[],pend:{},busy:false,errUntil:0,w:0,h:0,lsig:'',ready:false};
+ var vt=stream.getVideoTracks()[0];vt.addEventListener('ended',function(){if(LT.scr===S)ltScrStop('Screen sharing ended.');});
+ ltScrUI();var v=$$('ltv');v.srcObject=stream;try{await v.play();}catch(e){}
+ if(LT.scr!==S)return;if(vt.readyState==='ended'){ltScrStop('Screen sharing ended.');return;}
+ try{await ltOcrLoad(S,ltL(LT.from)[3]);}catch(e){if(LT.scr===S){ltScrStop('');ltSt2('The text reader could not be loaded. Please check your internet connection and try again.','bad');}return;}
+ if(LT.scr===S)ltScrLoop(S);}
+function ltScrStop(msg){var S=LT.scr;LT.scr=null;if(S){try{S.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}try{if(S.worker)S.worker.terminate();}catch(e){}}
+ var v=$$('ltv');if(v){try{v.srcObject=null;}catch(e){}}var c=$$('ltov');if(c){try{c.getContext('2d').clearRect(0,0,c.width,c.height);}catch(e){}}ltScrUI();if(msg!==undefined)ltSt2(msg,'');}
+function ltStop(){if(LT.listening||LT.rec)ltMicStop();if(LT.scr)ltScrStop();try{if('speechSynthesis' in window)speechSynthesis.cancel();}catch(e){}}
+/* ---- the page ---- */
+function ltPane(){var sp=LT.mode==='speak',mob=ltPhone();
+ var dev=ltDevCan()?'<label class="qck"><input type="checkbox" id="ltdev"'+(LT.dev?' checked':'')+'> Translate on this device when possible (private, nothing is sent)</label>':'';
+ if(sp)return '<div class="dl-cta lt-cta"><button class="btn pri dl-big" id="ltmic" type="button" aria-pressed="false"></button><button class="btn" id="ltclr" type="button">Clear</button><button class="btn" id="ltcp" type="button">Copy translation</button></div>'+
+  '<label class="qck"><input type="checkbox" id="ltsay"'+(LT.say?' checked':'')+'> Read the translation out loud (use headphones so the microphone does not hear it)</label>'+dev+
+  '<div id="ltst" role="status" aria-live="polite"></div><div class="lt-log" id="ltlist" role="log" aria-live="polite"></div><p class="hint lt-via" id="ltvia"></p>';
+ return '<p class="hint lt-in">Share a screen, a window or a browser tab. The text on it is read and translated about every second or two, and the translation is painted over the picture below. Choose the language that is <b>on the screen</b> in the From box above.</p>'+
+  '<div class="dl-cta lt-cta"><button class="btn pri dl-big" id="ltsh" type="button"></button><button class="btn" id="ltcp2" type="button">Copy translation</button></div>'+
+  '<label class="qck"><input type="checkbox" id="ltover"'+(LT.over?' checked':'')+'> Show the translation over the picture</label>'+dev+
+  '<div id="ltst2" role="status" aria-live="polite">'+(mob?'<div class="msg warn"><span class="dotk"></span><span>Screen sharing is not available in phone browsers. Please open this page in Chrome, Edge or Firefox on a computer.</span></div>':'')+'</div>'+
+  '<div class="lt-vw" id="ltvw" style="display:none"><video id="ltv" muted playsinline></video><canvas id="ltov" aria-hidden="true"></canvas></div>'+
+  '<div class="lt-log lt-sl" id="ltsl" aria-live="off"></div><p class="hint lt-via" id="ltvia"></p>';}
+function ltBind(){var sp=LT.mode==='speak';
+ var dv=$$('ltdev');if(dv)dv.onchange=function(){LT.dev=this.checked;LT.itr='';LTD={};LTDR={};LTDM={};};
+ if(sp){$$('ltmic').onclick=ltMic;ltMicUI();ltListRender();
+  $$('ltclr').onclick=function(){LT.lines=[];LT.interim='';LT.itr='';ltListRender();ltSt('');};
+  $$('ltcp').onclick=function(){var t=LT.lines.filter(function(l){return l.t;}).map(function(l){return l.t;}).join('\n');if(!t){ltFlash('ltcp','Nothing yet');return;}ltCopyText(t).then(function(){ltFlash('ltcp','Copied');},function(){ltFlash('ltcp','Could not copy');});};
+  $$('ltsay').onchange=function(){LT.say=this.checked;if(!this.checked){try{speechSynthesis.cancel();}catch(e){}}};
+  if(!ltSR())ltSt('This browser cannot listen to the microphone. Please use Chrome, Edge or Safari.','warn');}
+ else{$$('ltsh').onclick=ltScrStart;ltScrUI();var S=LT.scr;
+  $$('ltover').onchange=function(){LT.over=this.checked;ltDraw(LT.scr);};
+  $$('ltcp2').onclick=function(){var s=LT.scr,t=s?(s.blocks||[]).map(function(b){return ltLookup(s,b.key);}).filter(Boolean).join('\n'):'';if(!t){ltFlash('ltcp2','Nothing yet');return;}ltCopyText(t).then(function(){ltFlash('ltcp2','Copied');},function(){ltFlash('ltcp2','Could not copy');});};
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia)&&!$$('ltst2').firstChild)ltSt2('Your browser cannot share the screen. Please use Chrome, Edge or Firefox on a computer.','warn');
+  if(ltPhone())$$('ltsh').disabled=true;ltSideList({blocks:[],tr:{},keys:[],lsig:''});}}
+function ltPhone(){return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');}
+function ltTabs(){document.querySelectorAll('#lttabs a').forEach(function(b){var on=b.dataset.m===LT.mode;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false');});}
+function ltSetMode(m){if(m===LT.mode)return;ltStop();LT.mode=m;$$('ltpane').innerHTML=ltPane();ltTabs();ltBind();}
+function translatePage(){nav('translate');
+ app.innerHTML='<div class="dl-hd"><div class="ic i12">'+ico('globe',26)+'</div><h1>Live Translate</h1></div>'+
+ '<p class="lead dl-lead">Speak and read your words in another language as you talk, or share your screen and see it translated right on the picture.</p>'+
+ '<section class="card dl-sec dl-f" id="ltsec"><div class="lt-bar"><label class="qfl" for="ltfrom">From<select class="sel" id="ltfrom">'+ltOpts(LT.from)+'</select></label>'+
+ '<button class="btn lt-sw" id="ltswap" type="button" aria-label="Swap the two languages">'+ico('swap',18,2.2)+'</button>'+
+ '<label class="qfl" for="ltto">To<select class="sel" id="ltto">'+ltOpts(LT.to)+'</select></label></div>'+
+ '<div class="seg lt-tabs" id="lttabs" role="tablist"><a href="javascript:void 0" role="tab" data-m="speak">'+ico('mic',16,2.2)+'Speak</a><a href="javascript:void 0" role="tab" data-m="screen">'+ico('screen',16,2.2)+'Screen</a></div>'+
+ '<div id="ltpane">'+ltPane()+'</div></section>'+
+ '<p class="dl-note">Translations are automatic, so check anything important. Your screen picture never leaves your device: the text on it is read on your device and only those words are translated. What you say is turned into text by your browser’s own speech service, and the words are then translated on your device or sent to be translated.</p>';
+ var chg=function(){LT.from=$$('ltfrom').value;LT.to=$$('ltto').value;LT.itr='';if(LT.mode==='speak'){ltMicRestart();ltSt('');if(LT.listening&&ltDevCan())ltDevGet(LT.from,LT.to);}};
+ $$('ltfrom').onchange=$$('ltto').onchange=chg;
+ $$('ltswap').onclick=function(){var f=LT.from;LT.from=LT.to;LT.to=f;$$('ltfrom').value=LT.from;$$('ltto').value=LT.to;[$$('ltfrom'),$$('ltto')].forEach(function(s){if(s._cs)s._cs.sync();});LT.itr='';if(LT.mode==='speak'){ltMicRestart();ltSt('');if(LT.listening&&ltDevCan())ltDevGet(LT.from,LT.to);}};
+ $$('lttabs').onclick=function(e){var b=e.target.closest?e.target.closest('a'):null;if(b&&b.dataset.m)ltSetMode(b.dataset.m);};
+ ltTabs();ltBind();}
 
 /* ---------- QR Code Generator ---------- */
 /* QR encoder: qrcode-generator by Kazuhiko Arase, MIT license (https://github.com/kazuhikoarase/qrcode-generator). Bundled so the tool works offline. */
@@ -3059,11 +3277,11 @@ function idePage(){nav('ide');
 window.addEventListener('hashchange',function(){if(curR()!=='eve')aiLeave();if(curR()!=='ide'&&IDE.w){ideWd(false);try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;IDE.busy=false;}});
 
 
-function route(){var r=curR();menu(false);app.onclick=null;tsStop();
+function route(){var r=curR();menu(false);app.onclick=null;tsStop();ltStop();
  var known=r===''||r==='home'||r==='404'||ROUTES.indexOf(r)>=0;if(!known)r=PM?'404':'';
  setTitle(r===''?'home':r);
- app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||!!LOCKED[r]||(['planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve'].indexOf(r)<0));
- if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='deal')dealPage();else if(r==='tts')ttsPage();else if(r==='qr')qrPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(FULL[r])FULL[r]();else home();
+ app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||!!LOCKED[r]||(['planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve','translate'].indexOf(r)<0));
+ if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='deal')dealPage();else if(r==='tts')ttsPage();else if(r==='translate')translatePage();else if(r==='qr')qrPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(FULL[r])FULL[r]();else home();
  fixLinks(app);window.scrollTo(0,0);}
 
 document.getElementById('yr').textContent=new Date().getFullYear();
