@@ -1060,7 +1060,7 @@ function privacyPage(){nav('privacy');
  '<li><b>Eve AI:</b> the messages you send Eve, and any notes you attach, are sent to an AI service so it can write a reply. They are not stored by this website. Your chat history and saved flashcards stay on your device. Please do not share passwords or private personal details.</li>'+
  '<li><b>Deal or No Deal:</b> what you type about the item you want, your budget, and any prices you add are sent to an AI service so it can write its suggestions, and to a web search service that looks for matching product pages. They are not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Text to Speech:</b> the Speak as you type section runs on your device and sends nothing. When you make an audio file, the paragraph you wrote is sent to a speech service so it can create the audio. It is not stored by this website. Please do not type personal details.</li>'+
- '<li><b>Live Translate:</b> in Speak, your browser’s own speech service turns what you say into text. In Screen, the picture of your screen never leaves your device; the words on it are read on your device. The words are then translated on your device when your browser can do that, or sent to a translation service so they can be translated. They are not stored by this website. Please do not share private personal details.</li>'+
+ '<li><b>Live Translate:</b> in Speak, your browser’s own speech service turns what you say into text. If that service cannot be used, short clips of your voice are sent to a speech service instead so they can be turned into text, and they are not stored by this website. In Screen, the picture of your screen never leaves your device; the words on it are read on your device. The words are then translated on your device when your browser can do that, or sent to a translation service so they can be translated. They are not stored by this website. Please do not share private personal details.</li>'+
  '<li><b>Links you open</b> take you to other websites with their own policies.</li>'+
  '<li><b>Contact form:</b> the form uses a security check to tell people from automated programs, and the check provider may look at technical details of your browser to do this. The name, email and message you type are sent to us by email so they reach us. We use them only to read and answer your message.</li>'+
  '<li><b>Donations:</b> if you donate, the amount and the mobile number you type (plus the name and email, if you give them) are sent to our payment partner to start the payment, and you pay on their page under their own privacy policy. Eve Sandbox does not store your payment details or your mobile number.</li></ul>'+
@@ -1811,7 +1811,7 @@ var LLANGS=[['en','English','en-US','eng'],['hi','Hindi','hi-IN','hin'],['bn','B
  ['ja','Japanese','ja-JP','jpn'],['ko','Korean','ko-KR','kor'],['zh','Chinese (Simplified)','zh-CN','chi_sim'],['id','Indonesian','id-ID','ind'],['ms','Malay','ms-MY','msa'],['vi','Vietnamese','vi-VN','vie'],['th','Thai','th-TH','tha'],['tl','Filipino','fil-PH','fil'],['sv','Swedish','sv-SE','swe'],['el','Greek','el-GR','ell'],['cs','Czech','cs-CZ','ces'],['ro','Romanian','ro-RO','ron'],['hu','Hungarian','hu-HU','hun'],['da','Danish','da-DK','dan'],['fi','Finnish','fi-FI','fin'],['no','Norwegian','nb-NO','nor'],['sw','Swahili','sw-KE','swa']]
  .sort(function(a,b){return a[1]<b[1]?-1:a[1]>b[1]?1:0;});
 var LRTL={ar:1,he:1,fa:1,ur:1};
-var LT={mode:'speak',from:'en',to:'hi',dev:true,say:false,over:true,rec:null,listening:false,hold:0,lines:[],id:0,interim:'',itr:'',itBusy:false,itNext:null,via:'',scr:null,sr:0};
+var LT={mode:'speak',from:'en',to:'hi',dev:true,say:false,over:true,rec:null,listening:false,hold:0,lines:[],id:0,interim:'',itr:'',itBusy:false,itNext:null,via:'',scr:null,sr:0,eng:'browser',netTry:0,w:null,wq:Promise.resolve(),proc:0};
 URLS.tesseract=['https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js'];
 ALT.tesseract='https://unpkg.com/tesseract.js@5.1.1/dist/tesseract.min.js';
 var LTERR={setup:'Live Translate is not switched on yet. Please check back soon.',slow:'That was a lot of translating in a short time. Please wait a few minutes and try again.',limit:'Eve has used up her free translating for today. Please try again tomorrow.',busy:'The translator is busy right now. Please try again in a moment.',big:'That was too long to translate in one go.',net:'Could not connect. Please check your internet and try again.',timeout:'That is taking too long. Please try again.',lang:'That pair of languages is not available.',devonly:'This language can only be translated by Chrome on a computer for now. Please choose another language.',devwait:'The translator for this language is still getting ready on this device. Please try again in a moment.',down:'The translator could not answer right now. Please try again in a moment.'};
@@ -1839,13 +1839,13 @@ async function ltTr(texts,from,to){if(from===to)return texts.slice();var out=new
  texts.forEach(function(t,i){var k=from+'|'+to+'|'+t;if(LTC[k])out[i]=LTC[k];else{need.push(t);idx.push(i);}});
  if(need.length){var res=null,k=from+'>'+to,pr=ltDevGet(from,to),dev=LTDR[k]||null;
   if(!dev&&LT.dev&&ltDevCan()&&!LTDM[k]){dev=await Promise.race([pr,ltWait(1500).then(function(){return null;})]);}
-  if(dev){try{res=[];for(var i=0;i<need.length;i++)res.push(await dev.translate(need[i]));LT.via='device';}catch(e){res=null;delete LTDR[k];LTD[k]=Promise.resolve(null);LTDM[k]='unavailable';}}
+  if(dev){try{res=[];var fails=0;for(var i=0;i<need.length;i++){var x='';try{x=await dev.translate(need[i]);}catch(e){fails++;}res.push(x||'');}if(fails===need.length)throw 0;LT.via='device';}catch(e){res=null;delete LTDR[k];LTD[k]=Promise.resolve(null);LTDM[k]='unavailable';}}
   if(!res){if(ltL(from)[4]==='dev'||ltL(to)[4]==='dev')throw ltE(LTDM[k]==='downloadable'||LTDM[k]==='downloading'||!LTDM[k]&&LT.dev&&ltDevCan()?'devwait':'devonly');res=await ltWeb(need,from,to);LT.via='online';}
   if(LTCN>1500){LTC={};LTCN=0;}
   res.forEach(function(t,j){t=t||'';out[idx[j]]=t;if(t){LTC[from+'|'+to+'|'+need[j]]=t;LTCN++;}});}
  return out;}
 function ltSt(t,k){var e=$$('ltst');if(e)e.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span></div>':'';}
-function ltViaNote(){return LT.via==='device'?'Translated on this device. Nothing is sent anywhere.':LT.via==='online'?'Only the words are sent for translation.':'';}
+function ltViaNote(){var a=(LT.eng==='eve'&&LT.mode==='speak'&&LT.listening)?'Your voice is sent to be turned into text. ':'';return a+(LT.via==='device'?'Translated on this device. Nothing is sent anywhere.':LT.via==='online'?'Only the words are sent for translation.':'');}
 function ltCopyText(t){try{if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);}catch(e){}
  return new Promise(function(res,rej){try{var a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();var ok=document.execCommand('copy');document.body.removeChild(a);ok?res():rej();}catch(e){rej(e);}});}
 function ltFlash(id,t){var b=$$(id);if(!b)return;var o=b.getAttribute('data-l')||b.textContent;b.setAttribute('data-l',o);b.textContent=t;setTimeout(function(){var x=$$(id);if(x)x.textContent=o;},1400);}
@@ -1856,6 +1856,8 @@ function ltListRender(){var el=$$('ltlist');if(!el)return;
  var near=el.scrollHeight-el.scrollTop-el.clientHeight<60,rtl=LRTL[LT.to]?' dir="rtl"':'',h='';
  LT.lines.forEach(function(l){h+='<div class="lt-l"><div class="lt-o">'+esc(l.o)+'</div><div class="lt-t"'+rtl+'>'+(l.t?esc(l.t):l.err?'<span class="lt-x">Could not translate this part.</span>':'<span class="lt-w">Translating…</span>')+'</div></div>';});
  if(LT.interim)h+='<div class="lt-l int"><div class="lt-o">'+esc(LT.interim)+'</div>'+(LT.itr?'<div class="lt-t"'+rtl+'>'+esc(LT.itr)+'</div>':'')+'</div>';
+
+ if(LT.proc>0&&!LT.interim)h+='<div class="lt-l int"><div class="lt-o">Working on what you said…</div></div>';
  if(!h)h='<div class="lt-em">'+(LT.listening?'Listening… start speaking.':'Press Start listening and speak. What you say appears here with its translation under it.')+'</div>';
  el.innerHTML=h;if(near)el.scrollTop=el.scrollHeight;}
 function ltAdd(t){t=String(t||'').replace(/\s+/g,' ').trim();if(!t)return;var L={o:t,t:'',err:'',id:++LT.id};LT.lines.push(L);if(LT.lines.length>200)LT.lines.shift();LT.interim='';LT.itr='';ltListRender();
@@ -1869,24 +1871,65 @@ function ltSay(t){if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtter
  var u=new SpeechSynthesisUtterance(t),c=ltL(LT.to)[2];u.lang=c;
  try{var vs=speechSynthesis.getVoices(),v=vs.filter(function(x){return x.lang===c||String(x.lang).replace('_','-')===c;})[0]||vs.filter(function(x){return String(x.lang).slice(0,2)===c.slice(0,2);})[0];if(v)u.voice=v;}catch(e){}
  LT.hold++;try{if(LT.rec)LT.rec.abort();}catch(e){}
- var done=function(){LT.hold=Math.max(0,LT.hold-1);if(!LT.hold&&LT.listening&&!LT.rec)setTimeout(function(){if(LT.listening&&!LT.hold&&!LT.rec)ltRecStart();},250);};
+ var done=function(){LT.hold=Math.max(0,LT.hold-1);if(!LT.hold&&LT.listening&&!LT.rec&&LT.eng!=='eve')setTimeout(function(){if(LT.listening&&!LT.hold&&!LT.rec&&LT.eng!=='eve')ltRecStart();},250);};
  u.onend=done;u.onerror=done;try{speechSynthesis.speak(u);}catch(e){done();}}
-function ltRecStart(){var SR=ltSR();if(!SR||!LT.listening||LT.hold)return;var r=new SR();LT.rec=r;
+function ltRecStart(){var SR=ltSR();if(!SR||!LT.listening||LT.hold||LT.eng==='eve')return;var r=new SR();LT.rec=r;
  r.lang=ltL(LT.from)[2];r.continuous=true;r.interimResults=true;r.maxAlternatives=1;
  r.onresult=function(e){if(LT.rec!==r)return;var im='';for(var i=e.resultIndex;i<e.results.length;i++){var res=e.results[i],t=res[0]&&res[0].transcript||'';if(res.isFinal)ltAdd(t);else im+=t;}
   if(im!==LT.interim){LT.interim=im;if(!im)LT.itr='';ltListRender();ltIntTr(im);}};
  r.onerror=function(e){if(LT.rec!==r)return;var c=e&&e.error;
   if(c==='no-speech'||c==='aborted')return;
+  if(c==='network'&&LT.netTry<2){LT.netTry++;LT.rec=null;ltSt('Reconnecting to the speech service…','');setTimeout(function(){if(LT.listening&&!LT.rec&&LT.eng==='browser')ltRecStart();},700*LT.netTry);return;}
+  if((c==='network'||c==='service-not-allowed'||c==='language-not-supported')&&ltCanRec()&&String(CFG.aiApi||'')){LT.rec=null;ltToEve();return;}
   var m=c==='not-allowed'||c==='service-not-allowed'?'The microphone is blocked. Allow the microphone for this website in your browser, then press Start listening again.':c==='audio-capture'?'No microphone was found on this device.':c==='language-not-supported'?'This browser cannot listen in '+ltL(LT.from)[1]+'. Please choose another language.':c==='network'?'The browser’s speech service could not be reached. Check your internet and try again.':'Listening stopped. Please try again.';
   LT.listening=false;LT.rec=null;ltMicUI();ltListRender();ltSt(m,'bad');};
  r.onend=function(){if(LT.rec!==r)return;LT.rec=null;if(LT.listening&&!LT.hold)setTimeout(function(){if(LT.listening&&!LT.rec&&!LT.hold)ltRecStart();},250);};
  try{r.start();}catch(x){LT.rec=null;}}
 function ltMic(){if(LT.listening){ltMicStop();return;}
- if(!ltSR()){ltSt('This browser cannot listen to the microphone. Please use Chrome, Edge or Safari.','warn');return;}
- ltSt('');ltDevReset();LT.listening=true;LT.interim='';LT.itr='';ltMicUI();ltListRender();ltRecStart();
+ var own=!ltSR()||LT.eng==='eve';
+ if(own&&!(ltCanRec()&&String(CFG.aiApi||''))){ltSt('This browser cannot listen to the microphone. Please use Chrome, Edge or Safari.','warn');return;}
+ ltSt('');ltDevReset();LT.listening=true;LT.interim='';LT.itr='';LT.netTry=0;LT.eng=own?'eve':'browser';ltMicUI();ltListRender();if(own)ltWStart();else ltRecStart();
+ var vn=$$('ltvia');if(vn)vn.textContent=ltViaNote();
  ltDevGet(LT.from,LT.to,function(p){if(LT.listening)ltSt('Getting the translator ready on this device… '+p+'%','');}).then(function(){var e=$$('ltst');if(e&&/Getting the translator/.test(e.textContent))ltSt('');});}
-function ltMicStop(){LT.listening=false;var r=LT.rec;LT.rec=null;try{if(r)r.abort();}catch(e){}try{if('speechSynthesis' in window)speechSynthesis.cancel();}catch(e){}LT.hold=0;LT.interim='';LT.itr='';ltMicUI();ltListRender();}
-function ltMicRestart(){if(!LT.listening)return;var r=LT.rec;LT.rec=null;try{if(r)r.abort();}catch(e){}LT.interim='';LT.itr='';ltListRender();setTimeout(function(){if(LT.listening&&!LT.rec&&!LT.hold)ltRecStart();},300);}
+function ltMicStop(){LT.listening=false;var r=LT.rec;LT.rec=null;try{if(r)r.abort();}catch(e){}ltWStop();LT.proc=0;try{if('speechSynthesis' in window)speechSynthesis.cancel();}catch(e){}LT.hold=0;LT.interim='';LT.itr='';ltMicUI();ltListRender();}
+function ltMicRestart(){if(!LT.listening)return;if(LT.eng==='eve'){if(LT.w){LT.w.seg=null;LT.w.pre=[];}LT.interim='';ltListRender();return;}var r=LT.rec;LT.rec=null;try{if(r)r.abort();}catch(e){}LT.interim='';LT.itr='';ltListRender();setTimeout(function(){if(LT.listening&&!LT.rec&&!LT.hold)ltRecStart();},300);}
+/* ---- Eve's own listening: used when the browser's speech service cannot be reached, or the browser has none.
+   The microphone is cut into spoken sentences on this device; each sentence goes to Eve as a short sound clip and comes back as text. ---- */
+function ltCanRec(){return !!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&(window.AudioContext||window.webkitAudioContext));}
+function ltToEve(){LT.eng='eve';ltSt('Your browser’s speech service could not be reached, so Eve is listening another way. Your voice is sent to be turned into text.','');var n=$$('ltvia');if(n)n.textContent=ltViaNote();ltWStart();}
+function ltWav(chunks,sr){var n=0,o=0,i,j;chunks.forEach(function(c){n+=c.length;});var all=new Float32Array(n);chunks.forEach(function(c){all.set(c,o);o+=c.length;});
+ var ratio=sr/16000,m=Math.floor(n/ratio),buf=new ArrayBuffer(44+m*2),dv=new DataView(buf);
+ function str(p,t){for(var k=0;k<t.length;k++)dv.setUint8(p+k,t.charCodeAt(k));}
+ str(0,'RIFF');dv.setUint32(4,36+m*2,true);str(8,'WAVE');str(12,'fmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,16000,true);dv.setUint32(28,32000,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);str(36,'data');dv.setUint32(40,m*2,true);
+ for(i=0;i<m;i++){var a=Math.floor(i*ratio),b=Math.min(n,Math.floor((i+1)*ratio)),t=0;for(j=a;j<b;j++)t+=all[j];var v=b>a?t/(b-a):0;v=v>1?1:v<-1?-1:v;dv.setInt16(44+i*2,v<0?v*32768:v*32767,true);}
+ return new Blob([buf],{type:'audio/wav'});}
+function ltSend(blob,lang){var base=String(CFG.aiApi||'').replace(/\/+$/,'');if(!base)return Promise.reject(ltE('setup'));
+ var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},40000);
+ return fetch(base+'/listen?lang='+encodeURIComponent(lang),{method:'POST',headers:{'Content-Type':'audio/wav'},body:blob,signal:ctl.signal}).then(function(r){
+  return r.json().catch(function(){return {};}).then(function(j){clearTimeout(tm);if(r.ok&&j&&j.ok)return String(j.text||'');throw ltE((j&&j.error)||'down');});
+ },function(e){clearTimeout(tm);throw ltE(e&&e.name==='AbortError'?'timeout':'net');});}
+function ltWEnd(W){var chunks=W.seg,vt=W.vt;W.seg=null;W.pre=[];LT.interim='';
+ if(!chunks||vt<0.25){ltListRender();return;}
+ LT.proc++;ltListRender();var blob=ltWav(chunks,W.sr),lang=LT.from;
+ LT.wq=LT.wq.then(function(){if(!LT.listening||LT.eng!=='eve'){LT.proc=Math.max(0,LT.proc-1);return;}
+  return ltSend(blob,lang).then(function(t){LT.proc=Math.max(0,LT.proc-1);if(lang===LT.from&&t)ltAdd(t);else ltListRender();},
+   function(e){LT.proc=Math.max(0,LT.proc-1);ltListRender();ltSt(ltErr(e.code),'bad');if(e.code==='limit')ltMicStop();});});}
+async function ltWStart(){var AC=window.AudioContext||window.webkitAudioContext,stream;
+ try{stream=await navigator.mediaDevices.getUserMedia({audio:{channelCount:1,echoCancellation:true,noiseSuppression:true}});}
+ catch(e){if(!LT.listening)return;var n=e&&e.name;LT.listening=false;ltMicUI();ltListRender();
+  ltSt(n==='NotAllowedError'||n==='SecurityError'?'The microphone is blocked. Allow the microphone for this website in your browser, then press Start listening again.':n==='NotFoundError'?'No microphone was found on this device.':'Listening stopped. Please try again.','bad');return;}
+ if(!LT.listening||LT.eng!=='eve'){stream.getTracks().forEach(function(t){t.stop();});return;}
+ var ctx=new AC(),src=ctx.createMediaStreamSource(stream),proc=ctx.createScriptProcessor(4096,1,1),mute=ctx.createGain();mute.gain.value=0;
+ var W=LT.w={stream:stream,ctx:ctx,src:src,proc:proc,mute:mute,pre:[],seg:null,vt:0,last:0,start:0,t:0,sr:ctx.sampleRate,floor:0.004};
+ proc.onaudioprocess=function(e){if(LT.w!==W||!LT.listening)return;var f=new Float32Array(e.inputBuffer.getChannelData(0));
+  if(LT.hold){W.pre=[];if(W.seg){W.seg=null;LT.interim='';ltListRender();}return;}
+  var s=0,i;for(i=0;i<f.length;i++)s+=f[i]*f[i];var rms=Math.sqrt(s/f.length),dt=f.length/W.sr;W.t+=dt;
+  var loud=rms>Math.max(0.012,W.floor*3.5);if(!loud)W.floor=W.floor*0.97+rms*0.03;
+  if(!W.seg){W.pre.push(f);while(W.pre.length*f.length/W.sr>0.45)W.pre.shift();
+   if(loud){W.seg=W.pre;W.pre=[];W.vt=dt;W.last=W.t;W.start=W.t;LT.interim='…';ltListRender();}}
+  else{W.seg.push(f);if(loud){W.last=W.t;W.vt+=dt;}if(W.t-W.last>0.9||W.t-W.start>18)ltWEnd(W);}};
+ src.connect(proc);proc.connect(mute);mute.connect(ctx.destination);try{if(ctx.state==='suspended')ctx.resume();}catch(e){}}
+function ltWStop(){var W=LT.w;LT.w=null;if(!W)return;try{W.proc.onaudioprocess=null;W.src.disconnect();W.proc.disconnect();}catch(e){}try{W.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}try{W.ctx.close();}catch(e){}}
 /* ---- reading the screen ---- */
 function ltWait(ms){return new Promise(function(r){setTimeout(r,ms);});}
 function ltSt2(t,k){var e=$$('ltst2');if(e)e.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span></div>':'';}
@@ -1896,7 +1939,22 @@ function ltDice(a,b){if(a===b)return 1;if(a.length<5||b.length<5)return 0;var m=
 function ltLookup(S,key){if(S.tr[key])return S.tr[key];var best=0,hit='';for(var i=S.keys.length-1;i>=0&&i>S.keys.length-80;i--){var k=S.keys[i];if(Math.abs(k.length-key.length)>key.length*0.2)continue;var d=ltDice(k,key);if(d>best){best=d;hit=k;}}
  return best>=0.88?S.tr[hit]:'';}
 /* the text reader gives lines; lines that sit right under each other and line up belong to one block of text */
-function ltBlocks(d,img,w,h){var ls=(d.lines||[]).filter(function(l){return l.confidence>=45&&/\p{L}/u.test(l.text)&&(l.bbox.x1-l.bbox.x0)>8&&(l.bbox.y1-l.bbox.y0)>5;}).map(function(l){return {t:l.text.replace(/\s+/g,' ').trim(),x0:l.bbox.x0,y0:l.bbox.y0,x1:l.bbox.x1,y1:l.bbox.y1};}).filter(function(l){return l.t.length>=2;});
+/* a reading of the picture gives lines; only believable ones are kept (guesses from photos, icons and tiny marks are dropped) */
+function ltLineOk(l){var t=String(l.text||'').replace(/\s+/g,' ').trim();if(!t)return null;var bw=l.bbox.x1-l.bbox.x0,bh=l.bbox.y1-l.bbox.y0,n=(t.match(/\p{L}/gu)||[]).length;
+ if(l.confidence<60||n<3||bh<9||bh>160||bw<14||n/t.length<0.55)return null;var per=bw/t.length/bh;if(per<0.18||per>1.6)return null;
+ return {t:t,x0:l.bbox.x0,y0:l.bbox.y0,x1:l.bbox.x1,y1:l.bbox.y1,s:l.confidence*n};}
+/* the same spot can be read more than once (normal and bright-text readings): keep the best reading for each spot */
+function ltPick(c){c.sort(function(a,b){return b.s-a.s;});var keep=[];
+ c.forEach(function(l){var ar=(l.x1-l.x0)*(l.y1-l.y0),bad=false;
+  for(var i=0;i<keep.length;i++){var k=keep[i],ix=Math.min(l.x1,k.x1)-Math.max(l.x0,k.x0),iy=Math.min(l.y1,k.y1)-Math.max(l.y0,k.y0);if(ix>0&&iy>0&&ix*iy>0.35*ar){bad=true;break;}}
+  if(!bad)keep.push(l);});return keep;}
+/* only the bright, colourless pixels (white subtitles and captions) turned into black text on white, which is far easier to read on top of a photo */
+function ltMask(img,w,h,mc){var N=w*h,n=0,i,p,r,g,b,mx,mn;for(i=0,p=0;p<N;i+=4,p++){r=img[i];g=img[i+1];b=img[i+2];mx=r>g?(r>b?r:b):(g>b?g:b);mn=r<g?(r<b?r:b):(g<b?g:b);if(0.299*r+0.587*g+0.114*b>225&&mx-mn<60)n++;}
+ if(n<N*0.002||n>N*0.3)return null;mc.width=w;mc.height=h;var x=mc.getContext('2d'),o=x.createImageData(w,h),d=o.data;
+ for(i=0,p=0;p<N;i+=4,p++){r=img[i];g=img[i+1];b=img[i+2];mx=r>g?(r>b?r:b):(g>b?g:b);mn=r<g?(r<b?r:b):(g<b?g:b);var v=(0.299*r+0.587*g+0.114*b>225&&mx-mn<60)?0:255;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}
+ x.putImageData(o,0,0);return mc;}
+/* lines that sit right under each other and line up belong to one block of text */
+function ltBlocks(ls,img,w,h){ls=ls.slice();
  ls.sort(function(a,b){return a.y0-b.y0||a.x0-b.x0;});var bl=[];
  ls.forEach(function(l){var lh=l.y1-l.y0,best=null;
   for(var i=bl.length-1;i>=0&&i>=bl.length-14;i--){var b=bl[i],gap=l.y0-b.y1,dx=Math.abs(l.x0-b.x0),hs=Math.min(lh,b.lh)/Math.max(lh,b.lh),ov=Math.min(l.x1,b.x1)-Math.max(l.x0,b.x0);
@@ -1923,12 +1981,12 @@ function ltDraw(S){var c=$$('ltov');if(!c||!S||!S.w)return;if(c.width!==S.w||c.h
   var f=ltFit(x,t,bw-padX,bh-padY,rtl);x.fillStyle=b.dark?'#fff':'#111';x.textBaseline='top';x.direction=rtl?'rtl':'ltr';x.textAlign=rtl?'right':'left';x.font=f.sz+'px Inter,system-ui,-apple-system,"Segoe UI",sans-serif';
   var ty=by+Math.max(0,(bh-f.ls.length*f.sz*1.2)/2),tx=rtl?bx+bw-padX/2:bx+padX/2;f.ls.forEach(function(l,i){x.fillText(l,tx,ty+i*f.sz*1.2);});});}
 function ltSideList(S){var el=$$('ltsl');if(!el)return;var rtl=LRTL[LT.to]?' dir="rtl"':'',h='';
- (S.blocks||[]).forEach(function(b){var t=ltLookup(S,b.key);if(t)h+='<div class="lt-l"><div class="lt-o">'+esc(b.t)+'</div><div class="lt-t"'+rtl+'>'+esc(t)+'</div></div>';});
+ var sn={};(S.blocks||[]).forEach(function(b){if(sn[b.key])return;sn[b.key]=1;var t=ltLookup(S,b.key);if(t)h+='<div class="lt-l"><div class="lt-o">'+esc(b.t)+'</div><div class="lt-t"'+rtl+'>'+esc(t)+'</div></div>';});
  var sig=h.length+':'+h.slice(0,200);if(S.lsig===sig)return;S.lsig=sig;el.innerHTML=h||'<div class="lt-em">Text found on your screen will appear here with its translation.</div>';}
 function ltTrNeed(S){if(S.busy||Date.now()<S.errUntil)return;var from=LT.from,to=LT.to,need=[],seen={};
- (S.blocks||[]).forEach(function(b){if(!seen[b.key]&&!ltLookup(S,b.key)&&!S.pend[b.key]){seen[b.key]=1;need.push(b);}});if(!need.length)return;need=need.slice(0,16);
+ (S.blocks||[]).forEach(function(b){if(!seen[b.key]&&!S.bad[b.key]&&!ltLookup(S,b.key)&&!S.pend[b.key]){seen[b.key]=1;need.push(b);}});if(!need.length)return;need=need.slice(0,16);
  need.forEach(function(b){S.pend[b.key]=1;});S.busy=true;ltSt2('Translating…','');
- ltTr(need.map(function(b){return b.t.slice(0,690);}),from,to).then(function(o){if(S.pair!==from+'>'+to)return;need.forEach(function(b,i){delete S.pend[b.key];if(o[i]){S.tr[b.key]=o[i];S.keys.push(b.key);}});if(S.keys.length>400){S.keys.splice(0,200).forEach(function(k){delete S.tr[k];});}
+ ltTr(need.map(function(b){return b.t.slice(0,690);}),from,to).then(function(o){if(S.pair!==from+'>'+to)return;need.forEach(function(b,i){delete S.pend[b.key];if(o[i]){S.tr[b.key]=o[i];S.keys.push(b.key);}else S.bad[b.key]=1;});if(S.keys.length>400){S.keys.splice(0,200).forEach(function(k){delete S.tr[k];});}
    ltDraw(S);ltSideList(S);ltSt2('');var n=$$('ltvia');if(n)n.textContent=ltViaNote();},
   function(e){need.forEach(function(b){delete S.pend[b.key];});S.errUntil=Date.now()+12000;ltSt2(ltErr(e.code),'bad');}).then(function(){S.busy=false;});}
 async function ltOcrLoad(S,code){S.ready=false;if(S.worker){try{await S.worker.terminate();}catch(e){}S.worker=null;}
@@ -1936,22 +1994,25 @@ async function ltOcrLoad(S,code){S.ready=false;if(S.worker){try{await S.worker.t
  await need('tesseract');
  var w=await Tesseract.createWorker(code,1,{langPath:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/'+code+'/4.0.0_best_int',logger:function(m){if(LT.scr===S&&m&&/traineddata/.test(m.status||'')&&m.progress>0&&m.progress<1)ltSt2('Downloading the '+ltL(LT.from)[1]+' reading data… '+Math.round(m.progress*100)+'%','');}});
  if(LT.scr!==S){try{await w.terminate();}catch(e){}return;}
+ try{await w.setParameters({tessedit_pageseg_mode:'11'});}catch(e){}
  S.worker=w;S.code=code;S.ready=true;ltSt2('');}
 function ltSig(cx,w,h){var s=document.createElement('canvas');s.width=48;s.height=27;var x=s.getContext('2d',{willReadFrequently:true});x.drawImage(cx.canvas,0,0,48,27);var d=x.getImageData(0,0,48,27).data,o=new Array(48*27);for(var i=0;i<o.length;i++)o[i]=(d[i*4]*0.3+d[i*4+1]*0.59+d[i*4+2]*0.11);return o;}
 function ltSigDiff(a,b){if(!a||!b)return 99;var t=0;for(var i=0;i<a.length;i++)t+=Math.abs(a[i]-b[i]);return t/a.length;}
-async function ltScrLoop(S){var cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true}),idle=0;
+async function ltScrLoop(S){var cv=document.createElement('canvas'),mc=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true}),idle=0;
  while(LT.scr===S){
   try{
    var v=$$('ltv');if(!v||v.videoWidth<2||v.readyState<2){await ltWait(250);continue;}
    var code=ltL(LT.from)[3],pair=LT.from+'>'+LT.to;
-   if(S.code!==code){S.blocks=[];S.sig=null;S.tr={};S.keys=[];S.pend={};S.lsig='';ltDraw(S);ltSideList(S);await ltOcrLoad(S,code);if(LT.scr!==S)return;}
-   if(S.pair!==pair){S.pair=pair;S.tr={};S.keys=[];S.pend={};S.lsig='';S.sig=null;ltDraw(S);ltSideList(S);if(ltDevCan())ltDevGet(LT.from,LT.to);}
-   var sc=Math.min(1,1600/v.videoWidth),w=Math.round(v.videoWidth*sc),h=Math.round(v.videoHeight*sc);cv.width=w;cv.height=h;cx.drawImage(v,0,0,w,h);
+   if(S.code!==code){S.blocks=[];S.sig=null;S.tr={};S.keys=[];S.pend={};S.bad={};S.lsig='';ltDraw(S);ltSideList(S);await ltOcrLoad(S,code);if(LT.scr!==S)return;}
+   if(S.pair!==pair){S.pair=pair;S.tr={};S.keys=[];S.pend={};S.bad={};S.lsig='';S.sig=null;ltDraw(S);ltSideList(S);if(ltDevCan())ltDevGet(LT.from,LT.to);}
+   var sc=Math.min(1,1920/v.videoWidth),w=Math.round(v.videoWidth*sc),h=Math.round(v.videoHeight*sc);cv.width=w;cv.height=h;cx.drawImage(v,0,0,w,h);
    var sig=ltSig(cx,w,h),ch=ltSigDiff(S.sig,sig)>2;
    if(ch||(!S.blocks.length&&idle>6)){S.sig=sig;idle=0;
     var img=cx.getImageData(0,0,w,h).data;ltSt2(S.blocks.length?'':'Reading your screen…','');
     var res=await S.worker.recognize(cv,{},{blocks:true});if(LT.scr!==S)return;
-    S.w=w;S.h=h;S.blocks=ltBlocks(res.data,img,w,h);
+    var cand=(res.data.lines||[]).map(ltLineOk).filter(Boolean),mk=ltMask(img,w,h,mc);
+    if(mk){ltSt2(S.blocks.length?'':'Reading your screen…','');var r2=await S.worker.recognize(mk,{},{blocks:true});if(LT.scr!==S)return;cand=cand.concat((r2.data.lines||[]).map(ltLineOk).filter(Boolean));}
+    S.w=w;S.h=h;S.blocks=ltBlocks(ltPick(cand),img,w,h);
     ltDraw(S);ltSideList(S);
     if(!S.blocks.length)ltSt2('No readable text found on this screen yet. Try a window with clearer text, and make sure the “From” language matches it.','warn');else ltSt2('');
     ltTrNeed(S);
@@ -1965,14 +2026,15 @@ async function ltScrStart(){if(LT.scr){ltScrStop('');return;}
  ltSt2('');ltDevReset();ltDevGet(LT.from,LT.to,function(p){if(LT.scr)ltSt2('Getting the translator ready on this device… '+p+'%','');}).then(function(){var e=$$('ltst2');if(e&&/Getting the translator/.test(e.textContent))ltSt2('');});
  var stream;try{stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:5,max:10}},audio:false,selfBrowserSurface:'exclude'});}
  catch(e){ltSt2(e&&e.name==='NotAllowedError'?'Screen sharing was cancelled. Press Share a screen or window and choose what to share.':'Screen sharing could not start in this browser.','warn');return;}
- var S=LT.scr={stream:stream,worker:null,code:'',pair:'',sig:null,blocks:[],tr:{},keys:[],pend:{},busy:false,errUntil:0,w:0,h:0,lsig:'',ready:false};
+ var S=LT.scr={stream:stream,worker:null,code:'',pair:'',sig:null,blocks:[],tr:{},keys:[],pend:{},bad:{},busy:false,errUntil:0,w:0,h:0,lsig:'',ready:false};
  var vt=stream.getVideoTracks()[0];vt.addEventListener('ended',function(){if(LT.scr===S)ltScrStop('Screen sharing ended.');});
  ltScrUI();var v=$$('ltv');v.srcObject=stream;try{await v.play();}catch(e){}
  if(LT.scr!==S)return;if(vt.readyState==='ended'){ltScrStop('Screen sharing ended.');return;}
+ var ds='';try{ds=(vt.getSettings()||{}).displaySurface||'';}catch(e){}var nt=$$('ltnote');if(nt)nt.textContent=(ds==='monitor'||ds==='window')?'You are sharing a whole screen or window. If this page is on it, Eve will end up reading herself. For the best result share the browser tab that has the text or video, or keep this page out of view.':'';
  try{await ltOcrLoad(S,ltL(LT.from)[3]);}catch(e){if(LT.scr===S){ltScrStop('');ltSt2('The text reader could not be loaded. Please check your internet connection and try again.','bad');}return;}
  if(LT.scr===S)ltScrLoop(S);}
 function ltScrStop(msg){var S=LT.scr;LT.scr=null;if(S){try{S.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}try{if(S.worker)S.worker.terminate();}catch(e){}}
- var v=$$('ltv');if(v){try{v.srcObject=null;}catch(e){}}var c=$$('ltov');if(c){try{c.getContext('2d').clearRect(0,0,c.width,c.height);}catch(e){}}ltScrUI();if(msg!==undefined)ltSt2(msg,'');}
+ var nt=$$('ltnote');if(nt)nt.textContent='';var v=$$('ltv');if(v){try{v.srcObject=null;}catch(e){}}var c=$$('ltov');if(c){try{c.getContext('2d').clearRect(0,0,c.width,c.height);}catch(e){}}ltScrUI();if(msg!==undefined)ltSt2(msg,'');}
 function ltStop(){if(LT.listening||LT.rec)ltMicStop();if(LT.scr)ltScrStop();try{if('speechSynthesis' in window)speechSynthesis.cancel();}catch(e){}}
 /* ---- the page ---- */
 function ltPane(){var sp=LT.mode==='speak',mob=ltPhone();
@@ -1980,11 +2042,11 @@ function ltPane(){var sp=LT.mode==='speak',mob=ltPhone();
  if(sp)return '<div class="dl-cta lt-cta"><button class="btn pri dl-big" id="ltmic" type="button" aria-pressed="false"></button><button class="btn" id="ltclr" type="button">Clear</button><button class="btn" id="ltcp" type="button">Copy translation</button></div>'+
   '<label class="qck"><input type="checkbox" id="ltsay"'+(LT.say?' checked':'')+'> Read the translation out loud (use headphones so the microphone does not hear it)</label>'+dev+
   '<div id="ltst" role="status" aria-live="polite"></div><div class="lt-log" id="ltlist" role="log" aria-live="polite"></div><p class="hint lt-via" id="ltvia"></p>';
- return '<p class="hint lt-in">Share a screen, a window or a browser tab. The text on it is read and translated about every second or two, and the translation is painted over the picture below. Choose the language that is <b>on the screen</b> in the From box above.</p>'+
+ return '<p class="hint lt-in">Share a screen, a window or a browser tab. The text on it is read and translated every few seconds, and the translation is painted over the picture below. Choose the language that is <b>on the screen</b> in the From box above, and share a tab or window that is not this page.</p>'+
   '<div class="dl-cta lt-cta"><button class="btn pri dl-big" id="ltsh" type="button"></button><button class="btn" id="ltcp2" type="button">Copy translation</button></div>'+
   '<label class="qck"><input type="checkbox" id="ltover"'+(LT.over?' checked':'')+'> Show the translation over the picture</label>'+dev+
   '<div id="ltst2" role="status" aria-live="polite">'+(mob?'<div class="msg warn"><span class="dotk"></span><span>Screen sharing is not available in phone browsers. Please open this page in Chrome, Edge or Firefox on a computer.</span></div>':'')+'</div>'+
-  '<div class="lt-vw" id="ltvw" style="display:none"><video id="ltv" muted playsinline></video><canvas id="ltov" aria-hidden="true"></canvas></div>'+
+  '<p class="hint lt-note" id="ltnote"></p><div class="lt-vw" id="ltvw" style="display:none"><video id="ltv" muted playsinline></video><canvas id="ltov" aria-hidden="true"></canvas></div>'+
   '<div class="lt-log lt-sl" id="ltsl" aria-live="off"></div><p class="hint lt-via" id="ltvia"></p>';}
 function ltBind(){var sp=LT.mode==='speak';
  var dv=$$('ltdev');if(dv)dv.onchange=function(){LT.dev=this.checked;LT.itr='';LTD={};LTDR={};LTDM={};};
@@ -1992,7 +2054,7 @@ function ltBind(){var sp=LT.mode==='speak';
   $$('ltclr').onclick=function(){LT.lines=[];LT.interim='';LT.itr='';ltListRender();ltSt('');};
   $$('ltcp').onclick=function(){var t=LT.lines.filter(function(l){return l.t;}).map(function(l){return l.t;}).join('\n');if(!t){ltFlash('ltcp','Nothing yet');return;}ltCopyText(t).then(function(){ltFlash('ltcp','Copied');},function(){ltFlash('ltcp','Could not copy');});};
   $$('ltsay').onchange=function(){LT.say=this.checked;if(!this.checked){try{speechSynthesis.cancel();}catch(e){}}};
-  if(!ltSR())ltSt('This browser cannot listen to the microphone. Please use Chrome, Edge or Safari.','warn');}
+  if(!ltSR()&&!(ltCanRec()&&String(CFG.aiApi||'')))ltSt('This browser cannot listen to the microphone. Please use Chrome, Edge or Safari.','warn');}
  else{$$('ltsh').onclick=ltScrStart;ltScrUI();var S=LT.scr;
   $$('ltover').onchange=function(){LT.over=this.checked;ltDraw(LT.scr);};
   $$('ltcp2').onclick=function(){var s=LT.scr,t=s?(s.blocks||[]).map(function(b){return ltLookup(s,b.key);}).filter(Boolean).join('\n'):'';if(!t){ltFlash('ltcp2','Nothing yet');return;}ltCopyText(t).then(function(){ltFlash('ltcp2','Copied');},function(){ltFlash('ltcp2','Could not copy');});};
@@ -2009,7 +2071,7 @@ function translatePage(){nav('translate');
  '<label class="qfl" for="ltto">To<select class="sel" id="ltto">'+ltOpts(LT.to)+'</select></label></div>'+
  '<div class="seg lt-tabs" id="lttabs" role="tablist"><a href="javascript:void 0" role="tab" data-m="speak">'+ico('mic',16,2.2)+'Speak</a><a href="javascript:void 0" role="tab" data-m="screen">'+ico('screen',16,2.2)+'Screen</a></div>'+
  '<div id="ltpane">'+ltPane()+'</div></section>'+
- '<p class="dl-note">Translations are automatic, so check anything important. Your screen picture never leaves your device: the text on it is read on your device and only those words are translated. What you say is turned into text by your browser’s own speech service, and the words are then translated on your device or sent to be translated.</p>';
+ '<p class="dl-note">Translations are automatic, so check anything important. Your screen picture never leaves your device: the text on it is read on your device and only those words are translated. What you say is turned into text by your browser’s own speech service (or, if that cannot be used, short clips of your voice are sent to a speech service), and the words are then translated on your device or sent to be translated.</p>';
  var chg=function(){LT.from=$$('ltfrom').value;LT.to=$$('ltto').value;LT.itr='';if(LT.mode==='speak'){ltMicRestart();ltSt('');if(LT.listening&&ltDevCan())ltDevGet(LT.from,LT.to);}};
  $$('ltfrom').onchange=$$('ltto').onchange=chg;
  $$('ltswap').onclick=function(){var f=LT.from;LT.from=LT.to;LT.to=f;$$('ltfrom').value=LT.from;$$('ltto').value=LT.to;[$$('ltfrom'),$$('ltto')].forEach(function(s){if(s._cs)s._cs.sync();});LT.itr='';if(LT.mode==='speak'){ltMicRestart();ltSt('');if(LT.listening&&ltDevCan())ltDevGet(LT.from,LT.to);}};
