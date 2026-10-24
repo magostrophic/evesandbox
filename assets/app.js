@@ -1859,7 +1859,7 @@ function ltListRender(){var el=$$('ltlist');if(!el)return;
 
  if(LT.proc>0&&!LT.interim)h+='<div class="lt-l int"><div class="lt-o">Working on what you said…</div></div>';
  if(!h)h='<div class="lt-em">'+(LT.listening?'Listening… start speaking.':'Press Start listening and speak. What you say appears here with its translation under it.')+'</div>';
- el.innerHTML=h;if(near)el.scrollTop=el.scrollHeight;}
+ el.innerHTML=h;if(near)el.scrollTop=el.scrollHeight;ltPipRender();}
 function ltAdd(t){t=String(t||'').replace(/\s+/g,' ').trim();if(!t)return;var L={o:t,t:'',err:'',id:++LT.id};LT.lines.push(L);if(LT.lines.length>200)LT.lines.shift();LT.interim='';LT.itr='';ltListRender();
  var from=LT.from,to=LT.to;
  ltTr([t],from,to).then(function(o){L.t=o[0]||'';if(!L.t)L.err='x';ltListRender();ltSt(L.t?'':'Could not translate that part.',L.t?'':'warn');if(L.t&&LT.say)ltSay(L.t);var n=$$('ltvia');if(n)n.textContent=ltViaNote();},
@@ -1931,7 +1931,13 @@ async function ltWStart(){var AC=window.AudioContext||window.webkitAudioContext,
  src.connect(proc);proc.connect(mute);mute.connect(ctx.destination);try{if(ctx.state==='suspended')ctx.resume();}catch(e){}}
 function ltWStop(){var W=LT.w;LT.w=null;if(!W)return;try{W.proc.onaudioprocess=null;W.src.disconnect();W.proc.disconnect();}catch(e){}try{W.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}try{W.ctx.close();}catch(e){}}
 /* ---- reading the screen ---- */
-function ltWait(ms){return new Promise(function(r){setTimeout(r,ms);});}
+/* a timer that is not slowed down when this tab is in the background (the page keeps translating while you watch the video) */
+var LTW=null,LTWN=0,LTWM={};
+function ltWait(ms){if(LTW===null){try{LTW=new Worker(URL.createObjectURL(new Blob(['onmessage=function(e){var d=e.data;setTimeout(function(){postMessage(d.i)},d.ms)}'],{type:'text/javascript'})));LTW.onmessage=function(e){var f=LTWM[e.data];delete LTWM[e.data];if(f)f();};}catch(e){LTW=false;}}
+ if(!LTW)return new Promise(function(r){setTimeout(r,ms);});
+ return new Promise(function(r){var i=++LTWN;LTWM[i]=r;LTW.postMessage({i:i,ms:ms});});}
+/* a message the screen loop put up itself; it only takes down its own message, never an error from somewhere else */
+function ltScrMsg(S,t,k){if(t){var e0=$$('ltst2');if(S.own===t&&e0&&e0.textContent===t)return;ltSt2(t,k||'');S.own=t;}else if(S.own){var e=$$('ltst2');if(e&&e.textContent===S.own)ltSt2('');S.own='';}}
 function ltSt2(t,k){var e=$$('ltst2');if(e)e.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span></div>':'';}
 function ltKey(t){return String(t).toLowerCase().replace(/[^\p{L}\p{N}]+/gu,'');}
 function ltDice(a,b){if(a===b)return 1;if(a.length<5||b.length<5)return 0;var m={},n=0,i;for(i=0;i<a.length-1;i++){var g=a.substr(i,2);m[g]=(m[g]||0)+1;}
@@ -1940,8 +1946,15 @@ function ltLookup(S,key){if(S.tr[key])return S.tr[key];var best=0,hit='';for(var
  return best>=0.88?S.tr[hit]:'';}
 /* the text reader gives lines; lines that sit right under each other and line up belong to one block of text */
 /* a reading of the picture gives lines; only believable ones are kept (guesses from photos, icons and tiny marks are dropped) */
-function ltLineOk(l){var t=String(l.text||'').replace(/\s+/g,' ').trim();if(!t)return null;var bw=l.bbox.x1-l.bbox.x0,bh=l.bbox.y1-l.bbox.y0,n=(t.match(/\p{L}/gu)||[]).length;
- if(l.confidence<60||n<3||bh<9||bh>160||bw<14||n/t.length<0.55)return null;var per=bw/t.length/bh;if(per<0.18||per>1.6)return null;
+/* the writing system of each language, so a line in another writing system (English on a Chinese page, say) is not read as that language */
+var LSCR={zh:['Han'],ja:['Han','Hiragana','Katakana'],ko:['Hangul'],hi:['Devanagari'],mr:['Devanagari'],ne:['Devanagari'],bn:['Bengali'],ta:['Tamil'],te:['Telugu'],kn:['Kannada'],ml:['Malayalam'],gu:['Gujarati'],pa:['Gurmukhi'],ur:['Arabic'],ar:['Arabic'],fa:['Arabic'],he:['Hebrew'],th:['Thai'],ru:['Cyrillic'],uk:['Cyrillic'],el:['Greek']},LSRE={},LDENSE={zh:1,ja:1,ko:1};
+function ltScr(lang){if(!LSRE[lang]){var a=LSCR[lang]||['Latin'];LSRE[lang]=new RegExp('['+a.map(function(x){return '\\p{Script='+x+'}';}).join('')+']','gu');}return LSRE[lang];}
+/* a reading of the picture gives lines; only believable ones in the chosen language are kept (guesses from photos, icons and tiny marks are dropped) */
+function ltLineOk(l,lang){var t=String(l.text||'').replace(/\s+/g,' ').trim();
+ if(lang==='zh'||lang==='ja')t=t.replace(/([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}，。！？、：；「」（）])\s+(?=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}，。！？、：；「」（）])/gu,'$1');
+ if(lang==='en')t=t.replace(/(^|\s)\|(?=\s+[a-z])/g,'$1I');
+ if(!t)return null;var bw=l.bbox.x1-l.bbox.x0,bh=l.bbox.y1-l.bbox.y0,n=(t.match(/\p{L}/gu)||[]).length,sn=(t.match(ltScr(lang))||[]).length;
+ if(l.confidence<60||n<(LDENSE[lang]?2:3)||bh<9||bh>160||bw<14||n/t.length<0.55||sn/n<0.6)return null;var per=bw/t.length/bh;if(per<0.18||per>1.6)return null;
  return {t:t,x0:l.bbox.x0,y0:l.bbox.y0,x1:l.bbox.x1,y1:l.bbox.y1,s:l.confidence*n};}
 /* the same spot can be read more than once (normal and bright-text readings): keep the best reading for each spot */
 function ltPick(c){c.sort(function(a,b){return b.s-a.s;});var keep=[];
@@ -1949,10 +1962,18 @@ function ltPick(c){c.sort(function(a,b){return b.s-a.s;});var keep=[];
   for(var i=0;i<keep.length;i++){var k=keep[i],ix=Math.min(l.x1,k.x1)-Math.max(l.x0,k.x0),iy=Math.min(l.y1,k.y1)-Math.max(l.y0,k.y0);if(ix>0&&iy>0&&ix*iy>0.35*ar){bad=true;break;}}
   if(!bad)keep.push(l);});return keep;}
 /* only the bright, colourless pixels (white subtitles and captions) turned into black text on white, which is far easier to read on top of a photo */
-function ltMask(img,w,h,mc){var N=w*h,n=0,i,p,r,g,b,mx,mn;for(i=0,p=0;p<N;i+=4,p++){r=img[i];g=img[i+1];b=img[i+2];mx=r>g?(r>b?r:b):(g>b?g:b);mn=r<g?(r<b?r:b):(g<b?g:b);if(0.299*r+0.587*g+0.114*b>225&&mx-mn<60)n++;}
- if(n<N*0.002||n>N*0.3)return null;mc.width=w;mc.height=h;var x=mc.getContext('2d'),o=x.createImageData(w,h),d=o.data;
- for(i=0,p=0;p<N;i+=4,p++){r=img[i];g=img[i+1];b=img[i+2];mx=r>g?(r>b?r:b):(g>b?g:b);mn=r<g?(r<b?r:b):(g<b?g:b);var v=(0.299*r+0.587*g+0.114*b>225&&mx-mn<60)?0:255;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}
- x.putImageData(o,0,0);return mc;}
+/* gives the picture to read and how far down the screen it starts. Only the rows that hold bright text are kept, so a subtitle at the bottom is far quicker to read than the whole screen */
+function ltMask(img,w,h,mc,done){var N=w*h,n=0,left=0,i,p,r,g,b,mx,mn,rows=new Uint32Array(h),cov=null;
+ /* "done" = places the first reading already read with confidence: when they hold nearly all the bright text there is nothing left for this second look */
+ if(done&&done.length){cov=new Uint8Array(N);done.forEach(function(k){var x0=Math.max(0,Math.floor(k.x0)-6),x1=Math.min(w,Math.ceil(k.x1)+6),y0=Math.max(0,Math.floor(k.y0)-6),y1=Math.min(h,Math.ceil(k.y1)+6);for(var y=y0;y<y1;y++)cov.fill(1,y*w+x0,y*w+x1);});}
+ for(i=0,p=0;p<N;i+=4,p++){r=img[i];g=img[i+1];b=img[i+2];mx=r>g?(r>b?r:b):(g>b?g:b);mn=r<g?(r<b?r:b):(g<b?g:b);if(0.299*r+0.587*g+0.114*b>225&&mx-mn<60){n++;rows[(p/w)|0]++;if(cov&&!cov[p])left++;}}
+ if(n<N*0.002||n>N*0.3)return null;if(cov&&left<n*0.3)return null;
+ var y0=0,y1=h-1,th=Math.max(3,w*0.004);while(y0<h&&rows[y0]<th)y0++;
+ if(y0<h){while(y1>y0&&rows[y1]<th)y1--;y0=Math.max(0,y0-16);y1=Math.min(h-1,y1+16);if(y1-y0+1>h*0.8){y0=0;y1=h-1;}}else{y0=0;y1=h-1;}
+ var mh=y1-y0+1,M=w*mh;mc.width=w;mc.height=mh;var x=mc.getContext('2d'),o=x.createImageData(w,mh),d=o.data,q;
+ for(p=0;p<M;p++){i=(y0*w+p)*4;r=img[i];g=img[i+1];b=img[i+2];mx=r>g?(r>b?r:b):(g>b?g:b);mn=r<g?(r<b?r:b):(g<b?g:b);var v=(0.299*r+0.587*g+0.114*b>225&&mx-mn<60)?0:255;q=p*4;d[q]=d[q+1]=d[q+2]=v;d[q+3]=255;}
+ x.putImageData(o,0,0);return {c:mc,oy:y0};}
+function ltShift(l,oy){return oy?{text:l.text,confidence:l.confidence,bbox:{x0:l.bbox.x0,x1:l.bbox.x1,y0:l.bbox.y0+oy,y1:l.bbox.y1+oy}}:l;}
 /* lines that sit right under each other and line up belong to one block of text */
 function ltBlocks(ls,img,w,h){ls=ls.slice();
  ls.sort(function(a,b){return a.y0-b.y0||a.x0-b.x0;});var bl=[];
@@ -1982,11 +2003,11 @@ function ltDraw(S){var c=$$('ltov');if(!c||!S||!S.w)return;if(c.width!==S.w||c.h
   var ty=by+Math.max(0,(bh-f.ls.length*f.sz*1.2)/2),tx=rtl?bx+bw-padX/2:bx+padX/2;f.ls.forEach(function(l,i){x.fillText(l,tx,ty+i*f.sz*1.2);});});}
 function ltSideList(S){var el=$$('ltsl');if(!el)return;var rtl=LRTL[LT.to]?' dir="rtl"':'',h='';
  var sn={};(S.blocks||[]).forEach(function(b){if(sn[b.key])return;sn[b.key]=1;var t=ltLookup(S,b.key);if(t)h+='<div class="lt-l"><div class="lt-o">'+esc(b.t)+'</div><div class="lt-t"'+rtl+'>'+esc(t)+'</div></div>';});
- var sig=h.length+':'+h.slice(0,200);if(S.lsig===sig)return;S.lsig=sig;el.innerHTML=h||'<div class="lt-em">Text found on your screen will appear here with its translation.</div>';}
+ var sig=h.length+':'+h.slice(0,200);if(S.lsig===sig)return;S.lsig=sig;el.innerHTML=h||'<div class="lt-em">Text found on your screen will appear here with its translation.</div>';ltPipRender();}
 function ltTrNeed(S){if(S.busy||Date.now()<S.errUntil)return;var from=LT.from,to=LT.to,need=[],seen={};
  (S.blocks||[]).forEach(function(b){if(!seen[b.key]&&!S.bad[b.key]&&!ltLookup(S,b.key)&&!S.pend[b.key]){seen[b.key]=1;need.push(b);}});if(!need.length)return;need=need.slice(0,16);
  need.forEach(function(b){S.pend[b.key]=1;});S.busy=true;ltSt2('Translating…','');
- ltTr(need.map(function(b){return b.t.slice(0,690);}),from,to).then(function(o){if(S.pair!==from+'>'+to)return;need.forEach(function(b,i){delete S.pend[b.key];if(o[i]){S.tr[b.key]=o[i];S.keys.push(b.key);}else S.bad[b.key]=1;});if(S.keys.length>400){S.keys.splice(0,200).forEach(function(k){delete S.tr[k];});}
+ ltTr(need.map(function(b){return b.t.slice(0,690);}),from,to).then(function(o){if(S.pair!==from+'>'+to)return;need.forEach(function(b,i){delete S.pend[b.key];if(o[i]&&ltKey(o[i])!==b.key){S.tr[b.key]=o[i];S.keys.push(b.key);}else S.bad[b.key]=1;});if(S.keys.length>400){S.keys.splice(0,200).forEach(function(k){delete S.tr[k];});}
    ltDraw(S);ltSideList(S);ltSt2('');var n=$$('ltvia');if(n)n.textContent=ltViaNote();},
   function(e){need.forEach(function(b){delete S.pend[b.key];});S.errUntil=Date.now()+12000;ltSt2(ltErr(e.code),'bad');}).then(function(){S.busy=false;});}
 async function ltOcrLoad(S,code){S.ready=false;if(S.worker){try{await S.worker.terminate();}catch(e){}S.worker=null;}
@@ -1996,60 +2017,135 @@ async function ltOcrLoad(S,code){S.ready=false;if(S.worker){try{await S.worker.t
  if(LT.scr!==S){try{await w.terminate();}catch(e){}return;}
  try{await w.setParameters({tessedit_pageseg_mode:'11'});}catch(e){}
  S.worker=w;S.code=code;S.ready=true;ltSt2('');}
-function ltSig(cx,w,h){var s=document.createElement('canvas');s.width=48;s.height=27;var x=s.getContext('2d',{willReadFrequently:true});x.drawImage(cx.canvas,0,0,48,27);var d=x.getImageData(0,0,48,27).data,o=new Array(48*27);for(var i=0;i<o.length;i++)o[i]=(d[i*4]*0.3+d[i*4+1]*0.59+d[i*4+2]*0.11);return o;}
-function ltSigDiff(a,b){if(!a||!b)return 99;var t=0;for(var i=0;i<a.length;i++)t+=Math.abs(a[i]-b[i]);return t/a.length;}
+var LTSG=null;
+/* a tiny grey copy of the picture (64 by 36), to notice when something on the screen changed */
+function ltSig(cx,w,h){var s=LTSG||(LTSG=document.createElement('canvas'));s.width=64;s.height=36;var x=s.getContext('2d',{willReadFrequently:true});x.drawImage(cx.canvas,0,0,64,36);var d=x.getImageData(0,0,64,36).data,o=new Float32Array(64*36);for(var i=0;i<o.length;i++)o[i]=(d[i*4]*0.3+d[i*4+1]*0.59+d[i*4+2]*0.11);return o;}
+/* how much the picture changed: the average change, or the change inside any one small tile (a new subtitle line changes one tile a lot while the average barely moves). Above 2 counts as changed */
+function ltSigDiff(a,b){if(!a||!b)return 99;var t=0,tl=new Float32Array(48),x,y,m=0;
+ for(y=0;y<36;y++)for(x=0;x<64;x++){var d=Math.abs(a[y*64+x]-b[y*64+x]);t+=d;tl[((y/6)|0)*8+(x>>3)]+=d;}
+ for(x=0;x<48;x++)if(tl[x]>m)m=tl[x];return Math.max(t/2304,m/48*0.4);}
+/* a small coloured strip on this page (see the "Eve is reading a shared screen" badge): if it shows up in the shared picture, the picture contains Eve herself */
+function ltBeacon(img,w,h){var best=null;
+ for(var y=0;y<h;y+=2){var o=y*w*4,cur=0,len=0,gap=9,alt=0,cs=-1,ce=-1,rs=0;
+  for(var x=0;x<=w;x++){var c=0;if(x<w){var i=o+x*4,r=img[i],g=img[i+1],b=img[i+2];c=(b>190&&r>190&&g<90)?1:(b>190&&g>190&&r<90)?2:0;}
+   if(c&&c===cur){len++;gap=0;ce=x;continue;}
+   if(c){if(cur&&len>=2&&gap<=2){alt++;if(alt===1)cs=rs;}else{alt=0;cs=-1;}cur=c;len=1;gap=0;rs=x;ce=x;continue;}
+   if(x===w||++gap>2){if(alt>=5&&len>=2){var f=ltBeaconAt(img,w,y,cs,ce);if(!best||f.w>best.w)best=f;}cur=0;len=0;alt=0;cs=-1;}}}
+ return best;}
+function ltBeaconAt(img,w,y,cs,ce){var xm=cs+2,t=y;while(t>0){var i=((t-1)*w+xm)*4,r=img[i],g=img[i+1],b=img[i+2];if(b>190&&((r>190&&g<90)||(g>190&&r<90)))t--;else break;}
+ return {x:cs,w:ce-cs+1,y:t};}
+/* where this page sits inside the shared picture (worked out from where the strip appears), so it can be left out */
+function ltSelfRect(bc,w,h){var e=$$('ltbc');if(!e)return null;var r=e.getBoundingClientRect();if(!r.width)return null;var sc=bc.w/64;if(sc<0.3||sc>8)return null;
+ var m=6*sc,x=Math.max(0,bc.x-r.left*sc-m),y=Math.max(0,bc.y-r.top*sc-m),x2=Math.min(w,bc.x-r.left*sc+window.innerWidth*sc+m),y2=Math.min(h,bc.y-r.top*sc+window.innerHeight*sc+m);
+ if(x2<=x||y2<=y)return null;return {x:x,y:y,w:x2-x,h:y2-y,f:(x2-x)*(y2-y)/(w*h)};}
+/* the preview: the live picture normally; the last good picture (or the picture with this page blanked out) when the shared picture contains Eve herself */
+function ltFreeze(S,on,msg){var pv=$$('ltpv');if(!!S.frozen!==on){S.frozen=on;
+  if(on&&pv){var g=S.gd;if(g&&g.width){pv.width=g.width;pv.height=g.height;pv.getContext('2d').drawImage(g,0,0);}else{pv.width=16;pv.height=9;var q=pv.getContext('2d');q.fillStyle='#000';q.fillRect(0,0,16,9);}}}
+ if(msg!==undefined)ltScrMsg(S,msg,'');ltPv(S);}
+function ltPv(S){var pv=$$('ltpv');if(pv)pv.style.display=(S.frozen||S.mask)?'block':'none';}
+function ltPvMask(S,cv){var pv=$$('ltpv'),m=S.mask;if(!pv||!m)return;pv.width=cv.width;pv.height=cv.height;var q=pv.getContext('2d');q.drawImage(cv,0,0);
+ q.fillStyle='#2b2b30';q.fillRect(m.x,m.y,m.w,m.h);q.fillStyle='#fff';q.font='600 '+Math.max(12,Math.min(28,m.h/12))+'px Inter,system-ui,sans-serif';q.textAlign='center';q.textBaseline='middle';q.fillText('This page (hidden from the reader)',m.x+m.w/2,m.y+m.h/2);}
+/* frames from the shared screen: read straight from the stream when the browser can (works even while this tab is in the background), else from the preview video */
+function ltPump(S){if(typeof MediaStreamTrackProcessor==='undefined')return;
+ try{var rd=new MediaStreamTrackProcessor({track:S.stream.getVideoTracks()[0]}).readable.getReader();S.rd=rd;
+  (async function(){try{while(LT.scr===S){var r=await rd.read();if(r.done)break;if(S.vf){try{S.vf.close();}catch(e){}}S.vf=r.value;}}catch(e){}})();}catch(e){S.rd=null;}}
 async function ltScrLoop(S){var cv=document.createElement('canvas'),mc=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true}),idle=0;
  while(LT.scr===S){
   try{
-   var v=$$('ltv');if(!v||v.videoWidth<2||v.readyState<2){await ltWait(250);continue;}
-   var code=ltL(LT.from)[3],pair=LT.from+'>'+LT.to;
+   var src=null,sw=0,sh=0,vf=S.vf;
+   if(vf&&vf.displayWidth>1){src=vf;sw=vf.displayWidth;sh=vf.displayHeight;}
+   else{var v=$$('ltv');if(v&&v.videoWidth>1&&v.readyState>=2){src=v;sw=v.videoWidth;sh=v.videoHeight;}}
+   if(!src){await ltWait(250);continue;}
+   var lang=LT.from,code=ltL(lang)[3],pair=lang+'>'+LT.to;
    if(S.code!==code){S.blocks=[];S.sig=null;S.tr={};S.keys=[];S.pend={};S.bad={};S.lsig='';ltDraw(S);ltSideList(S);await ltOcrLoad(S,code);if(LT.scr!==S)return;}
    if(S.pair!==pair){S.pair=pair;S.tr={};S.keys=[];S.pend={};S.bad={};S.lsig='';S.sig=null;ltDraw(S);ltSideList(S);if(ltDevCan())ltDevGet(LT.from,LT.to);}
-   var sc=Math.min(1,1920/v.videoWidth),w=Math.round(v.videoWidth*sc),h=Math.round(v.videoHeight*sc);cv.width=w;cv.height=h;cx.drawImage(v,0,0,w,h);
-   var sig=ltSig(cx,w,h),ch=ltSigDiff(S.sig,sig)>2;
-   if(ch||(!S.blocks.length&&idle>6)){S.sig=sig;idle=0;
-    var img=cx.getImageData(0,0,w,h).data;ltSt2(S.blocks.length?'':'Reading your screen…','');
+   /* the browser only sends a new picture when something on the screen moves; when it has not, there is nothing to draw or compare */
+   var still=!!(vf&&vf===S.lastVf&&S.sig&&!S.frozen&&!S.mask&&cv.width>1),img=null,sig=null,ch=false;
+   if(!still){
+    var sc=Math.min(1,1920/sw),nw=Math.round(sw*sc),nh=Math.round(sh*sc);if(cv.width!==nw||cv.height!==nh){cv.width=nw;cv.height=nh;}cx.drawImage(src,0,0,nw,nh);S.lastVf=vf||null;
+    /* does this picture contain Eve herself? (only possible when a whole window or screen is shared, not another tab) */
+    if(S.surface!=='browser'){
+     img=cx.getImageData(0,0,nw,nh).data;var bc=ltBeacon(img,nw,nh),rc=bc?ltSelfRect(bc,nw,nh):null;
+     if(bc){if(!rc||rc.f>0.7){S.selfN=2;S.mask=null;ltFreeze(S,true,'The shared picture shows Eve herself, so it is paused. Go back to the tab or window you are translating and Eve carries on.'+(ltPipCan()?' To read the translation while you watch, press Float translation.':' To read the translation while you watch, open this page in its own window beside it.'));await ltWait(300);continue;}
+      S.mask=rc;S.maskN=3;S.selfN=0;}
+     else{if(S.selfN>0)S.selfN--;if(S.mask&&--S.maskN<=0){S.mask=null;S.sig=null;}}
+     if(S.frozen){if(S.selfN>0||Date.now()<S.hold){await ltWait(250);continue;}ltFreeze(S,false,'');S.sig=null;}
+     /* leave this page out of what is read, and out of the preview */
+     if(S.mask){cx.fillStyle='#808080';cx.fillRect(S.mask.x,S.mask.y,S.mask.w,S.mask.h);img=null;ltPvMask(S,cv);}
+    }
+    sig=ltSig(cx,nw,nh);ch=ltSigDiff(S.sig,sig)>2;
+   }
+   var w=cv.width,h=cv.height;
+   ltPv(S);
+   /* a screen with no text is looked at again now and then, less and less often */
+   if(ch||(!S.blocks.length&&idle>Math.min(40,6+(S.empty||0)*4))){var t0=Date.now();if(sig)S.sig=sig;idle=0;
+    if(!img)img=cx.getImageData(0,0,w,h).data;
+    var g=S.gd;if(g.width!==w||g.height!==h){g.width=w;g.height=h;}g.getContext('2d').drawImage(cv,0,0);
+    ltScrMsg(S,S.blocks.length?'':'Reading your screen…');
     var res=await S.worker.recognize(cv,{},{blocks:true});if(LT.scr!==S)return;
-    var cand=(res.data.lines||[]).map(ltLineOk).filter(Boolean),mk=ltMask(img,w,h,mc);
-    if(mk){ltSt2(S.blocks.length?'':'Reading your screen…','');var r2=await S.worker.recognize(mk,{},{blocks:true});if(LT.scr!==S)return;cand=cand.concat((r2.data.lines||[]).map(ltLineOk).filter(Boolean));}
+    var ok=function(l){return ltLineOk(l,lang);},cand=(res.data.lines||[]).map(ok).filter(Boolean),mk=ltMask(img,w,h,mc,(res.data.lines||[]).filter(function(l){return l.confidence>=75&&l.bbox&&String(l.text||'').trim();}).map(function(l){return l.bbox;}));
+    if(mk){var r2=await S.worker.recognize(mk.c,{},{blocks:true});if(LT.scr!==S)return;cand=cand.concat((r2.data.lines||[]).map(function(l){return ok(ltShift(l,mk.oy));}).filter(Boolean));}
+    if(lang!==LT.from)continue;
     S.w=w;S.h=h;S.blocks=ltBlocks(ltPick(cand),img,w,h);
+    /* when the same text keeps coming back (a video playing behind fixed subtitles), look less often */
+    var ks=S.blocks.map(function(b){return b.key;}).join('|');if(S.ksig&&(ks===S.ksig||ltDice(ks,S.ksig)>=0.85))S.same=Math.min(4,S.same+1);else{S.ksig=ks;S.same=0;}
     ltDraw(S);ltSideList(S);
-    if(!S.blocks.length)ltSt2('No readable text found on this screen yet. Try a window with clearer text, and make sure the “From” language matches it.','warn');else ltSt2('');
-    ltTrNeed(S);
-   }else{idle++;ltTrNeed(S);}
-   await ltWait(ch?150:700);
-  }catch(e){if(LT.scr!==S)return;console.warn('screen translation step failed:',e);ltSt2('Something went wrong while reading the screen. Trying again…','warn');await ltWait(1500);}
+    if(!S.blocks.length){S.empty=(S.empty||0)+1;ltScrMsg(S,'No '+ltL(lang)[1]+' text found on this screen yet. Try a window with clearer text, and make sure the “From” language matches the text on the screen.','warn');}else{S.empty=0;ltScrMsg(S,'');}
+    ltTrNeed(S);S.ms=Date.now()-t0;
+    await ltWait(Math.max(150,Math.min(1500,S.ms*0.5))+Math.min(2000,(S.empty||0)*300)+S.same*300);
+   }else{idle++;ltTrNeed(S);await ltWait(S.frozen||S.mask?250:(S.surface==='browser'?700:500));}
+  }catch(e){if(LT.scr!==S)return;console.warn('screen translation step failed:',e);ltScrMsg(S,'Something went wrong while reading the screen. Trying again…','warn');await ltWait(1500);}
  }}
-function ltScrUI(){var b=$$('ltsh'),vw=$$('ltvw');if(!b)return;var on=!!LT.scr;b.classList.toggle('rec',on);b.innerHTML=on?ico('stop',18,2.2)+'Stop sharing':ico('screen',18,2.2)+'Share a screen or window';if(vw)vw.style.display=on?'block':'none';}
+function ltScrUI(){var b=$$('ltsh'),vw=$$('ltvw'),pl=$$('ltpill');if(!b)return;var on=!!LT.scr;b.classList.toggle('rec',on);b.innerHTML=on?ico('stop',18,2.2)+'Stop sharing':ico('screen',18,2.2)+'Share a screen or window';if(vw)vw.style.display=on?'block':'none';if(pl)pl.style.display=on?'flex':'none';}
 async function ltScrStart(){if(LT.scr){ltScrStop('');return;}
  if(!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia)){ltSt2('Your browser cannot share the screen. Please use Chrome, Edge or Firefox on a computer.','warn');return;}
  ltSt2('');ltDevReset();ltDevGet(LT.from,LT.to,function(p){if(LT.scr)ltSt2('Getting the translator ready on this device… '+p+'%','');}).then(function(){var e=$$('ltst2');if(e&&/Getting the translator/.test(e.textContent))ltSt2('');});
  var stream;try{stream=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:{ideal:5,max:10}},audio:false,selfBrowserSurface:'exclude'});}
  catch(e){ltSt2(e&&e.name==='NotAllowedError'?'Screen sharing was cancelled. Press Share a screen or window and choose what to share.':'Screen sharing could not start in this browser.','warn');return;}
- var S=LT.scr={stream:stream,worker:null,code:'',pair:'',sig:null,blocks:[],tr:{},keys:[],pend:{},bad:{},busy:false,errUntil:0,w:0,h:0,lsig:'',ready:false};
+ var S=LT.scr={stream:stream,worker:null,code:'',pair:'',sig:null,blocks:[],tr:{},keys:[],pend:{},bad:{},busy:false,errUntil:0,w:0,h:0,lsig:'',ready:false,gd:document.createElement('canvas'),frozen:false,mask:null,selfN:0,maskN:0,hold:0,surface:'',vf:null,rd:null,ms:0,empty:0,lastVf:null,same:0,ksig:''};
  var vt=stream.getVideoTracks()[0];vt.addEventListener('ended',function(){if(LT.scr===S)ltScrStop('Screen sharing ended.');});
+ var ds='';try{ds=(vt.getSettings()||{}).displaySurface||'';}catch(e){}S.surface=ds;ltPump(S);
+ /* coming back to this tab: if a whole window or screen is shared it may now show this page, so hold the last good picture for a moment */
+ S.vis=function(){if(LT.scr===S&&document.visibilityState==='visible'&&S.surface!=='browser'&&S.gd.width){S.hold=Date.now()+800;ltFreeze(S,true);}};
+ document.addEventListener('visibilitychange',S.vis);
  ltScrUI();var v=$$('ltv');v.srcObject=stream;try{await v.play();}catch(e){}
  if(LT.scr!==S)return;if(vt.readyState==='ended'){ltScrStop('Screen sharing ended.');return;}
- var ds='';try{ds=(vt.getSettings()||{}).displaySurface||'';}catch(e){}var nt=$$('ltnote');if(nt)nt.textContent=(ds==='monitor'||ds==='window')?'You are sharing a whole screen or window. If this page is on it, Eve will end up reading herself. For the best result share the browser tab that has the text or video, or keep this page out of view.':'';
+ var nt=$$('ltnote');if(nt)nt.textContent=(ds==='monitor'||ds==='window')?(ltPipCan()?'Tip: press Float translation to keep the translation in a small window on top of everything while you watch. Eve leaves her own page out of what she reads.':'Tip: put this page beside the shared window to read the translation. Eve leaves her own page out of what she reads.'):'';
  try{await ltOcrLoad(S,ltL(LT.from)[3]);}catch(e){if(LT.scr===S){ltScrStop('');ltSt2('The text reader could not be loaded. Please check your internet connection and try again.','bad');}return;}
  if(LT.scr===S)ltScrLoop(S);}
-function ltScrStop(msg){var S=LT.scr;LT.scr=null;if(S){try{S.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}try{if(S.worker)S.worker.terminate();}catch(e){}}
- var nt=$$('ltnote');if(nt)nt.textContent='';var v=$$('ltv');if(v){try{v.srcObject=null;}catch(e){}}var c=$$('ltov');if(c){try{c.getContext('2d').clearRect(0,0,c.width,c.height);}catch(e){}}ltScrUI();if(msg!==undefined)ltSt2(msg,'');}
-function ltStop(){if(LT.listening||LT.rec)ltMicStop();if(LT.scr)ltScrStop();try{if('speechSynthesis' in window)speechSynthesis.cancel();}catch(e){}}
+function ltScrStop(msg){var S=LT.scr;LT.scr=null;if(S){try{S.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}try{if(S.worker)S.worker.terminate();}catch(e){}try{document.removeEventListener('visibilitychange',S.vis);}catch(e){}try{if(S.rd)S.rd.cancel();}catch(e){}try{if(S.vf)S.vf.close();}catch(e){}}
+ var nt=$$('ltnote');if(nt)nt.textContent='';var v=$$('ltv');if(v){try{v.srcObject=null;}catch(e){}}var pv=$$('ltpv');if(pv)pv.style.display='none';var c=$$('ltov');if(c){try{c.getContext('2d').clearRect(0,0,c.width,c.height);}catch(e){}}ltScrUI();if(msg!==undefined)ltSt2(msg,'');ltPipRender();}
+/* ---- a small window that stays on top of everything (Chrome and Edge), so the translation can be read while watching the video ---- */
+var LTP=null;
+function ltPipCan(){return !!(window.documentPictureInPicture&&documentPictureInPicture.requestWindow);}
+function ltPipUI(){var b=$$('ltpip');if(b)b.textContent=LTP?'Close floating window':'Float translation';}
+function ltPipRender(){if(!LTP)return;try{var d=LTP.document,el=d.getElementById('ltpl');if(!el)return;var src=$$(LT.mode==='speak'?'ltlist':'ltsl');var near=el.scrollHeight-el.scrollTop-el.clientHeight<60;
+ el.innerHTML=src?src.innerHTML:'';if(LT.mode==='speak'&&near)el.scrollTop=el.scrollHeight;}catch(e){}}
+async function ltPip(){if(LTP){try{LTP.close();}catch(e){}LTP=null;ltPipUI();return;}
+ var w;try{w=await documentPictureInPicture.requestWindow({width:460,height:300});}catch(e){var m=LT.mode==='speak'?'ltst':'ltst2';(LT.mode==='speak'?ltSt:ltSt2)('The floating window could not be opened in this browser.','warn');return;}
+ LTP=w;var d=w.document;
+ try{Array.prototype.forEach.call(document.styleSheets,function(ss){try{var css='';Array.prototype.forEach.call(ss.cssRules,function(r){css+=r.cssText+'\n';});var st=d.createElement('style');st.textContent=css;d.head.appendChild(st);}catch(e){if(ss.href){var l=d.createElement('link');l.rel='stylesheet';l.href=ss.href;d.head.appendChild(l);}}});}catch(e){}
+ try{d.documentElement.className=document.documentElement.className;var th=document.documentElement.getAttribute('data-theme');if(th)d.documentElement.setAttribute('data-theme',th);}catch(e){}
+ d.body.style.cssText='margin:0;padding:10px;background:var(--bg,#000);color:var(--ink,#fff);font-family:Inter,system-ui,sans-serif';
+ d.body.innerHTML='<div class="lt-log lt-pl" id="ltpl" role="log" aria-live="polite" style="max-height:none;height:calc(100vh - 20px);margin:0"></div>';
+ w.addEventListener('pagehide',function(){if(LTP===w){LTP=null;ltPipUI();}});
+ ltPipUI();ltPipRender();}
+function ltStop(){if(LT.listening||LT.rec)ltMicStop();if(LT.scr)ltScrStop();try{if('speechSynthesis' in window)speechSynthesis.cancel();}catch(e){}if(LTP){try{LTP.close();}catch(e){}LTP=null;}if(LTW){try{LTW.terminate();}catch(e){}LTW=null;LTWM={};}}
 /* ---- the page ---- */
 function ltPane(){var sp=LT.mode==='speak',mob=ltPhone();
  var dev=ltDevCan()?'<label class="qck"><input type="checkbox" id="ltdev"'+(LT.dev?' checked':'')+'> Translate on this device when possible (private, nothing is sent)</label>':'';
- if(sp)return '<div class="dl-cta lt-cta"><button class="btn pri dl-big" id="ltmic" type="button" aria-pressed="false"></button><button class="btn" id="ltclr" type="button">Clear</button><button class="btn" id="ltcp" type="button">Copy translation</button></div>'+
+ if(sp)return '<div class="dl-cta lt-cta"><button class="btn pri dl-big" id="ltmic" type="button" aria-pressed="false"></button><button class="btn" id="ltclr" type="button">Clear</button><button class="btn" id="ltcp" type="button">Copy translation</button>'+(ltPipCan()?'<button class="btn" id="ltpip" type="button">Float translation</button>':'')+'</div>'+
   '<label class="qck"><input type="checkbox" id="ltsay"'+(LT.say?' checked':'')+'> Read the translation out loud (use headphones so the microphone does not hear it)</label>'+dev+
   '<div id="ltst" role="status" aria-live="polite"></div><div class="lt-log" id="ltlist" role="log" aria-live="polite"></div><p class="hint lt-via" id="ltvia"></p>';
- return '<p class="hint lt-in">Share a screen, a window or a browser tab. The text on it is read and translated every few seconds, and the translation is painted over the picture below. Choose the language that is <b>on the screen</b> in the From box above, and share a tab or window that is not this page.</p>'+
-  '<div class="dl-cta lt-cta"><button class="btn pri dl-big" id="ltsh" type="button"></button><button class="btn" id="ltcp2" type="button">Copy translation</button></div>'+
+ return '<p class="hint lt-in">Share a screen, a window or a browser tab. The text on it is read and translated every few seconds, and the translation is painted over the picture below. Choose the language that is <b>on the screen</b> in the From box above. Only text in that language is read.</p>'+
+  '<div class="dl-cta lt-cta"><button class="btn pri dl-big" id="ltsh" type="button"></button><button class="btn" id="ltcp2" type="button">Copy translation</button>'+(ltPipCan()?'<button class="btn" id="ltpip" type="button">Float translation</button>':'')+'</div>'+
   '<label class="qck"><input type="checkbox" id="ltover"'+(LT.over?' checked':'')+'> Show the translation over the picture</label>'+dev+
   '<div id="ltst2" role="status" aria-live="polite">'+(mob?'<div class="msg warn"><span class="dotk"></span><span>Screen sharing is not available in phone browsers. Please open this page in Chrome, Edge or Firefox on a computer.</span></div>':'')+'</div>'+
-  '<p class="hint lt-note" id="ltnote"></p><div class="lt-vw" id="ltvw" style="display:none"><video id="ltv" muted playsinline></video><canvas id="ltov" aria-hidden="true"></canvas></div>'+
+  '<p class="hint lt-note" id="ltnote"></p><div class="lt-vw" id="ltvw" style="display:none"><video id="ltv" muted playsinline></video><canvas id="ltpv" class="lt-pv" aria-hidden="true"></canvas><canvas id="ltov" aria-hidden="true"></canvas></div>'+
   '<div class="lt-log lt-sl" id="ltsl" aria-live="off"></div><p class="hint lt-via" id="ltvia"></p>';}
 function ltBind(){var sp=LT.mode==='speak';
  var dv=$$('ltdev');if(dv)dv.onchange=function(){LT.dev=this.checked;LT.itr='';LTD={};LTDR={};LTDM={};};
+ var pp=$$('ltpip');if(pp){pp.onclick=ltPip;ltPipUI();}ltPipRender();
  if(sp){$$('ltmic').onclick=ltMic;ltMicUI();ltListRender();
   $$('ltclr').onclick=function(){LT.lines=[];LT.interim='';LT.itr='';ltListRender();ltSt('');};
   $$('ltcp').onclick=function(){var t=LT.lines.filter(function(l){return l.t;}).map(function(l){return l.t;}).join('\n');if(!t){ltFlash('ltcp','Nothing yet');return;}ltCopyText(t).then(function(){ltFlash('ltcp','Copied');},function(){ltFlash('ltcp','Could not copy');});};
@@ -2071,7 +2167,9 @@ function translatePage(){nav('translate');
  '<label class="qfl" for="ltto">To<select class="sel" id="ltto">'+ltOpts(LT.to)+'</select></label></div>'+
  '<div class="seg lt-tabs" id="lttabs" role="tablist"><a href="javascript:void 0" role="tab" data-m="speak">'+ico('mic',16,2.2)+'Speak</a><a href="javascript:void 0" role="tab" data-m="screen">'+ico('screen',16,2.2)+'Screen</a></div>'+
  '<div id="ltpane">'+ltPane()+'</div></section>'+
- '<p class="dl-note">Translations are automatic, so check anything important. Your screen picture never leaves your device: the text on it is read on your device and only those words are translated. What you say is turned into text by your browser’s own speech service (or, if that cannot be used, short clips of your voice are sent to a speech service), and the words are then translated on your device or sent to be translated.</p>';
+ '<p class="dl-note">Translations are automatic, so check anything important. Your screen picture never leaves your device: the text on it is read on your device and only those words are translated. What you say is turned into text by your browser’s own speech service (or, if that cannot be used, short clips of your voice are sent to a speech service), and the words are then translated on your device or sent to be translated.</p>'+
+ '<div class="lt-pill" id="ltpill" style="display:none"><span class="lt-bc" id="ltbc" aria-hidden="true"></span><span>Eve is reading a shared screen</span><button class="lt-ps" id="ltpst" type="button">Stop</button></div>';
+ $$('ltpst').onclick=function(){ltScrStop('');};
  var chg=function(){LT.from=$$('ltfrom').value;LT.to=$$('ltto').value;LT.itr='';if(LT.mode==='speak'){ltMicRestart();ltSt('');if(LT.listening&&ltDevCan())ltDevGet(LT.from,LT.to);}};
  $$('ltfrom').onchange=$$('ltto').onchange=chg;
  $$('ltswap').onclick=function(){var f=LT.from;LT.from=LT.to;LT.to=f;$$('ltfrom').value=LT.from;$$('ltto').value=LT.to;[$$('ltfrom'),$$('ltto')].forEach(function(s){if(s._cs)s._cs.sync();});LT.itr='';if(LT.mode==='speak'){ltMicRestart();ltSt('');if(LT.listening&&ltDevCan())ltDevGet(LT.from,LT.to);}};
