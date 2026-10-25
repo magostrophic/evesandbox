@@ -1950,13 +1950,13 @@ function ltLookup(S,key){if(S.tr[key])return S.tr[key];var best=0,hit='';for(var
 var LSCR={zh:['Han'],ja:['Han','Hiragana','Katakana'],ko:['Hangul'],hi:['Devanagari'],mr:['Devanagari'],ne:['Devanagari'],bn:['Bengali'],ta:['Tamil'],te:['Telugu'],kn:['Kannada'],ml:['Malayalam'],gu:['Gujarati'],pa:['Gurmukhi'],ur:['Arabic'],ar:['Arabic'],fa:['Arabic'],he:['Hebrew'],th:['Thai'],ru:['Cyrillic'],uk:['Cyrillic'],el:['Greek']},LSRE={},LDENSE={zh:1,ja:1,ko:1};
 function ltScr(lang){if(!LSRE[lang]){var a=LSCR[lang]||['Latin'];LSRE[lang]=new RegExp('['+a.map(function(x){return '\\p{Script='+x+'}';}).join('')+']','gu');}return LSRE[lang];}
 /* a reading of the picture gives lines; only believable ones in the chosen language are kept (guesses from photos, icons and tiny marks are dropped) */
-function ltLineOk(l,lang){var t=String(l.text||'').replace(/\s+/g,' ').trim();
+function ltLineOk(l,lang,min){var t=String(l.text||'').replace(/\s+/g,' ').trim();
  if(lang==='zh'||lang==='ja')t=t.replace(/([\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}，。！？、：；「」（）])\s+(?=[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}，。！？、：；「」（）])/gu,'$1');
  if(lang==='en')t=t.replace(/(^|\s)\|(?=\s+[a-z])/g,'$1I');
  if(!t)return null;var dn=!!LDENSE[lang],bw=l.bbox.x1-l.bbox.x0,bh=l.bbox.y1-l.bbox.y0,n=(t.match(/\p{L}/gu)||[]).length,sn=(t.match(ltScr(lang))||[]).length;
  /* the reader is often unsure about Chinese, Japanese and Korean on moving video, so those are let in at a lower score; the writing-system check keeps the junk out. A single character must be a sure one.
     A line that is partly in another writing system (Chinese with its pinyin or English underneath) is let in when enough of it is in the chosen one */
- if(l.confidence<(dn?40:60)||n<(dn?1:3)||(dn&&sn<2&&l.confidence<75)||bh<9||bw<10||(!dn&&n/t.length<0.55)||!(dn?(sn/n>=0.5||(sn>=2&&sn/n>=0.25&&l.confidence>=60)):sn/n>=0.6))return null;var per=bw/t.length/bh;if(per<0.18||per>(dn?2.5:1.6))return null;
+ if(l.confidence<(min||(dn?40:60))||n<(dn?1:3)||(dn&&sn<2&&l.confidence<75)||bh<9||bw<10||(!dn&&n/t.length<0.55)||!(dn?(sn/n>=0.5||(sn>=2&&sn/n>=0.25&&l.confidence>=60)):sn/n>=0.6))return null;var per=bw/t.length/bh;if(per<0.18||per>(dn?2.5:1.6))return null;
  /* Chinese with pinyin or English beside it: only the Chinese words are kept (the pinyin is read badly and cannot be translated) */
  if(lang==='zh'&&sn/n<0.8){var re=ltScr(lang);t=t.split(' ').filter(function(w){if(!/\p{Script=Latin}/u.test(w))return true;re.lastIndex=0;var k=re.test(w);re.lastIndex=0;return k;}).join(' ').trim();if(!t)return null;n=(t.match(/\p{L}/gu)||[]).length;}
  return {t:t,x0:l.bbox.x0,y0:l.bbox.y0,x1:l.bbox.x1,y1:l.bbox.y1,s:l.confidence*n};}
@@ -2020,7 +2020,83 @@ function ltTrNeed(S){if(S.busy||Date.now()<S.errUntil)return;var from=LT.from,to
  ltTr(need.map(function(b){return b.t.slice(0,690);}),from,to).then(function(o){if(S.pair!==from+'>'+to)return;need.forEach(function(b,i){delete S.pend[b.key];if(o[i]&&ltKey(o[i])!==b.key){S.tr[b.key]=o[i];S.keys.push(b.key);}else S.bad[b.key]=1;});if(S.keys.length>400){S.keys.splice(0,200).forEach(function(k){delete S.tr[k];});}
    ltDraw(S);ltSideList(S);ltSt2('');var n=$$('ltvia');if(n)n.textContent=ltViaNote();},
   function(e){need.forEach(function(b){delete S.pend[b.key];});S.errUntil=Date.now()+12000;ltSt2(ltErr(e.code),'bad');}).then(function(){S.busy=false;});}
-async function ltOcrLoad(S,code){S.ready=false;if(S.worker){try{await S.worker.terminate();}catch(e){}S.worker=null;}
+/* ---- the Chinese reader. A text finder and a reader that run in the background on this device (free, nothing is sent anywhere).
+   They are far more accurate than the general reader on video: big lesson text, small subtitles and text over pictures. The worker's code is below; the files it loads are public and cached by the browser after the first time (about 27 MB) ---- */
+function ltPPWorker(){
+ var ort=null,det=null,rec=null,chars=null,cfg=null;
+ function say(m){postMessage(m);}
+ async function grab(url,label,lo,hi){
+  var r=await fetch(url);if(!r.ok)throw new Error('http '+r.status);var tot=+r.headers.get('content-length')||0,rd=r.body&&r.body.getReader();
+  if(!rd){var b=await r.arrayBuffer();say({t:'prog',p:hi});return b;}
+  var parts=[],got=0;for(;;){var x=await rd.read();if(x.done)break;parts.push(x.value);got+=x.value.length;if(tot)say({t:'prog',p:lo+(hi-lo)*Math.min(1,got/tot)});}
+  var out=new Uint8Array(got),o=0;parts.forEach(function(p){out.set(p,o);o+=p.length;});return out.buffer;}
+ async function load(c){cfg=c;
+  ort=await import(c.ort);ort.env.wasm.wasmPaths=c.wasm;ort.env.wasm.numThreads=1;ort.env.wasm.proxy=false;ort.env.logLevel='error';
+  var d=await grab(c.det,'det',0,30),r=await grab(c.rec,'rec',30,90),k=await (await fetch(c.keys)).text();
+  chars=['']; k.split('\n').forEach(function(x){if(x!=='')chars.push(x.replace(/\r$/,''));}); chars.push(' ');
+  var o={executionProviders:['wasm'],graphOptimizationLevel:'all'};
+  det=await ort.InferenceSession.create(new Uint8Array(d),o);say({t:'prog',p:95});rec=await ort.InferenceSession.create(new Uint8Array(r),o);}
+ /* pixels (RGBA) of the rectangle [x0,x1) x [y0,y1) shrunk or stretched to dw x dh. Shrinking averages the covered pixels so thin strokes survive */
+ function resize(src,sw,sh,x0,y0,x1,y1,dw,dh){var out=new Float32Array(dw*dh*3),cw=x1-x0,ch=y1-y0,fx=cw/dw,fy=ch/dh,x,y,i,j,k=0;
+  for(y=0;y<dh;y++){var ya=y0+y*fy,yb=ya+fy,ys=Math.max(0,Math.floor(ya)),ye=Math.min(sh-1,Math.max(ys,Math.ceil(yb)-1));
+   for(x=0;x<dw;x++){var xa=x0+x*fx,xb=xa+fx,xs=Math.max(0,Math.floor(xa)),xe=Math.min(sw-1,Math.max(xs,Math.ceil(xb)-1)),r=0,g=0,b=0,n=0;
+    if(fx<=1&&fy<=1){var sx=Math.min(sw-1,Math.max(0,x0+(x+0.5)*fx-0.5)),sy=Math.min(sh-1,Math.max(0,y0+(y+0.5)*fy-0.5)),ix=sx|0,iy=sy|0,jx=Math.min(sw-1,ix+1),jy=Math.min(sh-1,iy+1),ax=sx-ix,ay=sy-iy,p00=(iy*sw+ix)*4,p10=(iy*sw+jx)*4,p01=(jy*sw+ix)*4,p11=(jy*sw+jx)*4;
+     r=(src[p00]*(1-ax)+src[p10]*ax)*(1-ay)+(src[p01]*(1-ax)+src[p11]*ax)*ay;g=(src[p00+1]*(1-ax)+src[p10+1]*ax)*(1-ay)+(src[p01+1]*(1-ax)+src[p11+1]*ax)*ay;b=(src[p00+2]*(1-ax)+src[p10+2]*ax)*(1-ay)+(src[p01+2]*(1-ax)+src[p11+2]*ax)*ay;n=1;}
+    else{for(j=ys;j<=ye;j++)for(i=xs;i<=xe;i++){var q=(j*sw+i)*4;r+=src[q];g+=src[q+1];b+=src[q+2];n++;}}
+    out[k++]=r/n;out[k++]=g/n;out[k++]=b/n;}}
+  return out;}
+ /* the text finder: gives the places where writing is, as rectangles in the picture's own pixels */
+ async function find(src,W,H,lim){var ms=Math.max(W,H),ra=ms>lim?lim/ms:1,nw=Math.max(32,Math.round(W*ra/32)*32),nh=Math.max(32,Math.round(H*ra/32)*32),px=resize(src,W,H,0,0,W,H,nw,nh),N=nw*nh,t=new Float32Array(3*N),i;
+  var mean=[0.485,0.456,0.406],std=[0.229,0.224,0.225];
+  for(i=0;i<N;i++){var r=px[i*3],g=px[i*3+1],b=px[i*3+2];t[i]=(b/255-mean[0])/std[0];t[N+i]=(g/255-mean[1])/std[1];t[2*N+i]=(r/255-mean[2])/std[2];}
+  var o=await det.run({x:new ort.Tensor('float32',t,[1,3,nh,nw])}),p=o[det.outputNames[0]].data,lab=new Int32Array(N),st=new Int32Array(N),boxes=[],cur=0;
+  for(i=0;i<N;i++){if(p[i]<=0.3||lab[i])continue;cur++;var sp=0,x0=nw,y0=nh,x1=0,y1=0,cnt=0,sum=0;st[sp++]=i;lab[i]=cur;
+   while(sp){var q=st[--sp],qx=q%nw,qy=(q/nw)|0;cnt++;sum+=p[q];if(qx<x0)x0=qx;if(qx>x1)x1=qx;if(qy<y0)y0=qy;if(qy>y1)y1=qy;
+    for(var dy=-1;dy<=1;dy++){var yy=qy+dy;if(yy<0||yy>=nh)continue;for(var dx=-1;dx<=1;dx++){var xx=qx+dx;if(xx<0||xx>=nw)continue;var nb=yy*nw+xx;if(!lab[nb]&&p[nb]>0.3){lab[nb]=cur;st[sp++]=nb;}}}}
+   var bw=x1-x0+1,bh=y1-y0+1;if(bw<3||bh<3||cnt<12||sum/cnt<cfg.box)continue;
+   var d=bw*bh*1.5/(2*(bw+bh));boxes.push({x0:Math.max(0,(x0-d)/nw*W),y0:Math.max(0,(y0-d)/nh*H),x1:Math.min(W,(x1+1+d)/nw*W),y1:Math.min(H,(y1+1+d)/nh*H),sc:sum/cnt});}
+  return boxes;}
+ /* the reader: one line of writing to its words */
+ async function readLine(src,W,H,b){var bw=b.x1-b.x0,bh=b.y1-b.y0;if(bw<6||bh<6)return null;var dh=48,dw=Math.max(16,Math.min(2400,Math.round(dh*bw/bh)));
+  var px=resize(src,W,H,b.x0,b.y0,b.x1,b.y1,dw,dh),N=dw*dh,t=new Float32Array(3*N),i;
+  for(i=0;i<N;i++){t[i]=(px[i*3+2]/255-0.5)/0.5;t[N+i]=(px[i*3+1]/255-0.5)/0.5;t[2*N+i]=(px[i*3]/255-0.5)/0.5;}
+  var o=await rec.run({x:new ort.Tensor('float32',t,[1,3,dh,dw])}),out=o[rec.outputNames[0]],T=out.dims[1],C=out.dims[2],d=out.data,prev=0,txt='',sc=0,n=0;
+  for(var s=0;s<T;s++){var best=0,bv=-1,off=s*C;for(var c=0;c<C;c++){if(d[off+c]>bv){bv=d[off+c];best=c;}}
+   if(best!==0&&best!==prev){txt+=chars[best]||'';sc+=bv;n++;}prev=best;}
+  return {text:txt,conf:n?sc/n:0};}
+ async function run(m){var src=new Uint8ClampedArray(m.buf),W=m.w,H=m.h,t0=performance.now(),bx=await find(src,W,H,m.lim||1280),t1=performance.now(),res=[];
+  bx.sort(function(a,b){return (b.x1-b.x0)*(b.y1-b.y0)-(a.x1-a.x0)*(a.y1-a.y0);});bx=bx.slice(0,m.max||22);
+  for(var i=0;i<bx.length;i++){var b=bx[i];if((b.y1-b.y0)>2.5*(b.x1-b.x0))continue;var r=await readLine(src,W,H,b);if(r&&r.text.trim())res.push({text:r.text,confidence:r.conf*100,bbox:{x0:b.x0,y0:b.y0,x1:b.x1,y1:b.y1}});}
+  return {lines:res,ms:[Math.round(t1-t0),Math.round(performance.now()-t1)],boxes:bx.length};}
+ onmessage=async function(e){var m=e.data;try{
+  if(m.t==='load'){await load(m.cfg);say({t:'ready'});}
+  else if(m.t==='run'){var r=await run(m);say({t:'done',id:m.id,lines:r.lines,ms:r.ms,boxes:r.boxes});}
+ }catch(err){say({t:'err',id:m.id,e:String(err&&err.message||err)});}};
+}
+var LTPPB=['https://cdn.jsdelivr.net/npm/','https://unpkg.com/'];
+function ltPPLoad(S,onprog){
+ function tryBase(i){if(i>=LTPPB.length)return Promise.reject(new Error('reader'));
+  var o=LTPPB[i]+'onnxruntime-web@1.20.1/dist/',m=LTPPB[i]+'@gutenye/ocr-models@1.4.2/assets/';
+  return new Promise(function(res,rej){var w;try{w=new Worker(URL.createObjectURL(new Blob(['('+ltPPWorker.toString()+')()'],{type:'text/javascript'})),{type:'module'});}catch(e){return rej(e);}
+   var P={w:w,q:{},n:0,ready:false};
+   w.onmessage=function(e){var d=e.data;if(d.t==='ready'){P.ready=true;res(P);}else if(d.t==='prog'){if(onprog)onprog(Math.round(d.p));}
+    else if(d.t==='err'&&!d.id){try{w.terminate();}catch(x){}rej(new Error(d.e));}
+    else if(d.id&&P.q[d.id]){var q=P.q[d.id];delete P.q[d.id];clearTimeout(q.tm);d.t==='err'?q.rej(new Error(d.e)):q.res(d);}};
+   w.onerror=function(){if(!P.ready){try{w.terminate();}catch(x){}rej(new Error('reader'));}};
+   w.postMessage({t:'load',cfg:{ort:o+'ort.wasm.min.mjs',wasm:o,det:m+'ch_PP-OCRv4_det_infer.onnx',rec:m+'ch_PP-OCRv4_rec_infer.onnx',keys:m+'ppocr_keys_v1.txt',box:0.55}});
+  }).catch(function(){return tryBase(i+1);});}
+ return tryBase(0).then(function(P){S.pp=P;return P;});}
+function ltPPRun(S,img,w,h){var P=S.pp;if(!P)return Promise.reject(new Error('reader'));
+ return new Promise(function(res,rej){var id=++P.n,b=img.slice();P.q[id]={res:res,rej:rej,tm:setTimeout(function(){delete P.q[id];rej(new Error('slow'));},40000)};P.w.postMessage({t:'run',id:id,buf:b.buffer,w:w,h:h,lim:1280,max:22},[b.buffer]);});}
+function ltPPStop(S){var P=S&&S.pp;if(!P)return;S.pp=null;try{P.w.terminate();}catch(e){}Object.keys(P.q).forEach(function(k){clearTimeout(P.q[k].tm);try{P.q[k].rej(new Error('stopped'));}catch(e){}});}
+async function ltReadPP(S,img,w,h,lang){var r=await ltPPRun(S,img,w,h);if(LT.scr!==S)return null;var cand=[],done=[],seen=0;
+ (r.lines||[]).forEach(function(l){if(l.confidence>=40)seen++;if(l.confidence>=90)done.push(l.bbox);var k=ltLineOk(l,lang,62);if(k)cand.push(k);});
+ return {cand:cand,done:done,seen:seen};}
+async function ltOcrLoad(S,code){S.ready=false;if(S.worker){try{await S.worker.terminate();}catch(e){}S.worker=null;}ltPPStop(S);
+ if(code==='chi_sim'){ltSt2('Loading the Chinese reader… the first time it downloads about 27 MB.','');
+  try{await ltPPLoad(S,function(p){if(LT.scr===S)ltSt2('Downloading the Chinese reader… '+p+'%','');});
+   if(LT.scr!==S){ltPPStop(S);return;}S.code=code;S.ready=true;ltSt2('');return;}
+  catch(e){ltPPStop(S);console.warn('the Chinese reader could not be loaded, using the general reader instead',e);}}
  ltSt2('Loading the text reader for '+ltL(LT.from)[1]+'… the first time can take a little while.','');
  await need('tesseract');
  var w=await Tesseract.createWorker(code,1,{langPath:'https://cdn.jsdelivr.net/npm/@tesseract.js-data/'+code+'/4.0.0_best_int',logger:function(m){if(LT.scr===S&&m&&/traineddata/.test(m.status||'')&&m.progress>0&&m.progress<1)ltSt2('Downloading the '+ltL(LT.from)[1]+' reading data… '+Math.round(m.progress*100)+'%','');}});
@@ -2109,8 +2185,8 @@ async function ltScrLoop(S){var cv=document.createElement('canvas'),mc=document.
     if(!img)img=cx.getImageData(0,0,w,h).data;
     var g=S.gd;if(g.width!==w||g.height!==h){g.width=w;g.height=h;}g.getContext('2d').drawImage(cv,0,0);
     ltScrMsg(S,S.blocks.length?'':'Reading your screen…');
-    var rd=await ltRead(S,cv,w,h,lang);if(!rd||LT.scr!==S)return;
-    var cand=rd.cand,mk=ltMask(img,w,h,mc,rd.done);
+    var rd=S.pp?await ltReadPP(S,img,w,h,lang):await ltRead(S,cv,w,h,lang);if(!rd||LT.scr!==S)return;
+    var cand=rd.cand,mk=S.pp?null:ltMask(img,w,h,mc,rd.done);
     if(mk){var r2=await S.worker.recognize(mk.c,{},{blocks:true});if(LT.scr!==S)return;cand=cand.concat((r2.data.lines||[]).map(function(l){return ltLineOk(ltShift(l,mk.oy),lang);}).filter(Boolean));}
     if(lang!==LT.from)continue;
     S.w=w;S.h=h;S.blocks=ltBlocks(ltPick(cand),img,w,h);
@@ -2139,7 +2215,7 @@ async function ltScrStart(){if(LT.scr){ltScrStop('');return;}
  if(LT.scr!==S)return;if(vt.readyState==='ended'){ltScrStop('Screen sharing ended.');return;}
  try{await ltOcrLoad(S,ltL(LT.from)[3]);}catch(e){if(LT.scr===S){ltScrStop('');ltSt2('The text reader could not be loaded. Please check your internet connection and try again.','bad');}return;}
  if(LT.scr===S)ltScrLoop(S);}
-function ltScrStop(msg){var S=LT.scr;LT.scr=null;if(S){if(S.hist)LT.hist=S.hist;try{S.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}try{if(S.worker)S.worker.terminate();}catch(e){}try{document.removeEventListener('visibilitychange',S.vis);}catch(e){}try{if(S.rd)S.rd.cancel();}catch(e){}try{if(S.vf)S.vf.close();}catch(e){}}
+function ltScrStop(msg){var S=LT.scr;LT.scr=null;if(S){if(S.hist)LT.hist=S.hist;try{S.stream.getTracks().forEach(function(t){t.stop();});}catch(e){}try{if(S.worker)S.worker.terminate();}catch(e){}try{ltPPStop(S);}catch(e){}try{document.removeEventListener('visibilitychange',S.vis);}catch(e){}try{if(S.rd)S.rd.cancel();}catch(e){}try{if(S.vf)S.vf.close();}catch(e){}}
  var v=$$('ltv');if(v){try{v.srcObject=null;}catch(e){}}var pv=$$('ltpv');if(pv)pv.style.display='none';var c=$$('ltov');if(c){try{c.getContext('2d').clearRect(0,0,c.width,c.height);}catch(e){}}ltScrUI();if(msg!==undefined)ltSt2(msg,'');ltPipRender();}
 /* ---- a small window that stays on top of everything (Chrome and Edge), so the translation can be read while watching the video ---- */
 var LTP=null;
