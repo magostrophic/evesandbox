@@ -3688,7 +3688,7 @@ window.addEventListener('hashchange',function(){if(curR()!=='eve')aiLeave();if(c
 function route(){var r=curR();menu(false);app.onclick=null;tsStop();ltStop();
  var known=r===''||r==='home'||r==='404'||ROUTES.indexOf(r)>=0;if(!known)r=PM?'404':'';
  setTitle(r===''?'home':r);
- app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||!!LOCKED[r]||(['planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve','translate'].indexOf(r)<0));
+ app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||!!LOCKED[r]||(['planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve','translate','share'].indexOf(r)<0));
  if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='deal')dealPage();else if(r==='tts')ttsPage();else if(r==='translate')translatePage();else if(r==='share')sharePage();else if(r==='qr')qrPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(FULL[r])FULL[r]();else home();
  fixLinks(app);window.scrollTo(0,0);}
 
