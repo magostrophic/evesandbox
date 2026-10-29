@@ -190,7 +190,7 @@ function colorOf(n){for(var i=0;i<S.subjects.length;i++)if(S.subjects[i].n===n)r
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var app=document.getElementById('app');
 
-function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',deal:'tools',tts:'tools',qr:'tools',grab:'tools',convert:'tools',ide:'tools',eve:'tools',translate:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
+function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',deal:'tools',tts:'tools',share:'tools',qr:'tools',grab:'tools',convert:'tools',ide:'tools',eve:'tools',translate:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
 
 function planner(){
  nav('planner');
@@ -830,7 +830,7 @@ function vDraw(){
  o.innerHTML=h;
 }
 
-var CFG=Object.assign({email:'',phone:'',legalName:'',address:'',donate:[],donateApi:'',dealApi:'',grabApi:'',runApi:'',aiApi:'',turnstileKey:''},window.EVE_CFG||{});
+var CFG=Object.assign({email:'',phone:'',legalName:'',address:'',donate:[],donateApi:'',dealApi:'',grabApi:'',runApi:'',aiApi:'',shareApi:'',turnstileKey:''},window.EVE_CFG||{});
 var TL=[
  {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
  {r:'deal',c:'i10',ic:'tag',n:'Deal or No Deal',d:'Tell Eve what you want to buy. She suggests what to look for, links the top stores and shows which price is the real best deal.'},
@@ -843,10 +843,11 @@ var TL=[
  {r:'pdf',c:'i3',ic:'pdf',n:'PDF Tool',d:'Make, merge, split and compress PDFs, and add or remove passwords.'},
  {r:'qr',c:'i9',ic:'qr',n:'QR Code Generator',d:'Make a QR code for a link, text, Wi-Fi, email, phone number or contact card, and download it as PNG or SVG.'},
  {r:'planner',c:'',ic:'calendar',n:'Study Planner',d:'Plan your week with subjects and time slots, then print it or save it as an image.'},
+ {r:'share',c:'i13',ic:'share',n:'Text and File Sharing',d:'Send a note or files to anyone with a short code. It is deleted on its own after the time you pick, up to 2 hours.'},
  {r:'tts',c:'i11',ic:'speaker',n:'Text to Speech',d:'Hear your words read out loud as you type, or turn a paragraph into an audio file you can download.'},
  {r:'virus',c:'i4',ic:'shield',n:'Virus Checker',d:'Check whether a website or link looks safe before you open it.'}];
 var LOCKED={};TL.forEach(function(t){if(t.lock)LOCKED[t.r]=1;});
-/*RANKDATA*/var RANKD={"stages":[["a","Arcane Stage"],["0","Stage Zero"],["1","Stage One"],["2","Stage Two"],["3","Stage Three"],["4","Stage Four"],["5","Stage Five"],["6","Stage Six"],["7","Stage Seven"],["8","Stage Eight"],["9","Stage Nine"]],"tools":{"eve":["0","The most capable tool here. It answers questions, teaches step by step, makes flashcards and practice tests, and works from your own notes."],"translate":["1","Turns speech and the text on a shared screen into another language as it happens, across many languages."],"ide":["2","Runs real Python, C and Java programs with live input and output, right on the page."],"convert":["3","Converts pictures, PDFs, documents, spreadsheets and audio between many formats, right on your device."],"tts":["4","Two ways to listen: hear words read out as you type, or turn a paragraph into a downloadable audio file, with voices for many countries."],"pdf":["5","Several useful jobs in one place: make, merge, split and compress PDFs, and add or remove passwords."],"virus":["6","Weighs several signals about a link, such as warning lists and domain age, without ever opening it. A good first look, not a full scan."],"image":["6","Compresses, resizes, crops and removes plain backgrounds. A few jobs done well, each one fairly simple."],"deal":["7","Helps you decide what to buy and sends you to the right stores. It guides your shopping rather than fetching every price itself."],"qr":["7","Makes codes for links, text, Wi-Fi, email, phone numbers and contacts. One job, done cleanly."],"calc":["8","Works out CGPA and attendance and shows what you need for your targets. Useful, but a small single-purpose tool."],"planner":["8","A simple weekly grid you can print or save as a picture. Easy to use and light on features."],"grab":["9","Locked, so it cannot do anything yet. Its stage will be looked at again when it opens."]}};/*ENDRANKDATA*/
+/*RANKDATA*/var RANKD={"stages":[["a","Arcane Stage"],["0","Stage Zero"],["1","Stage One"],["2","Stage Two"],["3","Stage Three"],["4","Stage Four"],["5","Stage Five"],["6","Stage Six"],["7","Stage Seven"],["8","Stage Eight"],["9","Stage Nine"]],"tools":{"eve":["0","The most capable tool here. It answers questions, teaches step by step, makes flashcards and practice tests, and works from your own notes."],"translate":["1","Turns speech and the text on a shared screen into another language as it happens, across many languages."],"ide":["2","Runs real Python, C and Java programs with live input and output, right on the page."],"convert":["3","Converts pictures, PDFs, documents, spreadsheets and audio between many formats, right on your device."],"tts":["4","Two ways to listen: hear words read out as you type, or turn a paragraph into a downloadable audio file, with voices for many countries."],"pdf":["5","Several useful jobs in one place: make, merge, split and compress PDFs, and add or remove passwords."],"virus":["6","Weighs several signals about a link, such as warning lists and domain age, without ever opening it. A good first look, not a full scan."],"image":["6","Compresses, resizes, crops and removes plain backgrounds. A few jobs done well, each one fairly simple."],"deal":["7","Helps you decide what to buy and sends you to the right stores. It guides your shopping rather than fetching every price itself."],"qr":["7","Makes codes for links, text, Wi-Fi, email, phone numbers and contacts. One job, done cleanly."],"calc":["8","Works out CGPA and attendance and shows what you need for your targets. Useful, but a small single-purpose tool."],"planner":["8","A simple weekly grid you can print or save as a picture. Easy to use and light on features."],"grab":["9","Locked, so it cannot do anything yet. Its stage will be looked at again when it opens."],"share":["5","Shares a note and files through a short code and deletes everything on its own when the timer you chose runs out, up to two hours."]}};/*ENDRANKDATA*/
 function rankBadge(k){var s=RANKD.stages.filter(function(x){return x[0]===k;})[0];return '<span class="rk s'+k+'">'+(k==='a'?ico('spark',12,2.4):'')+s[1]+'</span>';}
 function rankList(){return '<div class="rkl">'+RANKD.stages.map(function(s){
  var ts=TL.filter(function(t){var r=RANKD.tools[t.r];return r&&r[0]===s[0];}).sort(function(a,b){return a.n<b.n?-1:1;});
@@ -1046,22 +1047,23 @@ async function dThanks(api){
  else n.innerHTML='<div class="note" style="margin:0 0 16px">We could not check that payment just now. If money left your account, it will be shown in your bank or UPI app, and you can <a href="#/contact">contact us</a>.</div>';
 }
 function termsPage(){nav('terms');
- app.innerHTML=banner('Legal','Terms of Service','Last updated: October 10, 2026')+
+ app.innerHTML=banner('Legal','Terms of Service','Last updated: October 27, 2026')+
  '<div class="wrapc doc" style="max-width:760px"><p>By using Eve Sandbox you agree to these terms. If you do not agree, please do not use the site.</p>'+
  '<h2>1. Using the site</h2><p>Eve Sandbox provides free tools for personal and educational use. You must use them lawfully and must not use the site to harm others, break the law, or interfere with how the site works.</p>'+
  '<h2>2. Your files and data</h2><p>The image and PDF tools work inside your browser. Your files are not uploaded to Eve Sandbox. You keep all rights to your files and are responsible for having the right to edit them. Keep a copy of your originals, because we cannot recover files for you. See the <a href="#/privacy" style="color:var(--brand)">Privacy</a> page for details.</p>'+
  '<h2>3. Passwords on PDFs</h2><p>If you protect a PDF with a password, we cannot recover that password for you. Only remove a password from a file you own or have permission to unlock. The tool cannot guess or crack passwords.</p>'+
  '<h2>4. Virus Checker</h2><p>The Virus Checker gives an automated opinion based on the look of an address and on third-party services. It is not a guarantee that a site is safe or unsafe. Use your own judgment, and do not enter passwords or payment details on a site you are unsure about.</p>'+
  '<h2>5. Prices and suggestions</h2><p>Suggestions, price ranges and verdicts in Deal or No Deal and Eve AI are automated estimates, not live prices or professional advice. Prices, offers and stock change often, so check everything on the store’s own page before you pay. Product links come from an automated web search and can be out of date, sold out or not exactly what you meant. Eve Sandbox does not sell products and is not connected to the stores it links to.</p>'+
- '<h2>6. No warranty</h2><p>The site and its tools are provided “as is” and “as available”, without promises of accuracy, availability or fitness for a particular purpose. To the fullest extent the law allows, we are not liable for any loss or damage from using the site or relying on its results.</p>'+
- '<h2>7. Third-party services and links</h2><p>Some features use or link to services run by others, such as lookup services, security-checking websites and payment and email services. We do not control them and are not responsible for their content or policies.</p>'+
- '<h2>8. Changes</h2><p>We may change the site or these terms from time to time. Continuing to use the site after a change means you accept the updated terms.</p>'+
- '<h2>9. Contact</h2><p>Questions about these terms? Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
+ '<h2>6. Text and File Sharing</h2><p>Shares are temporary. They are deleted automatically when their time ends (never more than 2 hours later) and we cannot bring them back. Anyone who has a share’s code can open it, so you are responsible for what you share and for who you give the code to. Do not share anything unlawful, harmful or that you have no right to share, including malware, other people’s private information and content that infringes someone’s rights. We may remove shares and limit use to keep the service safe and available for everyone.</p>'+
+ '<h2>7. No warranty</h2><p>The site and its tools are provided “as is” and “as available”, without promises of accuracy, availability or fitness for a particular purpose. To the fullest extent the law allows, we are not liable for any loss or damage from using the site or relying on its results.</p>'+
+ '<h2>8. Third-party services and links</h2><p>Some features use or link to services run by others, such as lookup services, security-checking websites and payment and email services. We do not control them and are not responsible for their content or policies.</p>'+
+ '<h2>9. Changes</h2><p>We may change the site or these terms from time to time. Continuing to use the site after a change means you accept the updated terms.</p>'+
+ '<h2>10. Contact</h2><p>Questions about these terms? Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
 function privacyPage(){nav('privacy');
- app.innerHTML=banner('Legal','Privacy','Last updated: October 10, 2026')+
+ app.innerHTML=banner('Legal','Privacy','Last updated: October 27, 2026')+
  '<div class="wrapc doc" style="max-width:760px"><h2 style="margin-top:0">The short version</h2><p>No accounts. Your images and PDFs stay on your device. We do not add analytics or advertising code to this site.</p>'+
  '<h2>What stays on your device</h2><ul><li>Images and PDFs you open in the tools are processed in your browser and are never sent to us.</li><li>The Study Planner, the Complex Calculator and your Eve AI chats save their data in your browser so it is there next time. Clearing your browser data removes it.</li></ul>'+
- '<h2>What leaves your device</h2><p>Some features need help from outside services. We keep this to the minimum each feature needs, and those services follow their own privacy policies.</p><ul>'+
+ '<h2>What leaves your device</h2><p>Some features need help from outside services, or store what you give them for a short time. We keep this to the minimum each feature needs, and those services follow their own privacy policies.</p><ul>'+
  '<li><b>Virus Checker:</b> the address you enter is sent to a few public lookup services to find out about it. The tool never visits the address itself.</li>'+
  '<li><b>Supporting software:</b> some tools (such as the PDF tools, the File Converter and Eve IDE) download the extra software they need from a public source the first time you use them.</li>'+
  '<li><b>Eve IDE:</b> Python runs on your device. When you run C or Java, your code and input are sent to an online service that runs them and sends back the result.</li>'+
@@ -1070,6 +1072,7 @@ function privacyPage(){nav('privacy');
  '<li><b>Deal or No Deal:</b> what you type about the item you want, your budget, and any prices you add are sent to an AI service so it can write its suggestions, and to a web search service that looks for matching product pages. They are not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Text to Speech:</b> the Speak as you type section runs on your device and sends nothing. When you make an audio file, the paragraph you wrote is sent to a speech service so it can create the audio. It is not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Live Translate:</b> in Speak, your browser’s own speech service turns what you say into text. If that service cannot be used, short clips of your voice are sent to a speech service instead so they can be turned into text, and they are not stored by this website. In Screen, the picture of your screen never leaves your device; the words on it are read on your device. The words are then translated on your device when your browser can do that, or sent to a translation service so they can be translated. They are not stored by this website. Please do not share private personal details.</li>'+
+ '<li><b>Text and File Sharing:</b> the note and files you share are sent to us and kept in storage only until the time you pick, which is never more than 2 hours. Then they are deleted automatically, or sooner if you stop the share. Anyone who has the share’s code can open it until then. A security check is used before a share is made, and its provider may look at technical details of your browser to do this. Please do not share passwords or private personal details.</li>'+
  '<li><b>Links you open</b> take you to other websites with their own policies.</li>'+
  '<li><b>Contact form:</b> the form uses a security check to tell people from automated programs, and the check provider may look at technical details of your browser to do this. The name, email and message you type are sent to us by email so they reach us. We use them only to read and answer your message.</li>'+
  '<li><b>Donations:</b> if you donate, the amount and the mobile number you type (plus the name and email, if you give them) are sent to our payment partner to start the payment, and you pay on their page under their own privacy policy. Eve Sandbox does not store your payment details or your mobile number.</li></ul>'+
@@ -1215,8 +1218,8 @@ var FULL={tools:toolsPage,about:aboutPage,contact:contactPage,donate:donatePage,
 
 /* ---------- pages and addresses ---------- */
 var PAGE=EVE_PAGE,PM=!!PAGE,BASEP=EVE_BASE,INIT404=PAGE==='404';
-var ROUTES=['tools','about','contact','donate','terms','privacy','planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve','translate'];
-var TITLES={home:'Home',tools:'Tools',about:'About',contact:'Contact',donate:'Donate',terms:'Terms of Service',privacy:'Privacy',planner:'Study Planner',image:'Image Tool',pdf:'PDF Tool',virus:'Virus Checker',calc:'Complex Calculator',deal:'Deal or No Deal',tts:'Text to Speech',qr:'QR Code Generator',grab:'Grab Box',convert:'File Converter',ide:'Eve IDE',eve:'Eve AI',translate:'Live Translate','404':'Page Not Found'};
+var ROUTES=['tools','about','contact','donate','terms','privacy','planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve','translate','share'];
+var TITLES={home:'Home',tools:'Tools',about:'About',contact:'Contact',donate:'Donate',terms:'Terms of Service',privacy:'Privacy',planner:'Study Planner',image:'Image Tool',pdf:'PDF Tool',virus:'Virus Checker',calc:'Complex Calculator',deal:'Deal or No Deal',tts:'Text to Speech',qr:'QR Code Generator',grab:'Grab Box',convert:'File Converter',ide:'Eve IDE',eve:'Eve AI',translate:'Live Translate',share:'Text and File Sharing','404':'Page Not Found'};
 function U(r){r=(!r||r==='home')?'':r;return PM?BASEP+(r?r+'/':''):'#/'+r;}
 function curR(){
  if(!PM)return location.hash.replace('#/','');
@@ -1235,6 +1238,140 @@ function go(r){var u=U(r);
  fire();}
 function notFound(){nav('404');
  app.innerHTML=banner('404','Page not found','That page does not exist.')+'<div class="wrapc"><div class="card" style="text-align:center;padding:32px 20px"><h3>We could not find that page</h3><p>The link may be old or mistyped.</p><div class="cta" style="justify-content:center;margin-top:16px"><a class="btn pri" href="#/">Go to the home page</a><a class="btn" href="#/tools">See the tools</a></div><p style="margin-top:26px">Or jump straight to a tool:</p><div class="cta" style="justify-content:center;margin-top:10px"><a class="btn" href="#/eve">Eve AI</a><a class="btn" href="#/planner">Study Planner</a><a class="btn" href="#/image">Image Tool</a><a class="btn" href="#/pdf">PDF Tool</a><a class="btn" href="#/calc">Complex Calculator</a></div></div></div>';}
+/* ---------- Text and File Sharing: a note and/or files, kept for up to 2 hours, opened with a short code ---------- */
+IC.share='<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>';
+var SH={api:'',cfg:null,files:[],mins:30,tok:'',tid:null,busy:false,mine:null,tm:{},lim:{files:5,total:25000000,text:20000}};
+var SHK='eve-sandbox:share:last';
+var SHM=[[5,'5 min','5 minutes'],[15,'15 min','15 minutes'],[30,'30 min','30 minutes'],[60,'1 hour','1 hour'],[90,'90 min','90 minutes'],[120,'2 hours','2 hours']];
+var SHE={captcha:'The security check did not pass. Please try it again.',rate:'That is a lot of tries in a short time. Please wait a little and try again.',busy:'Sharing is very busy right now. Please try again later.',storage:'Sharing hit a problem. Please try again in a moment.',big:'Those files are too big. The limit is 25 MB in total.',files:'You can share up to 5 files at a time.',text:'That note is too long.',time:'Please pick how long to keep it.',empty:'Add a note or a file first.',off:'Sharing is not available right now.',size:'A file did not upload properly. Please try again.',key:'Something went wrong while uploading. Please try again.',bad:'Something went wrong. Please try again.',gone:'The time ran out before the upload finished. Please choose a longer time.',net:'We could not reach the sharing service. Please check your connection and try again.'};
+function shApi(){var a=String(CFG.shareApi||'').replace(/\/+$/,'');if(a)return a;var m=/^(https?:\/\/)eve-ai(\.[^\/]+)$/.exec(String(CFG.aiApi||'').replace(/\/+$/,''));return m?m[1]+'eve-share'+m[2]:'';}
+function shFmt(s){var h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60,p=function(n){return n<10?'0'+n:''+n;};return h?h+':'+p(m)+':'+p(x):m+':'+p(x);}
+function shCode(c){return c.slice(0,4)+'-'+c.slice(4);}
+function shNorm(c){return String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
+function shMsg(id,t,k){var e=$$(id);if(e)e.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span></div>':'';}
+function shGet(k){try{return JSON.parse(sessionStorage.getItem(k));}catch(e){return null;}}
+function shSet(k,v){try{if(v==null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function shCopy(t,what){ltCopyText(t).then(function(){toast('Copied!');},function(){toast('Copying was blocked. Please select the '+what+' and copy it.');});}
+function shJson(r){return r.json().then(function(j){return {s:r.status,j:j};},function(){return {s:r.status,j:null};});}
+function shRun(id,end,done){clearInterval(SH.tm[id]);var tick=function(){var el=$$(id);if(!el){clearInterval(SH.tm[id]);return;}var s=Math.max(0,Math.ceil((end-Date.now())/1000));el.textContent=shFmt(s);if(s<=0){clearInterval(SH.tm[id]);done();}};tick();SH.tm[id]=setInterval(tick,500);}
+function shPut(code,key,i,file,onp){return new Promise(function(ok,no){var x=new XMLHttpRequest();x.open('PUT',SH.api+'/file/'+code+'/'+i);x.setRequestHeader('X-Share-Key',key);
+ x.upload.onprogress=function(e){if(e.lengthComputable)onp(e.loaded);};
+ x.onload=function(){var j=null;try{j=JSON.parse(x.responseText);}catch(e){}if(x.status===200&&j&&j.ok)ok();else no({err:j&&j.error});};
+ x.onerror=function(){no({});};x.ontimeout=x.onerror;x.timeout=10*60*1000;x.send(file);});}
+function shTotal(){return SH.files.reduce(function(a,f){return a+f.size;},0);}
+function shFiles(){var b=$$('shfl');if(!b)return;
+ b.innerHTML=SH.files.map(function(f,i){return '<div class="shf"><span class="nm">'+esc(f.name)+'</span><span class="sz">'+fb(f.size)+'</span><button class="x" type="button" data-i="'+i+'" aria-label="Remove '+esc(f.name)+'">'+ico('x',14,2.4)+'</button></div>';}).join('')+
+ (SH.files.length?'<p class="hint" style="margin:8px 0 0">'+SH.files.length+(SH.files.length===1?' file':' files')+', '+fb(shTotal())+' of 25 MB</p>':'');}
+function shAdd(list){var err='';Array.prototype.forEach.call(list||[],function(f){
+  if(SH.files.length>=SH.lim.files){err='You can share up to '+SH.lim.files+' files at a time.';return;}
+  if(!f.size){err='"'+f.name+'" is empty, so it was skipped.';return;}
+  if(shTotal()+f.size>SH.lim.total){err='Files can be '+Math.round(SH.lim.total/1000000)+' MB in total, so "'+f.name+'" did not fit.';return;}
+  SH.files.push(f);});
+ shFiles();shMsg('shm1',err,err?'warn':'');}
+function shCount(){var t=$$('shtx'),c=$$('shcn');if(t&&c)c.textContent=t.value.length+' / '+SH.lim.text;}
+function shOff(t){shMsg('shst',t||'Text and File Sharing is getting ready. Please check back soon.','warn');['shgo','shopen'].forEach(function(i){var b=$$(i);if(b)b.disabled=true;});}
+function shCapReset(){SH.tok='';try{if(SH.tid!=null&&window.turnstile)turnstile.reset(SH.tid);}catch(e){}}
+function shHealth(){
+ if(!SH.api){shOff();return;}
+ var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},9000);
+ fetch(SH.api+'/health',{signal:ctl.signal}).then(function(r){return r.json();}).then(function(j){clearTimeout(tm);
+  if(!j||!j.ok||!j.storage)throw 0;SH.cfg=j;
+  if(j.maxFiles>0)SH.lim.files=j.maxFiles;if(j.maxTotalBytes>0)SH.lim.total=j.maxTotalBytes;if(j.maxText>0)SH.lim.text=j.maxText;shCount();
+  if(j.captcha){
+   if(!tsOn()){shOff('The security check is not set up yet, so sharing is paused. Please check back soon.');return;}
+   var h=$$('shcap');if(!h)return;h.style.display='';
+   tsLib().then(function(T){if(!$$('shcap'))return;SH.tid=T.render($$('shcap'),{sitekey:CFG.turnstileKey,theme:'auto',callback:function(x){SH.tok=x;},'expired-callback':function(){SH.tok='';},'error-callback':function(){SH.tok='';}});},
+    function(){shMsg('shm1','The security check could not load. Please reload the page.','bad');});}
+ }).catch(function(){clearTimeout(tm);shOff();});}
+function shMineDraw(){var m=SH.mine,box=$$('shres');if(!box)return;if(!m){box.innerHTML='';return;}
+ var parts=[];if(m.note)parts.push('a note');if(m.files.length)parts.push(m.files.length+(m.files.length===1?' file':' files')+' ('+fb(m.size)+')');
+ box.innerHTML='<div class="shres" role="status"><div class="shcd" style="margin:0 0 6px">Your share code</div><div class="shcode" id="shbig">'+shCode(m.code)+'</div>'+
+  '<div class="shcd">Disappears in <b id="shcd1"></b></div>'+
+  '<div class="dl-cta"><button class="btn pri" id="shcc" type="button">'+ico('copy',16,2.2)+'Copy code</button><button class="btn" id="shcl" type="button">'+ico('copy',16,2.2)+'Copy link</button></div>'+
+  '<p class="shsum">Sharing '+parts.join(' and ')+'. Anyone who has this code can open it until the time is up.</p>'+
+  '<div class="dl-cta" style="margin-top:6px"><button class="btn" id="shstop" type="button">Stop sharing now</button></div></div>';
+ $$('shcc').onclick=function(){shCopy(shCode(m.code),'code');};
+ $$('shcl').onclick=function(){shCopy(PM?location.origin+U('share')+'?c='+m.code:location.href.split('#')[0]+'#/share','link');};
+ $$('shstop').onclick=function(){var b=this;b.disabled=true;b.textContent='Stopping...';
+  fetch(SH.api+'/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:m.code,key:m.key})}).then(shJson).then(function(x){
+   if(!x.j||!x.j.ok)throw 0;clearInterval(SH.tm.shcd1);SH.mine=null;shSet(SHK,null);
+   if($$('shres'))$$('shres').innerHTML='<div class="msg good"><span class="dotk"></span><span>Stopped. Everything was deleted.</span></div>';
+  }).catch(function(){b.disabled=false;b.textContent='Stop sharing now';shMsg('shm1','We could not stop it just now. Please try again.','bad');});};
+ shRun('shcd1',m.end,function(){SH.mine=null;shSet(SHK,null);if($$('shres'))$$('shres').innerHTML='<div class="msg"><span class="dotk"></span><span>Your share has ended and everything was deleted.</span></div>';});}
+function shCreate(){
+ if(SH.busy)return;
+ var text=$$('shtx').value,files=SH.files.slice(),total=shTotal(),go=$$('shgo'),made=null,done=0;
+ if(!text.trim()&&!files.length){shMsg('shm1',SHE.empty,'bad');return;}
+ if(SH.cfg&&SH.cfg.captcha&&!SH.tok){shMsg('shm1','Please finish the security check above first.','bad');return;}
+ SH.busy=true;go.disabled=true;go.textContent='Creating...';shMsg('shm1','');
+ function back(){SH.busy=false;if($$('shgo')){go.disabled=false;go.innerHTML=ico('upload',18,2.2)+'Create share';}}
+ fetch(SH.api+'/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({minutes:SH.mins,text:text,token:SH.tok,files:files.map(function(f){return {name:f.name,size:f.size};})})})
+ .then(shJson)
+ .then(function(x){if(!x.j||!x.j.ok)throw {err:(x.j&&x.j.error)||'bad'};made=x.j;
+  return files.reduce(function(p,f,i){return p.then(function(){return shPut(made.code,made.key,i,f,function(l){shMsg('shm1','Uploading file '+(i+1)+' of '+files.length+' ('+Math.min(100,Math.round((done+l)/total*100))+'%)...');}).then(function(){done+=f.size;});});},Promise.resolve());})
+ .then(function(){
+  SH.mine={code:made.code,key:made.key,end:Date.now()+(made.expiresAt-made.now),note:!!text.trim(),files:files.map(function(f){return {name:f.name,size:f.size};}),size:total};
+  shSet(SHK,SH.mine);shCapReset();back();
+  if($$('shtx')){$$('shtx').value='';SH.files=[];shFiles();shCount();shMsg('shm1','');shMineDraw();var r=$$('shres');if(r&&r.scrollIntoView)r.scrollIntoView({behavior:'smooth',block:'nearest'});}
+ }).catch(function(e){
+  if(made){try{fetch(SH.api+'/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code:made.code,key:made.key})}).catch(function(){});}catch(x){}}
+  shCapReset();back();shMsg('shm1',SHE[e&&e.err]||SHE.net,'bad');});}
+function shShow(j){
+ var end=Date.now()+(j.expiresAt-j.now),h='<div class="shres o"><div class="shcd" style="margin:0 0 10px">Code <b>'+shCode(j.code)+'</b>. Ends in <b id="shcd2"></b></div>';
+ if(j.text)h+='<h3 class="sht">Note</h3><div class="shtx" id="shnote">'+esc(j.text)+'</div><div class="dl-cta" style="margin-top:10px"><button class="btn" id="shcpn" type="button">'+ico('copy',16,2.2)+'Copy text</button></div>';
+ if(j.files&&j.files.length)h+='<h3 class="sht">Files</h3>'+j.files.map(function(f){return '<div class="shf"><span class="nm">'+esc(f.name)+'</span><span class="sz">'+fb(f.size)+'</span><button class="btn" type="button" data-i="'+f.i+'">Download</button></div>';}).join('');
+ $$('shout').innerHTML=h+'</div>';
+ var cp=$$('shcpn');if(cp)cp.onclick=function(){shCopy(j.text,'text');};
+ $$('shout').onclick=function(e){var b=e.target.closest?e.target.closest('button[data-i]'):null;if(!b||b.disabled)return;var f=j.files[+b.getAttribute('data-i')];if(!f)return;
+  b.disabled=true;b.textContent='Downloading...';shMsg('shm2','');
+  fetch(SH.api+'/f/'+j.code+'/'+f.i).then(function(r){if(!r.ok)throw {s:r.status};return r.blob();}).then(function(bl){return saveBlob(new Blob([bl],{type:'application/octet-stream'}),f.name);})
+  .catch(function(er){shMsg('shm2',er&&er.s===404?'That file is no longer there. The share may have ended.':er&&er.s===429?'Too many tries. Please wait a few minutes.':SHE.net,'bad');})
+  .then(function(){b.disabled=false;b.textContent='Download';});};
+ shRun('shcd2',end,function(){if($$('shout'))$$('shout').innerHTML='<div class="msg"><span class="dotk"></span><span>This share has ended and was deleted.</span></div>';});}
+function shOpen(raw){
+ var code=shNorm(raw),b=$$('shopen');$$('shout').innerHTML='';clearInterval(SH.tm.shcd2);
+ if(!/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/.test(code)){shMsg('shm2','Codes have 8 letters and numbers, like K7M2-QX9A.','bad');return;}
+ shMsg('shm2','');b.disabled=true;b.textContent='Opening...';
+ fetch(SH.api+'/s/'+code).then(shJson).then(function(x){b.disabled=false;b.textContent='Open';
+  if(x.s===429){shMsg('shm2','Too many tries. Please wait a few minutes and try again.','bad');return;}
+  if(x.s===404||(x.j&&x.j.error==='gone')){shMsg('shm2','We could not find that code. It may have ended, been stopped, or have a typo.','bad');return;}
+  if(!x.j||!x.j.ok)throw 0;shShow(x.j);
+ }).catch(function(){if($$('shopen')){b.disabled=false;b.textContent='Open';}shMsg('shm2',SHE.net,'bad');});}
+function sharePage(){nav('share');
+ SH.api=shApi();SH.cfg=null;SH.files=[];SH.tid=null;SH.tok='';SH.busy=false;
+ app.innerHTML='<div class="dl-hd"><div class="ic i13">'+ico('share',26)+'</div><h1>Text and File Sharing</h1></div>'+
+ '<p class="lead dl-lead">Send a note or files to anyone with a short code. Everything is deleted on its own after the time you choose, up to 2 hours.</p>'+
+ '<div id="shst"></div>'+
+ '<section class="card dl-sec dl-f" id="shs1"><div class="dl-sh"><span class="dl-n">1</span><div><h2>Share something</h2><span class="hint">Write a note, add files, or both. Then pick how long it should stay.</span></div></div>'+
+ '<textarea id="shtx" rows="6" maxlength="20000" aria-label="Your note" placeholder="Write or paste your text here"></textarea><div class="ts-count" id="shcn"></div>'+
+ '<label class="card drop" id="shdrop"><input type="file" id="shfi" multiple hidden>'+ico('upload',28)+'<b>Choose files</b><span class="hint">or drop them here. Up to 5 files, 25 MB in total.</span></label><div id="shfl"></div>'+
+ '<div class="qfl" id="shdl">Keep it for</div><div class="shd" role="radiogroup" aria-labelledby="shdl" id="shdur">'+SHM.map(function(m){return '<button type="button" role="radio" data-m="'+m[0]+'" aria-checked="'+(m[0]===SH.mins)+'">'+m[1]+'</button>';}).join('')+'</div>'+
+ '<p class="hint" id="shdh" style="margin:10px 0 0"></p>'+
+ '<div class="cts" id="shcap" style="display:none"></div>'+
+ '<div class="dl-cta"><button class="btn pri dl-big" id="shgo" type="button">'+ico('upload',18,2.2)+'Create share</button></div><div id="shm1"></div><div id="shres"></div></section>'+
+ '<section class="card dl-sec dl-f" id="shs2"><div class="dl-sh"><span class="dl-n">2</span><div><h2>Open a share</h2><span class="hint">Type the code someone gave you to see their note and download their files.</span></div></div>'+
+ '<label class="qfl" for="shcode">Code<input type="text" id="shcode" maxlength="9" placeholder="XXXX-XXXX" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false"></label>'+
+ '<div class="dl-cta"><button class="btn pri dl-big" id="shopen" type="button">Open</button></div><div id="shm2"></div><div id="shout"></div></section>'+
+ '<p class="dl-note">Anyone who has a code can open that share until it ends, and shares cannot be brought back after they are deleted. Please do not share passwords or private documents, or anything you do not have the right to share. See the <a href="#/terms" style="color:var(--brand)">Terms</a> and <a href="#/privacy" style="color:var(--brand)">Privacy</a> pages.</p>';
+ fixLinks(app);
+ var t=$$('shtx');t.addEventListener('input',shCount);shCount();
+ var fi=$$('shfi'),dr=$$('shdrop');
+ fi.onchange=function(){shAdd(fi.files);fi.value='';};
+ dr.ondragover=function(e){e.preventDefault();};dr.ondrop=function(e){e.preventDefault();if(e.dataTransfer)shAdd(e.dataTransfer.files);};
+ $$('shfl').onclick=function(e){var b=e.target.closest?e.target.closest('button[data-i]'):null;if(!b)return;SH.files.splice(+b.getAttribute('data-i'),1);shFiles();shMsg('shm1','');};
+ function dh(){var m=SHM.filter(function(x){return x[0]===SH.mins;})[0];$$('shdh').textContent='It will be deleted automatically '+m[2]+' after you press Create share. The longest time is 2 hours.';}
+ $$('shdur').onclick=function(e){var b=e.target.closest?e.target.closest('button[data-m]'):null;if(!b)return;SH.mins=+b.getAttribute('data-m');Array.prototype.forEach.call($$('shdur').children,function(x){x.setAttribute('aria-checked',String(x===b));});dh();};
+ dh();
+ $$('shgo').onclick=shCreate;
+ var ci=$$('shcode');
+ ci.oninput=function(){var v=shNorm(ci.value).slice(0,8);ci.value=v.length>4?v.slice(0,4)+'-'+v.slice(4):v;};
+ ci.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();shOpen(ci.value);}};
+ $$('shopen').onclick=function(){shOpen(ci.value);};
+ var sv=SH.mine||shGet(SHK);if(sv&&sv.code&&sv.key&&sv.end>Date.now()){SH.mine=sv;shMineDraw();}else{SH.mine=null;shSet(SHK,null);}
+ shHealth();
+ var q=PM&&/[?&]c=([A-Za-z0-9-]{4,16})/.exec(location.search);
+ if(q){var c0=shNorm(q[1]).slice(0,8);ci.value=c0.length>4?c0.slice(0,4)+'-'+c0.slice(4):c0;shOpen(c0);var s2=$$('shs2');if(s2&&s2.scrollIntoView)s2.scrollIntoView({block:'start'});}
+}
 /* ---------- Grab Box: direct file links ---------- */
 var GB={ab:null,blob:null,url:''};
 function gbName(u,ct){
@@ -3552,7 +3689,7 @@ function route(){var r=curR();menu(false);app.onclick=null;tsStop();ltStop();
  var known=r===''||r==='home'||r==='404'||ROUTES.indexOf(r)>=0;if(!known)r=PM?'404':'';
  setTitle(r===''?'home':r);
  app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||!!LOCKED[r]||(['planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve','translate'].indexOf(r)<0));
- if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='deal')dealPage();else if(r==='tts')ttsPage();else if(r==='translate')translatePage();else if(r==='qr')qrPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(FULL[r])FULL[r]();else home();
+ if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='deal')dealPage();else if(r==='tts')ttsPage();else if(r==='translate')translatePage();else if(r==='share')sharePage();else if(r==='qr')qrPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(FULL[r])FULL[r]();else home();
  fixLinks(app);window.scrollTo(0,0);}
 
 document.getElementById('yr').textContent=new Date().getFullYear();
