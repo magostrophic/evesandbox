@@ -196,7 +196,7 @@ function planner(){
  nav('planner');
  var D=days(),h='';
  h+='<h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Study Planner</h1>';
- h+='<input class="title-in" id="ttl" type="text" value="'+esc(S.title)+'" aria-label="Planner title">';
+ h+='<div class="dl-hd"><div class="ic bl noprint">'+ico('calendar',26)+'</div><input class="title-in" id="ttl" type="text" value="'+esc(S.title)+'" aria-label="Planner title"></div>';
  h+='<div class="chips-wrap"><p class="hint" style="margin:.2em 0 8px">1. Add your subjects</p><div class="chips">';
  S.subjects.forEach(function(s,i){h+='<span class="chip" style="background:'+s.c+'">'+esc(s.n)+'<button data-del="'+i+'" aria-label="Remove '+esc(s.n)+'">'+ico('x',12,3)+'</button></span>';});
  h+='<input type="text" id="ns" placeholder="New subject" maxlength="24" style="width:150px"><button class="btn" id="addS">Add</button></div></div>';
@@ -329,7 +329,7 @@ async function saveBlob(b,name){
 }
 function imagetool(){
  nav('image');
- app.innerHTML='<h1 style="font-size:2.2rem">Image Tool</h1><p class="lead" style="font-size:1rem">Compress, resize, crop and remove plain backgrounds. Everything happens on your device, so nothing is uploaded.</p>'+
+ app.innerHTML=toolHd('image','Compress, resize, crop and remove plain backgrounds. Everything happens on your device, so nothing is uploaded.')+
  '<label class="card drop" id="drop"><input type="file" id="file" accept="image/*" hidden>'+ico('upload',28)+'<b>Choose an image</b><span class="hint">or drop it here</span></label><div id="ws"></div>';
  $$('file').onchange=function(e){if(e.target.files[0])loadImg(e.target.files[0]);};
  var d=$$('drop');d.ondragover=function(e){e.preventDefault();};
@@ -579,7 +579,7 @@ var INFO={
  unlock:['Choose a PDF you have the password for. The result opens without a password. This cannot guess or crack passwords.','application/pdf,.pdf',false,'Remove password']};
 function pdftool(){
  nav('pdf');
- app.innerHTML='<h1 style="font-size:2.2rem">PDF Tool</h1><p class="lead" style="font-size:1rem">Everything happens on your device, so your files are never uploaded.</p>'+
+ app.innerHTML=toolHd('pdf','Everything happens on your device, so your files are never uploaded.')+
  '<div class="row" style="margin:16px 0" id="ptabs">'+TOOLS.map(function(t){return '<button class="btn" data-t="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div><div id="pp"></div>';
  $$('ptabs').onclick=function(e){var t=e.target.dataset.t;if(!t)return;P.tool=t;P.files=[];P.out=null;ptool();};
  ptool();
@@ -780,7 +780,7 @@ function vjf(url,ms){var c=new AbortController(),t=setTimeout(function(){c.abort
 var V={id:0,a:null,items:[],reddit:null,pend:0,live:false};
 function vtool(){
  nav('virus');
- app.innerHTML='<h1 style="font-size:2.2rem">Virus Checker</h1><p class="lead" style="font-size:1rem">Check if a website or link looks safe before you open it. This tool never visits the site you enter.</p>'+
+ app.innerHTML=toolHd('virus','Check if a website or link looks safe before you open it. This tool never visits the site you enter.')+
  '<div class="vin"><input type="text" id="vd" placeholder="example.com or paste a link" autocapitalize="off" autocomplete="off" spellcheck="false"><button class="btn pri" id="vgo">Check</button></div><div id="vout"></div>'+
  '<div class="card" style="margin-top:20px"><b>Staying safe online</b><p>Look at the address before you click. Never enter a password on a page you reached from a message. Avoid cracked software and "free" downloads. Turn on two-step login for your accounts.</p></div>';
  var go=function(){vRun($$('vd').value);};
@@ -835,7 +835,7 @@ var TL=[
  {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
  {r:'deal',c:'i10',ic:'tag',n:'Deal or No Deal',d:'Tell Eve what you want to buy. She suggests what to look for, links the top stores and shows which price is the real best deal.'},
  {r:'eve',c:'i1',ic:'spark',n:'Eve AI',d:'Your caring study buddy. Ask questions, get step-by-step help, make flashcards and practice tests, and learn from your own notes.'},
- {r:'ide',c:'ired',ic:'code',n:'Eve IDE',d:'Write and run Python, C and Java programs, with input and output right on the page.'},
+ {r:'ide',c:'i8',ic:'code',n:'Eve IDE',d:'Write and run Python, C and Java programs, with input and output right on the page.'},
  {r:'convert',c:'i8',ic:'swap',n:'File Converter',d:'Turn pictures, PDFs, documents, spreadsheets and audio into another format, right on your device.'},
  {r:'grab',c:'i7',ic:'dlbox',lock:1,n:'Grab Box',d:'Paste a link to a file or a page and download the video, audio or document on it.'},
   {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop and remove plain backgrounds from images.'},
@@ -846,6 +846,7 @@ var TL=[
  {r:'share',c:'i13',ic:'share',n:'Text and File Sharing',d:'Send a note or files to anyone with a short code. It is deleted on its own after the time you pick, up to 2 hours.'},
  {r:'tts',c:'i11',ic:'speaker',n:'Text to Speech',d:'Hear your words read out loud as you type, or turn a paragraph into an audio file you can download.'},
  {r:'virus',c:'i4',ic:'shield',n:'Virus Checker',d:'Check whether a website or link looks safe before you open it.'}];
+function toolHd(r,lead){var t=TL.filter(function(x){return x.r===r;})[0]||{n:'',ic:'spark'};return '<div class="dl-hd"><div class="ic bl">'+ico(t.ic,26)+'</div><h1>'+t.n+'</h1></div>'+(lead?'<p class="lead dl-lead">'+lead+'</p>':'');}
 var LOCKED={};TL.forEach(function(t){if(t.lock)LOCKED[t.r]=1;});
 /*RANKDATA*/var RANKD={"stages":[["a","Arcane Stage"],["0","Stage Zero"],["1","Stage One"],["2","Stage Two"],["3","Stage Three"],["4","Stage Four"],["5","Stage Five"],["6","Stage Six"],["7","Stage Seven"],["8","Stage Eight"],["9","Stage Nine"]],"tools":{"eve":["0","The most capable tool here. It answers questions, teaches step by step, makes flashcards and practice tests, and works from your own notes."],"translate":["1","Turns speech and the text on a shared screen into another language as it happens, across many languages."],"ide":["2","Runs real Python, C and Java programs with live input and output, right on the page."],"convert":["3","Converts pictures, PDFs, documents, spreadsheets and audio between many formats, right on your device."],"tts":["4","Two ways to listen: hear words read out as you type, or turn a paragraph into a downloadable audio file, with voices for many countries."],"pdf":["5","Several useful jobs in one place: make, merge, split and compress PDFs, and add or remove passwords."],"virus":["6","Weighs several signals about a link, such as warning lists and domain age, without ever opening it. A good first look, not a full scan."],"image":["6","Compresses, resizes, crops and removes plain backgrounds. A few jobs done well, each one fairly simple."],"deal":["7","Helps you decide what to buy and sends you to the right stores. It guides your shopping rather than fetching every price itself."],"qr":["7","Makes codes for links, text, Wi-Fi, email, phone numbers and contacts. One job, done cleanly."],"calc":["8","Works out CGPA and attendance and shows what you need for your targets. Useful, but a small single-purpose tool."],"planner":["8","A simple weekly grid you can print or save as a picture. Easy to use and light on features."],"grab":["9","Locked, so it cannot do anything yet. Its stage will be looked at again when it opens."],"share":["5","Shares a note and files through a short code and deletes everything on its own when the timer you chose runs out, up to two hours."]}};/*ENDRANKDATA*/
 function rankBadge(k){var s=RANKD.stages.filter(function(x){return x[0]===k;})[0];return '<span class="rk s'+k+'">'+(k==='a'?ico('spark',12,2.4):'')+s[1]+'</span>';}
@@ -870,7 +871,7 @@ function home(){
  document.getElementById('scue').onclick=function(){var e=document.getElementById('tl');e.scrollIntoView({behavior:'smooth',block:'start'});};
 }
 function lockedPage(r){var t=TL.filter(function(x){return x.r===r;})[0]||{n:'This tool'};nav('tools');
- app.innerHTML=banner('Locked',t.n,'This tool is locked. It will open again soon.')+'<div class="wrapc"><div class="card" style="text-align:center;padding:32px 20px"><span class="ic i7" style="margin:0 auto 10px">'+ico('lock',24)+'</span><h3>'+t.n+' is locked</h3><p>We are getting it ready. Please check back soon.</p><p style="margin-top:16px"><a class="btn pri" href="#/tools">Back to tools</a></p></div></div>';}
+ app.innerHTML=toolHd(r,'This tool is locked. It will open again soon.')+'<div class="card" style="text-align:center;padding:32px 20px;margin-top:18px"><span class="ic bl" style="margin:0 auto 10px">'+ico('lock',24)+'</span><h3>'+t.n+' is locked</h3><p>We are getting it ready. Please check back soon.</p><p style="margin-top:16px"><a class="btn pri" href="#/tools">Back to tools</a></p></div>';}
 function toolsPage(){nav('tools');app.innerHTML=banner('All tools','Tools','Everything you can do on Eve Sandbox. More are on the way.')+'<div class="wrapc">'+toolsGrid().replace('class="grid"','class="grid" style="margin-top:0"')+'</div>';}
 function aboutPage(){nav('about');
  app.innerHTML=banner('About','Built for students, by an independent developer','Eve Sandbox exists to take small daily headaches off a student’s plate.')+
@@ -1103,7 +1104,7 @@ function atCalc(){var A=0,T=0,rows=C.at.rows.map(function(r){var a=nm(r.a),t=nm(
 function reqPct(){var q=nm(C.at.req);return (q>=1&&q<=100)?q:NaN;}
 
 function calcPage(){nav('calc');
- app.innerHTML='<h1 style="font-size:2.2rem">Complex Calculator</h1><p class="lead" style="font-size:1rem">Work out your CGPA and your attendance, and see what you need to reach your targets. Your entries are saved on this device.</p>'+
+ app.innerHTML=toolHd('calc','Work out your CGPA and your attendance, and see what you need to reach your targets. Your entries are saved on this device.')+
  '<div class="seg" id="ctabs" style="margin:16px 0"><a data-ct="cgpa" href="javascript:void 0">CGPA</a><a data-ct="att" href="javascript:void 0">Attendance</a></div><div id="cbody"></div>';
  $$('ctabs').onclick=function(e){var t=e.target.dataset.ct;if(!t)return;C.tab=t;cSave();cView();};
  cView();
@@ -1232,7 +1233,7 @@ function setTitle(r){document.title='Eve Sandbox - '+(TITLES[r]||'Page Not Found
 function fixLinks(root){if(!PM)return;(root||document).querySelectorAll('a[href^="#/"]').forEach(function(a){var m=/^#\/([a-z-]*)$/.exec(a.getAttribute('href'));if(m&&(m[1]===''||ROUTES.indexOf(m[1])>=0))a.setAttribute('href',U(m[1]));});}
 function fire(){window.dispatchEvent(new Event('hashchange'));}
 function go(r){var u=U(r);
- if(location.pathname===u&&!INIT404){window.scrollTo(0,0);return;}
+ if(location.pathname===u&&!location.search&&!INIT404){window.scrollTo(0,0);return;}
  INIT404=false;
  try{history.pushState(null,'',u);}catch(e){location.href=u;return;}
  fire();}
@@ -1337,9 +1338,30 @@ function shOpen(raw){
   if(x.s===404||(x.j&&x.j.error==='gone')){shMsg('shm2','We could not find that code. It may have ended, been stopped, or have a typo.','bad');return;}
   if(!x.j||!x.j.ok)throw 0;shShow(x.j);
  }).catch(function(){if($$('shopen')){b.disabled=false;b.textContent='Open';}shMsg('shm2',SHE.net,'bad');});}
+function shRecv(code){
+ var out=$$('shout');if(!out)return;clearInterval(SH.tm.shcd2);shMsg('shm2','');
+ function fail(h,t,retry){if(!$$('shout'))return;$$('shout').innerHTML='<div class="shres" role="alert"><h3 style="margin:0 0 6px">'+h+'</h3><p style="margin:0;color:var(--mute)">'+t+'</p>'+(retry?'<div class="dl-cta"><button class="btn pri" id="shretry" type="button">Try again</button></div>':'')+'</div>';var b=$$('shretry');if(b)b.onclick=function(){shRecv(code);};}
+ if(!SH.api){fail('Sharing is getting ready','Text and File Sharing is not available right now. Please check back soon.');return;}
+ if(!/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/.test(code)){fail('This link does not look right','The code in the link is incomplete or has a typo. Please ask the sender to send the link again.');return;}
+ out.innerHTML='<div class="shres" role="status"><div class="shcd" style="margin:0">Opening the share...</div></div>';
+ var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},15000);
+ fetch(SH.api+'/s/'+code,{signal:ctl.signal}).then(shJson).then(function(x){clearTimeout(tm);if(!$$('shout'))return;
+  if(x.s===429){fail('Too many tries','Please wait a few minutes and try again.',true);return;}
+  if(x.s===404||(x.j&&x.j.error==='gone')){fail('We could not find this share','It may have ended, been stopped by the sender, or the link may have a typo. Please ask the sender for a new link.');return;}
+  if(!x.j||!x.j.ok)throw 0;shShow(x.j);
+ }).catch(function(){clearTimeout(tm);fail('We could not reach the sharing service','Please check your connection and try again.',true);});}
+function shRecvPage(raw){
+ var code=shNorm(raw).slice(0,8);
+ app.innerHTML=toolHd('share','Someone shared this with you. It is deleted on its own when the timer ends.')+
+ '<section class="card dl-sec" id="shrv"><div id="shm2"></div><div id="shout"></div></section>'+
+ '<p class="dl-note">Only download files from people you trust. Files are always saved as downloads and never run on this site. Want to send something yourself? <a href="#/share" id="shown" style="color:var(--brand)">Share a note or files</a>. See the <a href="#/terms" style="color:var(--brand)">Terms</a> and <a href="#/privacy" style="color:var(--brand)">Privacy</a> pages.</p>';
+ fixLinks(app);
+ shRecv(code);}
 function sharePage(){nav('share');
  SH.api=shApi();SH.cfg=null;SH.files=[];SH.tid=null;SH.tok='';SH.busy=false;
- app.innerHTML='<div class="dl-hd"><div class="ic i13">'+ico('share',26)+'</div><h1>Text and File Sharing</h1></div>'+
+ var q=PM&&/[?&]c=([A-Za-z0-9-]{1,16})/.exec(location.search);
+ if(q){shRecvPage(q[1]);return;}
+ app.innerHTML=toolHd('share')+
  '<p class="lead dl-lead">Send a note or files to anyone with a short code. Everything is deleted on its own after the time you choose, up to 2 hours.</p>'+
  '<div id="shst"></div>'+
  '<section class="card dl-sec dl-f" id="shs1"><div class="dl-sh"><span class="dl-n">1</span><div><h2>Share something</h2><span class="hint">Write a note, add files, or both. Then pick how long it should stay.</span></div></div>'+
@@ -1369,8 +1391,6 @@ function sharePage(){nav('share');
  $$('shopen').onclick=function(){shOpen(ci.value);};
  var sv=SH.mine||shGet(SHK);if(sv&&sv.code&&sv.key&&sv.end>Date.now()){SH.mine=sv;shMineDraw();}else{SH.mine=null;shSet(SHK,null);}
  shHealth();
- var q=PM&&/[?&]c=([A-Za-z0-9-]{4,16})/.exec(location.search);
- if(q){var c0=shNorm(q[1]).slice(0,8);ci.value=c0.length>4?c0.slice(0,4)+'-'+c0.slice(4):c0;shOpen(c0);var s2=$$('shs2');if(s2&&s2.scrollIntoView)s2.scrollIntoView({block:'start'});}
 }
 /* ---------- Grab Box: direct file links ---------- */
 var GB={ab:null,blob:null,url:''};
@@ -1466,7 +1486,7 @@ async function gbScan(u){
  gbShowFound(gbScanHtml(html,u.href),u.href);
 }
 function grabPage(){nav('grab');
- app.innerHTML='<h1 style="font-size:2.2rem">Grab Box</h1><p class="lead" style="font-size:1rem">Paste a link to a file, or to a page that has a video or audio file on it, and Grab Box finds it so you can download it.</p>'+
+ app.innerHTML=toolHd('grab','Paste a link to a file, or to a page that has a video or audio file on it, and Grab Box finds it so you can download it.')+
  '<div class="card" style="margin-top:16px"><div class="row" style="flex-wrap:nowrap;gap:8px"><input type="text" id="gbu" inputmode="url" placeholder="Paste a link here" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn pri" id="gbgo">Grab</button></div>'+
  '<p class="hint" style="margin:10px 0 0">Only download files you made or have permission to save. Video sites and social networks are not supported.</p></div><div class="note" id="gbmsg" style="display:none"></div><div id="gbout"></div>';
  $$('gbgo').onclick=function(){gbGo();};$$('gbu').onkeydown=function(e){if(e.key==='Enter')gbGo();};
@@ -1553,7 +1573,7 @@ function dChips(id,lab,attr,list,cur,one){return '<div class="dl-ch'+(one?' one'
 var DSTEPS=[['dform','Describe'],['dres','Matches'],['dcmp','Compare']];
 
 function dealPage(){nav('deal');
- app.innerHTML='<div class="dl-hd"><div class="ic i10">'+ico('tag',26)+'</div><h1>Deal or No Deal</h1></div>'+
+ app.innerHTML=toolHd('deal')+
  '<p class="lead dl-lead">Tell Eve what you want to buy. She suggests what to look for, takes you to the top stores, and works out which price is the real best deal after delivery and discounts.</p>'+
  '<div class="dl-steps" id="dsteps">'+DSTEPS.map(function(x,i){return '<button type="button" class="dl-sp" data-go="'+x[0]+'"><b>'+(i+1)+'</b><span>'+x[1]+'</span></button>';}).join('')+'</div>'+
  '<section class="card dl-sec dl-f" id="dform"><div class="dl-sh"><span class="dl-n">1</span><div><h2>What do you need?</h2><span class="hint">The more you tell Eve, the better her picks.</span></div></div>'+
@@ -1907,7 +1927,7 @@ async function tsMake(){if(TS.busy)return;
 function tsCancel(){TSC.want=false;TS.run++;try{if(TS.ctl)TS.ctl.abort();}catch(e){}tsBusy(false);tsM2('');}
 
 function ttsPage(){nav('tts');
- app.innerHTML='<div class="dl-hd"><div class="ic i11">'+ico('speaker',26)+'</div><h1>Text to Speech</h1></div>'+
+ app.innerHTML=toolHd('tts')+
  '<p class="lead dl-lead">Hear your words read out loud as you type them, or turn a whole paragraph into an audio file you can download.</p>'+
  '<section class="card dl-sec dl-f" id="tsl1"><div class="dl-sh"><span class="dl-n">1</span><div><h2>Speak as you type</h2><span class="hint">Each word is read out loud the moment you finish it. Press space after a word to hear it.</span></div></div>'+
  '<textarea id="tsa" rows="3" maxlength="600" aria-label="Type here to hear each word" placeholder="Start typing here"></textarea>'+
@@ -2408,7 +2428,7 @@ function ltPhone(){return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent||
 function ltTabs(){document.querySelectorAll('#lttabs a').forEach(function(b){var on=b.dataset.m===LT.mode;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false');});}
 function ltSetMode(m){if(m===LT.mode)return;ltStop();LT.mode=m;$$('ltpane').innerHTML=ltPane();ltTabs();ltBind();}
 function translatePage(){nav('translate');
- app.innerHTML='<div class="dl-hd"><div class="ic i12">'+ico('globe',26)+'</div><h1>Live Translate</h1></div>'+
+ app.innerHTML=toolHd('translate')+
  '<p class="lead dl-lead">Speak and read your words in another language as you talk, or share your screen and see it translated right on the picture.</p>'+
  '<section class="card dl-sec dl-f" id="ltsec"><div class="lt-bar"><label class="qfl" for="ltfrom">From<select class="sel" id="ltfrom">'+ltOpts(LT.from)+'</select></label>'+
  '<button class="btn lt-sw" id="ltswap" type="button" aria-label="Swap the two languages">'+ico('swap',18,2.2)+'</button>'+
@@ -2497,7 +2517,7 @@ function qContrast(){var a=qLum(QS.fg),b=qLum(QS.bg),hi=Math.max(a,b),lo=Math.mi
 var QERR={L:'Low (7%)',M:'Medium (15%)',Q:'Quartile (25%)',H:'High (30%)'};
 
 function qrPage(){nav('qr');
- app.innerHTML='<h1 style="font-size:2.2rem">QR Code Generator</h1><p class="lead" style="font-size:1rem">Make a QR code for a link, text, Wi-Fi, email, phone number or contact card. Everything is made on your device, so nothing you type is uploaded.</p>'+
+ app.innerHTML=toolHd('qr','Make a QR code for a link, text, Wi-Fi, email, phone number or contact card. Everything is made on your device, so nothing you type is uploaded.')+
  '<div class="qrw"><div class="qrl">'+
  '<div class="seg" id="qtabs" style="margin:16px 0 0">'+QTABS.map(function(t){return '<a data-qt="'+t[0]+'" href="javascript:void 0">'+t[1]+'</a>';}).join('')+'</div>'+
  '<div class="card" style="margin-top:12px" id="qf"></div>'+
@@ -2934,7 +2954,7 @@ function fcAdd(files){
 }
 function convertPage(){nav('convert');
  FC.rows=[];FC.busy=false;FC.from='';FC.to='';
- app.innerHTML='<h1 style="font-size:2.2rem">File Converter</h1><p class="lead" style="font-size:1rem">Turn a file into another format that suits it. Pictures, PDFs, documents, spreadsheets, text and audio are supported, and everything is converted on your device, so your files are never uploaded.</p>'+
+ app.innerHTML=toolHd('convert','Turn a file into another format that suits it. Pictures, PDFs, documents, spreadsheets, text and audio are supported, and everything is converted on your device, so your files are never uploaded.')+
  '<div class="card" id="fcpick" style="margin-top:16px;padding:16px"></div>'+
  '<label class="card drop" id="fcdrop" style="margin-top:14px"><input type="file" id="fcfile" multiple hidden>'+ico('upload',28)+'<b id="fcdt">Choose files</b><span class="hint">or drop them here</span></label>'+
  '<p class="hint" style="margin:10px 2px 0">Pictures: PNG, JPG, WebP, BMP, GIF, SVG &middot; Documents: PDF, Word (.docx), HTML, Markdown, text &middot; Data: Excel, CSV, TSV, JSON &middot; Sound: MP3, WAV, OGG, M4A, FLAC and sound from videos</p><div id="fclist" style="margin-top:14px"></div>';
@@ -3659,7 +3679,7 @@ function ideKey(e){
 }
 function idePage(){nav('ide');
  ideLoad();
- app.innerHTML='<h1 style="font-size:2.2rem">Eve IDE</h1><p class="lead" style="font-size:1rem">Write and run Python, C and Java programs. Press the play button, or Ctrl+Enter.</p>'+
+ app.innerHTML=toolHd('ide','Write and run Python, C and Java programs. Press the play button, or Ctrl+Enter.')+
  '<div class="idebar"><div class="seg" id="idetabs">'+['python','c','java'].map(function(l){return '<a href="javascript:void 0" data-l="'+l+'"'+(l===IDE.lang?' class="on"':'')+'>'+IDEL[l]+'</a>';}).join('')+'</div>'+
  '<div class="row" style="gap:8px;flex-wrap:nowrap"><button class="btn" id="idestop" style="display:none">Stop</button><button class="btn pri" id="iderun" aria-label="Run" title="Run (Ctrl+Enter)">'+ico('play',20,2)+'</button></div></div>'+
  '<div class="card ideed"><div class="idehead"><span id="idefn">'+IDEN[IDE.lang]+'</span><span class="row" style="gap:6px"><button class="btn sm" id="ideopen">Open</button><button class="btn sm" id="idesave">Save</button><button class="btn sm" id="idereset">Example</button></span></div>'+
@@ -3688,7 +3708,7 @@ window.addEventListener('hashchange',function(){if(curR()!=='eve')aiLeave();if(c
 function route(){var r=curR();menu(false);app.onclick=null;tsStop();ltStop();
  var known=r===''||r==='home'||r==='404'||ROUTES.indexOf(r)>=0;if(!known)r=PM?'404':'';
  setTitle(r===''?'home':r);
- app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||!!LOCKED[r]||(['planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve','translate','share'].indexOf(r)<0));
+ app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||(!LOCKED[r]&&['planner','image','pdf','virus','calc','deal','tts','qr','grab','convert','ide','eve','translate','share'].indexOf(r)<0));
  if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='deal')dealPage();else if(r==='tts')ttsPage();else if(r==='translate')translatePage();else if(r==='share')sharePage();else if(r==='qr')qrPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(FULL[r])FULL[r]();else home();
  fixLinks(app);window.scrollTo(0,0);}
 
