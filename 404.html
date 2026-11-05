@@ -646,6 +646,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 /* Drawww */
 .ic.i14{background:linear-gradient(135deg,#2f6fed,#8e44ef)}
 main.wide{max-width:1500px}
+.dwhead{max-width:968px;margin:0 auto}
 .dww{margin-top:16px}
 .dwtb{display:flex;flex-wrap:wrap;align-items:center;gap:4px;background:var(--card);border-radius:14px;padding:6px 8px;box-shadow:0 0 0 .5px var(--line)}
 .dwtb .sep{width:1px;height:22px;background:var(--line);margin:0 4px;flex:none}
@@ -688,7 +689,8 @@ main.wide{max-width:1500px}
 .dwpp input[type=text],.dwpp input[type=number],.dwpp textarea,.dwpp select{width:100%;margin-top:4px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;min-width:0}
 .dwpp textarea{resize:vertical}
 .dwpp select{text-align:left;text-align-last:left;padding-right:24px}
-.dwpp input:focus,.dwpp textarea:focus,.dwpp select:focus{outline:2px solid var(--brand);outline-offset:0;border-color:transparent}
+.dwpp input[type=text]:focus,.dwpp input[type=number]:focus,.dwpp textarea:focus,.dwpp select:focus-visible{outline:2px solid var(--brand);outline-offset:0;border-color:transparent}
+.dwpp input[type=range]:focus,.dwpp input[type=range]:focus-visible{outline:none}
 .dwpp input[type=range]{width:100%;margin-top:6px}
 .dwfr{display:flex;gap:8px;align-items:flex-end}
 .dwfr .dwn{flex:1;min-width:0}
