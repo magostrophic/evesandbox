@@ -200,7 +200,7 @@ function colorOf(n){for(var i=0;i<S.subjects.length;i++)if(S.subjects[i].n===n)r
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var app=document.getElementById('app');
 
-function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',deal:'tools',drawww:'tools',tts:'tools',share:'tools',qr:'tools',grab:'tools',convert:'tools',ide:'tools',eve:'tools',translate:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
+function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',deal:'tools',drawww:'tools',tts:'tools',share:'tools',qr:'tools',convert:'tools',ide:'tools',eve:'tools',translate:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
 
 function planner(){
  nav('planner');
@@ -840,7 +840,7 @@ function vDraw(){
  o.innerHTML=h;
 }
 
-var CFG=Object.assign({email:'',phone:'',legalName:'',address:'',donate:[],donateApi:'',dealApi:'',grabApi:'',runApi:'',aiApi:'',shareApi:'',turnstileKey:''},window.EVE_CFG||{});
+var CFG=Object.assign({email:'',phone:'',legalName:'',address:'',donate:[],donateApi:'',dealApi:'',runApi:'',aiApi:'',shareApi:'',turnstileKey:''},window.EVE_CFG||{});
 var TL=[
  {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
  {r:'deal',c:'i10',ic:'tag',n:'Deal or No Deal',d:'Tell Eve what you want to buy. She suggests what to look for, links the top stores and shows which price is the real best deal.'},
@@ -848,8 +848,7 @@ var TL=[
  {r:'eve',c:'i1',ic:'spark',n:'Eve AI',d:'Your caring study buddy. Ask questions, get step-by-step help, make flashcards and practice tests, and learn from your own notes.'},
  {r:'ide',c:'i8',ic:'code',n:'Eve IDE',d:'Write and run Python, C and Java programs, with input and output right on the page.'},
  {r:'convert',c:'i8',ic:'swap',n:'File Converter',d:'Turn pictures, PDFs, documents, spreadsheets and audio into another format, right on your device.'},
- {r:'grab',c:'i7',ic:'dlbox',lock:1,n:'Grab Box',d:'Paste a link to a file or a page and download the video, audio or document on it.'},
-  {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop and remove plain backgrounds from images.'},
+   {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop and remove plain backgrounds from images.'},
  {r:'translate',c:'i12',ic:'globe',n:'Live Translate',d:'Speak in one language and read it in another as you talk, or share your screen and see it translated in real time.'},
  {r:'pdf',c:'i3',ic:'pdf',n:'PDF Tool',d:'Make, merge, split and compress PDFs, and add or remove passwords.'},
  {r:'qr',c:'i9',ic:'qr',n:'QR Code Generator',d:'Make a QR code for a link, text, Wi-Fi, email, phone number or contact card, and download it as PNG or SVG.'},
@@ -859,7 +858,7 @@ var TL=[
  {r:'virus',c:'i4',ic:'shield',n:'Virus Checker',d:'Check whether a website or link looks safe before you open it.'}];
 function toolHd(r,lead){var t=TL.filter(function(x){return x.r===r;})[0]||{n:'',ic:'spark'};return '<div class="dl-hd"><div class="ic bl">'+ico(t.ic,26)+'</div><h1>'+t.n+'</h1></div>'+(lead?'<p class="lead dl-lead">'+lead+'</p>':'');}
 var LOCKED={};TL.forEach(function(t){if(t.lock)LOCKED[t.r]=1;});
-/*RANKDATA*/var RANKD={"stages":[["a","Arcane Stage"],["0","Stage Zero"],["1","Stage One"],["2","Stage Two"],["3","Stage Three"],["4","Stage Four"],["5","Stage Five"],["6","Stage Six"],["7","Stage Seven"],["8","Stage Eight"],["9","Stage Nine"]],"tools":{"eve":["0","The most capable tool here. It answers questions, teaches step by step, makes flashcards and practice tests, and works from your own notes."],"translate":["1","Turns speech and the text on a shared screen into another language as it happens, across many languages."],"ide":["2","Runs real Python, C and Java programs with live input and output, right on the page."],"convert":["3","Converts pictures, PDFs, documents, spreadsheets and audio between many formats, right on your device."],"tts":["4","Two ways to listen: hear words read out as you type, or turn a paragraph into a downloadable audio file, with voices for many countries."],"pdf":["5","Several useful jobs in one place: make, merge, split and compress PDFs, and add or remove passwords."],"virus":["6","Weighs several signals about a link, such as warning lists and domain age, without ever opening it. A good first look, not a full scan."],"image":["6","Compresses, resizes, crops and removes plain backgrounds. A few jobs done well, each one fairly simple."],"drawww":["3","A full diagram editor for ER drawings: entity, relationship and attribute shapes, tables with joinable columns, lines with crow's foot signs, undo, zoom and downloads. Built for one kind of drawing rather than every kind."],"deal":["7","Helps you decide what to buy and sends you to the right stores. It guides your shopping rather than fetching every price itself."],"qr":["7","Makes codes for links, text, Wi-Fi, email, phone numbers and contacts. One job, done cleanly."],"calc":["8","Works out CGPA and attendance and shows what you need for your targets. Useful, but a small single-purpose tool."],"planner":["8","A simple weekly grid you can print or save as a picture. Easy to use and light on features."],"grab":["9","Locked, so it cannot do anything yet. Its stage will be looked at again when it opens."],"share":["5","Shares a note and files through a short code and deletes everything on its own when the timer you chose runs out, up to two hours."]}};/*ENDRANKDATA*/
+/*RANKDATA*/var RANKD={"stages":[["a","Arcane Stage"],["0","Stage Zero"],["1","Stage One"],["2","Stage Two"],["3","Stage Three"],["4","Stage Four"],["5","Stage Five"],["6","Stage Six"],["7","Stage Seven"],["8","Stage Eight"],["9","Stage Nine"]],"tools":{"eve":["0","The most capable tool here. It answers questions, teaches step by step, makes flashcards and practice tests, and works from your own notes."],"translate":["1","Turns speech and the text on a shared screen into another language as it happens, across many languages."],"ide":["2","Runs real Python, C and Java programs with live input and output, right on the page."],"convert":["3","Converts pictures, PDFs, documents, spreadsheets and audio between many formats, right on your device."],"tts":["4","Two ways to listen: hear words read out as you type, or turn a paragraph into a downloadable audio file, with voices for many countries."],"pdf":["5","Several useful jobs in one place: make, merge, split and compress PDFs, and add or remove passwords."],"virus":["6","Weighs several signals about a link, such as warning lists and domain age, without ever opening it. A good first look, not a full scan."],"image":["6","Compresses, resizes, crops and removes plain backgrounds. A few jobs done well, each one fairly simple."],"drawww":["3","A full diagram editor for ER drawings: entity, relationship and attribute shapes, tables with joinable columns, lines with crow's foot signs, undo, zoom and downloads. Built for one kind of drawing rather than every kind."],"deal":["7","Helps you decide what to buy and sends you to the right stores. It guides your shopping rather than fetching every price itself."],"qr":["7","Makes codes for links, text, Wi-Fi, email, phone numbers and contacts. One job, done cleanly."],"calc":["8","Works out CGPA and attendance and shows what you need for your targets. Useful, but a small single-purpose tool."],"planner":["8","A simple weekly grid you can print or save as a picture. Easy to use and light on features."],"share":["5","Shares a note and files through a short code and deletes everything on its own when the timer you chose runs out, up to two hours."]}};/*ENDRANKDATA*/
 function rankBadge(k){var s=RANKD.stages.filter(function(x){return x[0]===k;})[0];return '<span class="rk s'+k+'">'+(k==='a'?ico('spark',12,2.4):'')+s[1]+'</span>';}
 function rankList(){return '<div class="rkl">'+RANKD.stages.map(function(s){
  var ts=TL.filter(function(t){var r=RANKD.tools[t.r];return r&&r[0]===s[0];}).sort(function(a,b){return a.n<b.n?-1:1;});
@@ -1059,7 +1058,7 @@ async function dThanks(api){
  else n.innerHTML='<div class="note" style="margin:0 0 16px">We could not check that payment just now. If money left your account, it will be shown in your bank or UPI app, and you can <a href="#/contact">contact us</a>.</div>';
 }
 function termsPage(){nav('terms');
- app.innerHTML=banner('Legal','Terms of Service','Last updated: October 27, 2026')+
+ app.innerHTML=banner('Legal','Terms of Service','Last updated: November 7, 2026')+
  '<div class="wrapc doc" style="max-width:760px"><p>By using Eve Sandbox you agree to these terms. If you do not agree, please do not use the site.</p>'+
  '<h2>1. Using the site</h2><p>Eve Sandbox provides free tools for personal and educational use. You must use them lawfully and must not use the site to harm others, break the law, or interfere with how the site works.</p>'+
  '<h2>2. Your files and data</h2><p>The image and PDF tools work inside your browser. Your files are not uploaded to Eve Sandbox. You keep all rights to your files and are responsible for having the right to edit them. Keep a copy of your originals, because we cannot recover files for you. See the <a href="#/privacy" style="color:var(--brand)">Privacy</a> page for details.</p>'+
@@ -1067,24 +1066,25 @@ function termsPage(){nav('terms');
  '<h2>4. Virus Checker</h2><p>The Virus Checker gives an automated opinion based on the look of an address and on third-party services. It is not a guarantee that a site is safe or unsafe. Use your own judgment, and do not enter passwords or payment details on a site you are unsure about.</p>'+
  '<h2>5. Prices and suggestions</h2><p>Suggestions, price ranges and verdicts in Deal or No Deal and Eve AI are automated estimates, not live prices or professional advice. Prices, offers and stock change often, so check everything on the store’s own page before you pay. Product links come from an automated web search and can be out of date, sold out or not exactly what you meant. Eve Sandbox does not sell products and is not connected to the stores it links to.</p>'+
  '<h2>6. Text and File Sharing</h2><p>Shares are temporary. They are deleted automatically when their time ends (never more than 2 hours later) and we cannot bring them back. Anyone who has a share’s code can open it, so you are responsible for what you share and for who you give the code to. Do not share anything unlawful, harmful or that you have no right to share, including malware, other people’s private information and content that infringes someone’s rights. We may remove shares and limit use to keep the service safe and available for everyone.</p>'+
- '<h2>7. No warranty</h2><p>The site and its tools are provided “as is” and “as available”, without promises of accuracy, availability or fitness for a particular purpose. To the fullest extent the law allows, we are not liable for any loss or damage from using the site or relying on its results.</p>'+
- '<h2>8. Third-party services and links</h2><p>Some features use or link to services run by others, such as lookup services, security-checking websites and payment and email services. We do not control them and are not responsible for their content or policies.</p>'+
- '<h2>9. Changes</h2><p>We may change the site or these terms from time to time. Continuing to use the site after a change means you accept the updated terms.</p>'+
- '<h2>10. Contact</h2><p>Questions about these terms? Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
+ '<h2>7. Community</h2><p>The Community is a separate part of Eve Sandbox where signed-in people can post (text and pictures), reply (text only), vote, report and keep a public profile with a picture, a short bio and links. What you post, including pictures and everything on your profile, is public and can be read by anyone, including people who are not signed in, and may be shared by others using its link. You are responsible for what you post. Do not use a username, picture, bio or link that is unlawful, hateful, misleading, or pretends to be another person or Eve Sandbox, and do not post anything unlawful, hateful, threatening, sexual involving minors, misleading or spam, other people’s private information, malware, or anything you have no right to post. Be kind and keep to the topic. You keep the rights to your words and pictures, and you give Eve Sandbox permission to show them in the Community for as long as they stay posted. We may remove posts or replies, and limit or block accounts, to keep the Community safe, with or without notice. You can delete your own posts and replies at any time; deleting a post also deletes its replies and pictures. Votes and replies are the opinions of the people who wrote them, not of Eve Sandbox.</p>'+
+ '<h2>8. No warranty</h2><p>The site and its tools are provided “as is” and “as available”, without promises of accuracy, availability or fitness for a particular purpose. To the fullest extent the law allows, we are not liable for any loss or damage from using the site or relying on its results.</p>'+
+ '<h2>9. Third-party services and links</h2><p>Some features use or link to services run by others, such as lookup services, security-checking websites and payment and email services. We do not control them and are not responsible for their content or policies.</p>'+
+ '<h2>10. Changes</h2><p>We may change the site or these terms from time to time. Continuing to use the site after a change means you accept the updated terms.</p>'+
+ '<h2>11. Contact</h2><p>Questions about these terms? Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
 function privacyPage(){nav('privacy');
- app.innerHTML=banner('Legal','Privacy','Last updated: October 27, 2026')+
- '<div class="wrapc doc" style="max-width:760px"><h2 style="margin-top:0">The short version</h2><p>No accounts. Your images and PDFs stay on your device. We do not add analytics or advertising code to this site.</p>'+
+ app.innerHTML=banner('Legal','Privacy','Last updated: November 7, 2026')+
+ '<div class="wrapc doc" style="max-width:760px"><h2 style="margin-top:0">The short version</h2><p>No account is needed for the tools. Your images and PDFs stay on your device. We do not add analytics or advertising code to this site. The one place that uses sign-in is the Community, described below.</p>'+
  '<h2>What stays on your device</h2><ul><li>Images and PDFs you open in the tools are processed in your browser and are never sent to us.</li><li>The Study Planner, the Complex Calculator and your Eve AI chats save their data in your browser so it is there next time. Clearing your browser data removes it.</li></ul>'+
  '<h2>What leaves your device</h2><p>Some features need help from outside services, or store what you give them for a short time. We keep this to the minimum each feature needs, and those services follow their own privacy policies.</p><ul>'+
  '<li><b>Virus Checker:</b> the address you enter is sent to a few public lookup services to find out about it. The tool never visits the address itself.</li>'+
  '<li><b>Supporting software:</b> some tools (such as the PDF tools, the File Converter and Eve IDE) download the extra software they need from a public source the first time you use them.</li>'+
  '<li><b>Eve IDE:</b> Python runs on your device. When you run C or Java, your code and input are sent to an online service that runs them and sends back the result.</li>'+
- '<li><b>Grab Box:</b> it fetches the link you paste from the website it points to.</li>'+
  '<li><b>Eve AI:</b> the messages you send Eve, and any notes you attach, are sent to an AI service so it can write a reply. They are not stored by this website. Your chat history and saved flashcards stay on your device. Please do not share passwords or private personal details.</li>'+
  '<li><b>Deal or No Deal:</b> what you type about the item you want, your budget, and any prices you add are sent to an AI service so it can write its suggestions, and to a web search service that looks for matching product pages. They are not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Text to Speech:</b> the Speak as you type section runs on your device and sends nothing. When you make an audio file, the paragraph you wrote is sent to a speech service so it can create the audio. It is not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Live Translate:</b> in Speak, your browser’s own speech service turns what you say into text. If that service cannot be used, short clips of your voice are sent to a speech service instead so they can be turned into text, and they are not stored by this website. In Screen, the picture of your screen never leaves your device; the words on it are read on your device. The words are then translated on your device when your browser can do that, or sent to a translation service so they can be translated. They are not stored by this website. Please do not share private personal details.</li>'+
  '<li><b>Text and File Sharing:</b> the note and files you share are sent to us and kept in storage only until the time you pick, which is never more than 2 hours. Then they are deleted automatically, or sooner if you stop the share. Anyone who has the share’s code can open it until then. A security check is used before a share is made, and its provider may look at technical details of your browser to do this. Please do not share passwords or private personal details.</li>'+
+ '<li><b>Community:</b> to post, reply or vote you sign in through a sign-in service. From it we receive your account’s name, email address and a sign-in ID. Your email address is never shown to others and is never put on your posts. The display name and username you choose, your profile picture, bio and links, and the posts, pictures, replies, votes and reports you make, are stored on our servers. Your display name, username, profile picture, bio, links, posts, pictures and replies are public, and anyone can see them, even without signing in, so please do not put personal details in them. Before a photo is uploaded, the page removes hidden details such as where it was taken from JPEG photos, but pictures in other formats are stored as they are. Your votes are private to you, and only the totals are shown, unless you turn on the setting that shows the posts you liked on your profile. You can delete your own posts and replies at any time, which also deletes a post’s replies and pictures. To have your account and its data removed, use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</li>'+
  '<li><b>Links you open</b> take you to other websites with their own policies.</li>'+
  '<li><b>Contact form:</b> the form uses a security check to tell people from automated programs, and the check provider may look at technical details of your browser to do this. The name, email and message you type are sent to us by email so they reach us. We use them only to read and answer your message.</li>'+
  '<li><b>Donations:</b> if you donate, the amount and the mobile number you type (plus the name and email, if you give them) are sent to our payment partner to start the payment, and you pay on their page under their own privacy policy. Eve Sandbox does not store your payment details or your mobile number.</li></ul>'+
@@ -1230,8 +1230,8 @@ var FULL={tools:toolsPage,about:aboutPage,contact:contactPage,donate:donatePage,
 
 /* ---------- pages and addresses ---------- */
 var PAGE=EVE_PAGE,PM=!!PAGE,BASEP=EVE_BASE,INIT404=PAGE==='404';
-var ROUTES=['tools','about','contact','donate','terms','privacy','planner','image','pdf','virus','calc','deal','drawww','tts','qr','grab','convert','ide','eve','translate','share'];
-var TITLES={home:'Home',tools:'Tools',about:'About',contact:'Contact',donate:'Donate',terms:'Terms of Service',privacy:'Privacy',planner:'Study Planner',image:'Image Tool',pdf:'PDF Tool',virus:'Virus Checker',calc:'Complex Calculator',deal:'Deal or No Deal',drawww:'Drawww',tts:'Text to Speech',qr:'QR Code Generator',grab:'Grab Box',convert:'File Converter',ide:'Eve IDE',eve:'Eve AI',translate:'Live Translate',share:'Text and File Sharing','404':'Page Not Found'};
+var ROUTES=['tools','about','contact','donate','terms','privacy','planner','image','pdf','virus','calc','deal','drawww','tts','qr','convert','ide','eve','translate','share'];
+var TITLES={home:'Home',tools:'Tools',about:'About',contact:'Contact',donate:'Donate',terms:'Terms of Service',privacy:'Privacy',planner:'Study Planner',image:'Image Tool',pdf:'PDF Tool',virus:'Virus Checker',calc:'Complex Calculator',deal:'Deal or No Deal',drawww:'Drawww',tts:'Text to Speech',qr:'QR Code Generator',convert:'File Converter',ide:'Eve IDE',eve:'Eve AI',translate:'Live Translate',share:'Text and File Sharing','404':'Page Not Found'};
 function U(r){r=(!r||r==='home')?'':r;return PM?BASEP+(r?r+'/':''):'#/'+r;}
 function curR(){
  if(!PM)return location.hash.replace('#/','');
@@ -1402,105 +1402,6 @@ function sharePage(){nav('share');
  $$('shopen').onclick=function(){shOpen(ci.value);};
  var sv=SH.mine||shGet(SHK);if(sv&&sv.code&&sv.key&&sv.end>Date.now()){SH.mine=sv;shMineDraw();}else{SH.mine=null;shSet(SHK,null);}
  shHealth();
-}
-/* ---------- Grab Box: direct file links ---------- */
-var GB={ab:null,blob:null,url:''};
-function gbName(u,ct){
- var n='';try{n=decodeURIComponent(new URL(u).pathname.split('/').filter(Boolean).pop()||'');}catch(e){}
- n=n.replace(/[^\w.\- ]+/g,'').trim();
- var ext={'video/mp4':'mp4','video/webm':'webm','audio/mpeg':'mp3','audio/mp4':'m4a','audio/ogg':'ogg','audio/wav':'wav','image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif','image/svg+xml':'svg','application/pdf':'pdf','application/zip':'zip'}[(ct||'').split(';')[0]]||'';
- if(!n)n='download';
- if(!/\.[A-Za-z0-9]{2,5}$/.test(n)&&ext)n+='.'+ext;
- return n;
-}
-function gbMsg(h,bad){var e=$$('gbmsg');e.className='note'+(bad?' bad':'');e.innerHTML=h;e.style.display='block';}
-function gbBlocked(h){return /(^|\.)(youtube\.com|youtu\.be|instagram\.com|facebook\.com|fb\.watch|fb\.com|twitter\.com|x\.com|t\.co)$/i.test(h);}
-async function gbFetch(href,sig){
- var r=null;
- try{r=await fetch(href,{signal:sig,credentials:'omit',referrerPolicy:'no-referrer'});}
- catch(e){if(!CFG.grabApi||(e&&e.name==='AbortError'))throw e;}
- if(r&&r.ok)return r;
- if(!CFG.grabApi)return r||Promise.reject(new TypeError('blocked'));
- return fetch(CFG.grabApi+(CFG.grabApi.indexOf('?')<0?'?':'&')+'url='+encodeURIComponent(href),{signal:sig,credentials:'omit'});
-}
-async function gbGo(direct){
- var raw=($$('gbu').value||'').trim(),u;
- $$('gbout').innerHTML='';$$('gbmsg').style.display='none';
- if(!raw){gbMsg('Paste a direct link to a file first.',1);return;}
- if(!/^[a-z][a-z0-9+.\-]*:/i.test(raw))raw='https://'+raw;
- try{u=new URL(raw);}catch(e){gbMsg('That does not look like a valid link.',1);return;}
- if(u.protocol!=='https:'&&u.protocol!=='http:'){gbMsg('Only http and https links work.',1);return;}
- if(gbBlocked(u.hostname)){gbMsg('Links to video sites and social networks are not supported. Paste a direct file link (ending in .mp4, .mp3, .jpg, .pdf and so on) or a link to an ordinary web page that has the file on it.',1);return;}
- if(location.protocol==='https:'&&u.protocol==='http:'){gbMsg('This site is secure, so the browser blocks plain http downloads. Try the https version of the link.',1);return;}
- GB.blob=null;if(GB.ab)GB.ab.abort();GB.ab=new AbortController();
- var go=$$('gbgo');go.disabled=true;
- $$('gbout').innerHTML='<div class="card" style="margin-top:14px"><b id="gbt">Connecting...</b><div class="gbbar"><i id="gbp"></i></div><div class="row" style="justify-content:space-between;margin-top:8px"><span class="hint" id="gbs"></span><button class="btn" id="gbx">Cancel</button></div></div>';
- $$('gbx').onclick=function(){if(GB.ab)GB.ab.abort();};
- try{
-  var r=await gbFetch(u.href,GB.ab.signal);
-  if(!r.ok){if(r.status===415&&CFG.grabApi&&!direct){await gbScan(u);go.disabled=false;return;}throw {http:r.status};}
-  var ct=r.headers.get('content-type')||'',tot=+r.headers.get('content-length')||0;
-  if(/text\/html/i.test(ct)){if(direct)throw {page:1};await gbScan(u);go.disabled=false;return;}
-  if(tot>400*1048576){throw {big:1};}
-  var rd=r.body&&r.body.getReader?r.body.getReader():null,parts=[],got=0;
-  $$('gbt').textContent='Downloading...';
-  if(rd){
-   for(;;){var x=await rd.read();if(x.done)break;parts.push(x.value);got+=x.value.length;
-    if(got>400*1048576){GB.ab.abort();throw {big:1};}
-    $$('gbp').style.width=(tot?Math.min(100,got/tot*100):50)+'%';
-    if(!tot)$$('gbp').classList.add('ind');
-    $$('gbs').textContent=fb(got)+(tot?' of '+fb(tot):'');}
-  }else{var bb=await r.blob();parts=[bb];got=bb.size;}
-  var blob=new Blob(parts,{type:ct.split(';')[0]||'application/octet-stream'});
-  GB.blob=blob;var nm=gbName(u.href,ct);
-  var pv='',ou=URL.createObjectURL(blob);
-  if(/^video\//.test(blob.type))pv='<video controls playsinline preload="metadata" src="'+ou+'" class="gbpv"></video>';
-  else if(/^audio\//.test(blob.type))pv='<audio controls src="'+ou+'" style="width:100%;margin-top:12px"></audio>';
-  else if(/^image\//.test(blob.type))pv='<img src="'+ou+'" alt="Preview" class="gbpv" draggable="false">';
-  $$('gbout').innerHTML='<div class="card" style="margin-top:14px"><b>Ready</b><p class="hint" style="margin:.2em 0 0">'+esc(nm)+' &middot; '+fb(blob.size)+'</p>'+pv+'<div class="row" style="margin-top:12px"><button class="btn pri" id="gbdl">'+ico('dlbox',16,2.4)+' Download</button></div></div>';
-  $$('gbdl').onclick=function(){fileSave(GB.blob,nm);};
- }catch(e){
-  $$('gbout').innerHTML='';
-  if(e&&e.name==='AbortError'){gbMsg('Download cancelled.');}
-  else if(e&&e.http)gbMsg('The site answered with an error ('+e.http+'). Check that the link still works.',1);
-  else if(e&&e.page)gbMsg('That link opens a web page, not a file. Right-click the file on that page and copy its link address, then paste it here.',1);
-  else if(e&&e.big)gbMsg('That file is larger than 400 MB, which is too big to download in the browser.',1);
-  else if(!direct&&!CFG.grabApi){gbMsg('That website does not let this link be downloaded here. <a href="'+esc(u.href)+'" target="_blank" rel="noopener noreferrer">Open the link directly</a> instead.',1);}
-  else gbMsg('The browser could not fetch that file. Most often the other website does not allow downloads from other sites. <a href="'+esc(u.href)+'" target="_blank" rel="noopener noreferrer">Open the link directly</a> instead.',1);
- }
- go.disabled=false;
-}
-function gbScanHtml(html,base){
- var found=[],seen={},EXT=/\.(mp4|webm|m4v|mov|ogv|mp3|m4a|ogg|wav|flac)(\?|#|$)/i;
- function add(x){if(!x||found.length>=12)return;try{var a=new URL(String(x).replace(/\\\//g,'/'),base);if(!/^https?:$/.test(a.protocol)||gbBlocked(a.hostname)||seen[a.href])return;seen[a.href]=1;found.push(a.href);}catch(e){}}
- var d;try{d=new DOMParser().parseFromString(html,'text/html');}catch(e){return found;}
- d.querySelectorAll('meta[property^="og:video"],meta[property^="og:audio"],meta[name="twitter:player:stream"]').forEach(function(m){var c=m.getAttribute('content');if(c&&(EXT.test(c)||/og:(video|audio)(:url|:secure_url)?$/.test(m.getAttribute('property')||'')))add(c);});
- d.querySelectorAll('video[src],audio[src],source[src]').forEach(function(m){add(m.getAttribute('src'));});
- d.querySelectorAll('a[href]').forEach(function(a){var h=a.getAttribute('href')||'';if(EXT.test(h))add(h);});
- (html.replace(/\\\//g,'/').match(/https?:\/\/[^\s"'<>\\]+?\.(?:mp4|webm|m4v|mov|ogv|mp3|m4a|ogg|wav|flac)(?:\?[^\s"'<>\\]*)?/gi)||[]).forEach(add);
- return found;
-}
-function gbShowFound(list,pageUrl){
- $$('gbout').innerHTML='';
- if(!list.length){gbMsg('No downloadable files were found on that page. Some sites hide their files or use streaming, which Grab Box cannot save. If you can see the file in your browser\'s Network tab, paste its link here instead.',1);return;}
- $$('gbout').innerHTML='<div class="card" style="margin-top:14px"><b>Found '+list.length+' file'+(list.length>1?'s':'')+'</b><p class="hint" style="margin:.2em 0 0">on '+esc((function(){try{return new URL(pageUrl).hostname;}catch(e){return pageUrl;}})())+'</p>'+list.map(function(u,i){var n=gbName(u,'');var h='';try{h=new URL(u).hostname;}catch(e){}return '<div class="gbfound"><div style="min-width:0"><b class="gbtt" style="-webkit-line-clamp:1">'+esc(n)+'</b><span class="hint">'+esc(h)+'</span></div><button class="btn pri" data-i="'+i+'">Grab</button></div>';}).join('')+'</div>';
- $$('gbout').querySelectorAll('button[data-i]').forEach(function(b){b.onclick=function(){$$('gbu').value=list[+b.dataset.i];gbGo(true);};});
-}
-async function gbScan(u){
- $$('gbout').innerHTML='<div class="card" style="margin-top:14px"><b>Looking for files on that page...</b><div class="gbbar"><i class="ind"></i></div></div>';
- var html=null;
- try{var r=await fetch(u.href,{credentials:'omit',referrerPolicy:'no-referrer',signal:GB.ab&&GB.ab.signal});if(r.ok)html=await r.text();}catch(e){}
- if(html===null&&CFG.grabApi){
-  try{var r2=await fetch(CFG.grabApi.replace(/\/fetch\/?$/,'')+'/page?url='+encodeURIComponent(u.href),{credentials:'omit'});if(r2.ok){var j=await r2.json();html=j.html;}}catch(e){}
- }
- if(html===null){$$('gbout').innerHTML='';gbMsg('Could not read that page. Try pasting the direct link to the file instead.',1);return;}
- gbShowFound(gbScanHtml(html,u.href),u.href);
-}
-function grabPage(){nav('grab');
- app.innerHTML=toolHd('grab','Paste a link to a file, or to a page that has a video or audio file on it, and Grab Box finds it so you can download it.')+
- '<div class="card" style="margin-top:16px"><div class="row" style="flex-wrap:nowrap;gap:8px"><input type="text" id="gbu" inputmode="url" placeholder="Paste a link here" style="flex:1;font-size:1.05rem;padding:11px 14px" autocomplete="off" autocapitalize="off" spellcheck="false"><button class="btn pri" id="gbgo">Grab</button></div>'+
- '<p class="hint" style="margin:10px 0 0">Only download files you made or have permission to save. Video sites and social networks are not supported.</p></div><div class="note" id="gbmsg" style="display:none"></div><div id="gbout"></div>';
- $$('gbgo').onclick=function(){gbGo();};$$('gbu').onkeydown=function(e){if(e.key==='Enter')gbGo();};
 }
 /* ---------- Deal or No Deal ---------- */
 var DS={need:'',budget:'',pri:'value',cond:'new',state:'idle',err:'',plan:null,offers:[],judge:null,jstate:'idle',jerr:'',seq:0,run:0,fq:'',flt:{min:'',max:'',sort:'rel',rate:false,fast:false}};
@@ -4602,9 +4503,9 @@ window.addEventListener('hashchange',function(){if(curR()!=='eve')aiLeave();if(c
 function route(){var r=curR();menu(false);app.onclick=null;tsStop();ltStop();dwLeave();
  var known=r===''||r==='home'||r==='404'||ROUTES.indexOf(r)>=0;if(!known)r=PM?'404':'';
  setTitle(r===''?'home':r);
- app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||(!LOCKED[r]&&['planner','image','pdf','virus','calc','deal','drawww','tts','qr','grab','convert','ide','eve','translate','share'].indexOf(r)<0));
+ app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||(!LOCKED[r]&&['planner','image','pdf','virus','calc','deal','drawww','tts','qr','convert','ide','eve','translate','share'].indexOf(r)<0));
  app.classList.toggle('wide',r==='drawww');
- if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='deal')dealPage();else if(r==='drawww')drawwwPage();else if(r==='tts')ttsPage();else if(r==='translate')translatePage();else if(r==='share')sharePage();else if(r==='qr')qrPage();else if(r==='grab')grabPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(FULL[r])FULL[r]();else home();
+ if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='deal')dealPage();else if(r==='drawww')drawwwPage();else if(r==='tts')ttsPage();else if(r==='translate')translatePage();else if(r==='share')sharePage();else if(r==='qr')qrPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(FULL[r])FULL[r]();else home();
  fixLinks(app);window.scrollTo(0,0);}
 
 document.getElementById('yr').textContent=new Date().getFullYear();

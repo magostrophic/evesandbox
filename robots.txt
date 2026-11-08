@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /grab/
 
 Sitemap: https://evesandbox.com/sitemap.xml
