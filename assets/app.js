@@ -842,7 +842,7 @@ function vDraw(){
 
 var CFG=Object.assign({email:'',phone:'',legalName:'',address:'',donate:[],donateApi:'',dealApi:'',runApi:'',aiApi:'',shareApi:'',turnstileKey:''},window.EVE_CFG||{});
 var TL=[
- {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your CGPA and attendance, and see what you need to hit your targets.'},
+ {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your SGPA, CGPA and attendance, with marks or grades, failed subjects and re-exams, and see what you need to hit your targets.'},
  {r:'deal',c:'i10',ic:'tag',n:'Deal or No Deal',d:'Tell Eve what you want to buy. She suggests what to look for, links the top stores and shows which price is the real best deal.'},
  {r:'drawww',c:'i14',ic:'diagram',n:'Drawww',d:'Draw ER diagrams with entities, relationships, attributes and tables. Join them with lines, then download your diagram as a picture.'},
  {r:'eve',c:'i1',ic:'spark',n:'Eve AI',d:'Your caring study buddy. Ask questions, get step-by-step help, make flashcards and practice tests, and learn from your own notes.'},
@@ -1101,94 +1101,324 @@ function privacyPage(){nav('privacy');
  '<h2>Children</h2><p>Eve Sandbox is not meant for children under 13, and we do not knowingly collect their information. If you believe a child has given us personal information, please contact us and we will delete it.</p>'+
  '<h2>Changes to this policy</h2><p>If we change how we handle information, we will update this page and the date at the top. If a change is significant, we will say so on the site.</p>'+
  '<h2>Contact us</h2><p>Questions about privacy, or requests about your information? Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page or write to contact@evesandbox.com.</p></div>';}
-var CKEY='eve-sandbox:calc:v1';
-var G10=[['O',10],['A+',9],['A',8],['B+',7],['B',6],['C',5],['P',4],['F',0]];
-var G4=[['A',4],['A-',3.7],['B+',3.3],['B',3],['B-',2.7],['C+',2.3],['C',2],['C-',1.7],['D',1],['F',0]];
-function cRows(n,mkRow){var a=[];for(var i=0;i<n;i++)a.push(mkRow());return a;}
-function cDef(){return {tab:'cgpa',cg:{scale:'10',method:'credit',mult:9.5,max:10,sems:[{rows:cRows(5,function(){return {n:'',c:'',g:''};})}],tgt:{t:'',rem:''}},at:{req:75,rows:cRows(4,function(){return {n:'',a:'',t:''};}),fut:{n:'',m:''}}};}
-var C=cDef();
-try{var craw=localStorage.getItem(CKEY);if(craw){var cp=JSON.parse(craw);
- if(cp&&cp.cg&&cp.at&&Array.isArray(cp.cg.sems)&&cp.cg.sems.length&&cp.cg.sems.every(function(s){return s&&Array.isArray(s.rows);})&&Array.isArray(cp.at.rows)&&cp.at.rows.length&&cp.cg.tgt&&cp.at.fut)C=cp;}}catch(e){}
-function cSave(){try{localStorage.setItem(CKEY,JSON.stringify(C));}catch(e){}}
+/*CALC-ENGINE-START*/
+var CKEY='eve-sandbox:calc:v2',CKEY1='eve-sandbox:calc:v1';
+var GS={
+ univ:{n:'University marksheet style (OO+, OO, OA, AB+...)',g:[['OO+',10,95],['OO',9.5,90],['OA+',9,85],['OA',8.5,80],['AA+',8,75],['AA',7.5,70],['AB+',7,65],['AB',6.5,60],['BB+',6,55],['BB',5.5,50],['BC+',5,45],['BC',4.5,40],['F',0,0,1],['Ab',0,0,1]]},
+ s10:{n:'Standard 10 point (O, A+, A, B+...)',g:[['O',10,90],['A+',9,80],['A',8,70],['B+',7,60],['B',6,50],['C',5,45],['P',4,40],['F',0,0,1],['Ab',0,0,1]]},
+ s4:{n:'4.0 scale (A, A-, B+, B...)',g:[['A',4,93],['A-',3.7,90],['B+',3.3,87],['B',3,83],['B-',2.7,80],['C+',2.3,77],['C',2,73],['C-',1.7,70],['D',1,60],['F',0,0,1],['Ab',0,0,1]]}
+};
+function gsCopy(k){return GS[k].g.map(function(x){return {n:x[0],p:x[1],m:x[2],f:x[3]?1:0};});}
+function blankAtt(){return {g:'',p:'',mo:'',mm:'',sp:false,t:['',''],i:['',''],r:['','']};}
+function blankRow(){var r=blankAtt();r.n='';r.c='';r.x=null;return r;}
+function blankRows(n){var a=[];for(var i=0;i<n;i++)a.push(blankRow());return a;}
+function newSem(){return {m:'d',q:{s:'',c:''},rows:blankRows(6)};}
+function cDef(){return {tab:'sgpa',mode:'grade',sc:{p:'univ',b:'univ',g:gsCopy('univ')},cm:'',fp:'zero',re:'latest',cap:false,meth:'credit',mult:9.5,wi:'',so:false,
+ sg:{rows:blankRows(6),tgt:{t:'',rem:''}},cg:{sems:[newSem()],tgt:{t:'',rem:''}},
+ at:{req:75,rows:cRows(4,function(){return {n:'',a:'',t:''};}),fut:{n:'',m:''}}};}
+function cRows(n,mk){var a=[];for(var i=0;i<n;i++)a.push(mk());return a;}
 function nm(v){var x=parseFloat(v);return isFinite(x)?x:NaN;}
 function f2(x){return (Math.round(x*100)/100).toFixed(2);}
 function f1(x){return (Math.round(x*10)/10).toFixed(1);}
-function maxGp(){var c=C.cg;return c.scale==='10'?10:c.scale==='4'?4:(nm(c.max)>0?nm(c.max):10);}
-function gpOf(g){var c=C.cg;if(c.scale==='10'||c.scale==='4'){var L=c.scale==='10'?G10:G4;for(var i=0;i<L.length;i++)if(L[i][0]===g)return L[i][1];return NaN;}var x=nm(g);return (x>=0&&x<=maxGp())?x:NaN;}
-function cgCalc(){var cg=C.cg,TP=0,TC=0,sg=[],sum=0,cnt=0;
- cg.sems.forEach(function(s){var p=0,cr=0;s.rows.forEach(function(r){var c=nm(r.c),g=gpOf(r.g);if(c>0&&!isNaN(g)){p+=c*g;cr+=c;}});TP+=p;TC+=cr;var sgpa=cr>0?p/cr:NaN;sg.push({sgpa:sgpa,cr:cr});if(cr>0){sum+=sgpa;cnt++;}});
- return {TP:TP,TC:TC,sg:sg,cnt:cnt,cgpa:cg.method==='avg'?(cnt?sum/cnt:NaN):(TC>0?TP/TC:NaN)};}
+function normAtt(a){var b=blankAtt();if(!a||typeof a!=='object')return b;['g','p','mo','mm'].forEach(function(k){if(typeof a[k]==='string'||typeof a[k]==='number')b[k]=String(a[k]);});b.sp=!!a.sp;['t','i','r'].forEach(function(k){if(Array.isArray(a[k])&&a[k].length===2)b[k]=[String(a[k][0]),String(a[k][1])];});return b;}
+function normRow(r){var b=normAtt(r);b.n=r&&typeof r.n==='string'?r.n:'';b.c=r&&(typeof r.c==='string'||typeof r.c==='number')?String(r.c):'';b.x=r&&r.x?normAtt(r.x):null;return b;}
+function loadCalc(raw,raw1){
+ var d=cDef();
+ try{if(raw){var p=JSON.parse(raw);
+  if(p&&p.sg&&p.cg&&p.at&&p.sc&&Array.isArray(p.sc.g)&&p.sc.g.length&&Array.isArray(p.sg.rows)&&Array.isArray(p.cg.sems)&&p.cg.sems.length&&Array.isArray(p.at.rows)&&p.at.rows.length&&p.at.fut&&p.sg.tgt&&p.cg.tgt){
+   if(!GS[p.sc.b])p.sc.b=GS[p.sc.p]?p.sc.p:'univ';
+   p.sc.g=p.sc.g.map(function(x){return {n:String(x.n),p:x.p,m:x.m,f:x.f?1:0};});
+   p.sg.rows=p.sg.rows.map(normRow);if(!p.sg.rows.length)p.sg.rows=blankRows(6);
+   p.cg.sems=p.cg.sems.map(function(s){var q=s.q||{};var rows=Array.isArray(s.rows)?s.rows.map(normRow):[];if(!rows.length)rows=blankRows(6);return {m:s.m==='q'?'q':'d',q:{s:String(q.s==null?'':q.s),c:String(q.c==null?'':q.c)},rows:rows};});
+   return Object.assign(d,p);}}
+ }catch(e){}
+ try{if(raw1){var o=JSON.parse(raw1);
+  if(o&&o.cg&&o.at&&Array.isArray(o.cg.sems)&&o.cg.sems.length&&o.cg.sems.every(function(s){return s&&Array.isArray(s.rows);})&&Array.isArray(o.at.rows)&&o.at.rows.length&&o.cg.tgt&&o.at.fut){
+   var sc=o.cg.scale;
+   d.at=o.at;d.mult=nm(o.cg.mult)||9.5;d.meth=o.cg.method==='avg'?'avg':'credit';
+   d.sc=sc==='4'?{p:'s4',b:'s4',g:gsCopy('s4')}:{p:'s10',b:'s10',g:gsCopy('s10')};
+   d.mode=sc==='custom'?'points':'grade';
+   d.cg.tgt=o.cg.tgt;
+   d.cg.sems=o.cg.sems.map(function(s){var x=newSem();x.rows=s.rows.map(function(r){var b=blankRow();b.n=String(r.n||'');b.c=String(r.c||'');if(sc==='custom')b.p=String(r.g||'');else b.g=String(r.g||'');return b;});if(!x.rows.length)x.rows=blankRows(5);return x;});
+   d.tab=o.tab==='att'?'att':'cgpa';}}
+ }catch(e){}
+ return d;}
+var C=cDef();
+
+/* ----- the grading scale ----- */
+function gtab(){return C.sc.g;}
+function gPass(){return gtab().filter(function(x){return !x.f&&!isNaN(nm(x.p))&&!isNaN(nm(x.m));});}
+function maxGp(){var m=0;gPass().forEach(function(x){m=Math.max(m,nm(x.p));});return m||10;}
+function passMin(){var v=Infinity;gPass().forEach(function(x){v=Math.min(v,nm(x.m));});return isFinite(v)?v:40;}
+function passGp(){var v=Infinity;gPass().forEach(function(x){v=Math.min(v,nm(x.p));});return isFinite(v)?v:0;}
+function failName(){var f=gtab().filter(function(x){return x.f;})[0];return f?f.n:'F';}
+function gByName(n){var t=gtab();for(var i=0;i<t.length;i++)if(t[i].n===n)return t[i];return null;}
+function gByPts(v){var t=gPass();for(var i=0;i<t.length;i++)if(Math.abs(nm(t[i].p)-v)<1e-9)return t[i];return null;}
+function bandOf(pct){var best=null;gPass().forEach(function(x){var m=nm(x.m);if(pct+1e-9>=m&&(!best||m>nm(best.m)||(m===nm(best.m)&&nm(x.p)>nm(best.p))))best=x;});return best;}
+function lowPass(){var t=gPass().slice().sort(function(a,b){return nm(a.p)-nm(b.p);});return t[0]||null;}
+function cmv(){var v=nm(C.cm);return v>0?v:0;}
+
+/* ----- one result for one attempt at one subject ----- */
+function evalAtt(a){
+ var R={st:'none'},mode=C.mode;
+ if(mode==='grade'){if(!a.g)return R;var e=gByName(a.g);if(!e)return R;
+  return e.f?{st:'fail',g:e.n,gp:0,why:'Failing grade ('+e.n+')'}:{st:'pass',g:e.n,gp:nm(e.p)};}
+ if(mode==='points'){if(a.p===''||a.p==null)return R;var v=nm(a.p);
+  if(isNaN(v)||v<0||v>maxGp()+1e-9)return {st:'bad',why:'Grade points must be between 0 and '+maxGp()+'.'};
+  if(v+1e-9<passGp()||v===0)return {st:'fail',g:failName(),gp:0,why:'Below the lowest passing grade point ('+passGp()+')'};
+  var ge=gByPts(v);return {st:'pass',g:ge?ge.n:'',gp:v};}
+ var o,m,comp=[];
+ if(a.sp){var so=0,sm=0,any=false,bad=false,inc=false;
+  [['t','Theory'],['i','Internal'],['r','Practical']].forEach(function(k){var po=a[k[0]][0],pm=a[k[0]][1];if(po===''&&pm==='')return;if(po===''||pm===''){inc=true;return;}
+   var vo=nm(po),vm=nm(pm);if(isNaN(vo)||isNaN(vm)||vm<=0||vo<0||vo>vm){bad=true;return;}any=true;so+=vo;sm+=vm;comp.push([k[1],vo,vm]);});
+  if(bad)return {st:'bad',why:'Check the marks: obtained cannot be more than the maximum, and the maximum must be above 0.'};
+  if(inc||!any)return R;o=so;m=sm;}
+ else{if(a.mo==='')return R;o=nm(a.mo);m=a.mm===''?100:nm(a.mm);
+  if(isNaN(o)||isNaN(m)||m<=0||o<0||o>m)return {st:'bad',why:'Check the marks: obtained cannot be more than the maximum, and the maximum must be above 0.'};}
+ var pct=o/m*100,why='';
+ var cm=cmv();if(cm>0)comp.forEach(function(c){if(!why&&c[1]/c[2]*100+1e-9<cm)why=c[0]+' marks are below '+cm+'% of '+c[2];});
+ var b=bandOf(pct);
+ if(!why&&(pct+1e-9<passMin()||!b))why='Below the pass mark ('+f2(passMin())+'%)';
+ if(why)return {st:'fail',g:failName(),gp:0,pct:pct,o:o,m:m,why:why};
+ return {st:'pass',g:b.n,gp:nm(b.p),pct:pct,o:o,m:m};}
+
+/* ----- the result that counts for a subject (with an optional re-exam) ----- */
+function rowFinal(r,allowX){
+ var a=evalAtt(r),out={a:a,x:null,f:a};
+ if(allowX&&r.x){var b=evalAtt(r.x);
+  if(b.st==='pass'||b.st==='fail'){
+   var bb=b;
+   if(C.cap&&a.st==='fail'&&b.st==='pass'){var lp=lowPass();if(lp&&b.gp>nm(lp.p)+1e-9)bb=Object.assign({},b,{gp:nm(lp.p),g:lp.n,capped:true});}
+   out.x=bb;
+   out.f=(a.st==='pass'||a.st==='fail')?(C.re==='best'?(bb.gp>a.gp?bb:a):bb):bb;}
+  else if(b.st==='bad')out.xbad=b;}
+ return out;}
+
+/* ----- totals for a list of subjects ----- */
+function agg(rows,allowX){
+ var A={cp:0,cr:0,ea:0,fails:[],n:0,o:0,m:0,mk:0,dist:{}};
+ rows.forEach(function(r,i){var c=nm(r.c),F=rowFinal(r,allowX).f;
+  if(!(c>0)||(F.st!=='pass'&&F.st!=='fail'))return;
+  A.n++;A.cr+=c;
+  if(F.st==='pass'){A.ea+=c;A.cp+=c*F.gp;}else A.fails.push({i:i,n:r.n||('Subject '+(i+1)),c:c,why:F.why});
+  if(F.g)A.dist[F.g]=(A.dist[F.g]||0)+1;
+  if(F.m>0){A.o+=F.o;A.m+=F.m;A.mk++;}});
+ A.crU=C.fp==='ignore'?A.ea:A.cr;
+ A.gpa=A.crU>0?A.cp/A.crU:NaN;A.gpaZ=A.cr>0?A.cp/A.cr:NaN;A.gpaP=A.ea>0?A.cp/A.ea:NaN;
+ A.fc=A.fails.reduce(function(s,x){return s+x.c;},0);
+ return A;}
+
+/* ----- all semesters together (CGPA) ----- */
+function cgAll(){
+ var T={cp:0,cr:0,ea:0,crU:0,sems:[],fails:[],n:0,o:0,m:0,mk:0,dist:{},fc:0},sum=0,cnt=0;
+ C.cg.sems.forEach(function(s,si){var A;
+  if(s.m==='q'){var g=nm(s.q.s),c=nm(s.q.c);
+   if(c>0&&g>=0&&g<=maxGp()+1e-9)A={cp:g*c,cr:c,ea:c,crU:c,gpa:g,fails:[],fc:0,n:1,o:0,m:0,mk:0,dist:{},quick:true};
+   else A={cp:0,cr:0,ea:0,crU:0,gpa:NaN,fails:[],fc:0,n:0,o:0,m:0,mk:0,dist:{},quick:true};}
+  else A=agg(s.rows,true);
+  T.sems.push(A);T.cp+=A.cp;T.cr+=A.cr;T.ea+=A.ea;T.crU+=A.crU;T.fc+=A.fc;T.n+=A.n;T.o+=A.o;T.m+=A.m;T.mk+=A.mk;
+  A.fails.forEach(function(f){T.fails.push({s:si,i:f.i,n:f.n,c:f.c,why:f.why});});
+  Object.keys(A.dist).forEach(function(k){T.dist[k]=(T.dist[k]||0)+A.dist[k];});
+  if(!isNaN(A.gpa)){sum+=A.gpa;cnt++;}});
+ T.cgpa=C.meth==='avg'?(cnt?sum/cnt:NaN):(T.crU>0?T.cp/T.crU:NaN);
+ T.cgpaZ=T.cr>0?T.cp/T.cr:NaN;T.cgpaP=T.ea>0?T.cp/T.ea:NaN;
+ return T;}
+
+/* ----- targets and what-ifs ----- */
+function needFor(t,rem,cp,cr){var mx=maxGp();
+ if(!(t>=0&&rem>0))return null;
+ if(!(cr>0))return {k:'',m:'Add your grades above first.'};
+ var need=(t*(cr+rem)-cp)/rem,best=(cp+mx*rem)/(cr+rem);
+ if(t>mx)return {k:'bad',m:'Your target is above the top of the scale ('+mx+').'};
+ if(need<=0)return {k:'good',m:'You already have enough. Even scoring 0 in the rest keeps you at '+f2(cp/(cr+rem))+' or above.'};
+ if(need>mx+1e-9)return {k:'bad',m:'Not reachable. Even top grades in all '+rem+' credits would give '+f2(best)+'.'};
+ var g=gPass().filter(function(x){return nm(x.p)+1e-9>=need;}).sort(function(a,b){return nm(a.p)-nm(b.p);})[0];
+ return {k:'good',m:'You need an average of <b>'+f2(need)+'</b> over the next '+rem+' credits to finish at '+f2(t)+(g?' (about grade '+esc(g.n)+' or better).':'.')};}
+function clearGp(){var e=C.wi?gByName(C.wi):null;if(e&&!e.f)return e;return lowPass();}
+function whatIfClear(cp,cr,ea,fc){var e=clearGp();if(!e||!(fc>0))return null;var gp=nm(e.p),ncp=cp+fc*gp,ncr=C.fp==='ignore'?ea+fc:cr;return {e:e,v:ncr>0?ncp/ncr:NaN};}
+/*CALC-ENGINE-END*/
+try{C=loadCalc(localStorage.getItem(CKEY),localStorage.getItem(CKEY1));}catch(e){}
+function cSave(){try{localStorage.setItem(CKEY,JSON.stringify(C));}catch(e){}}
+function getRows(sc){return sc==='sg'?C.sg.rows:C.cg.sems[+sc].rows;}
+function setF(o,k,v){if(k.length===2&&'tir'.indexOf(k[0])>=0)o[k[0]][k[1]==='O'?0:1]=v;else o[k]=v;}
+function gOpts(sel){return '<option value="">Grade</option>'+gtab().filter(function(x){return x.n!=='';}).map(function(x){return '<option value="'+esc(x.n)+'" data-short="'+esc(x.n)+'"'+(x.n===sel?' selected':'')+'>'+esc(x.n)+(x.f?' (fail)':' · '+esc(String(nm(x.p))))+'</option>';}).join('');}
+
+/* ---------- the page ---------- */
+function calcPage(){nav('calc');
+ app.innerHTML=toolHd('calc','Work out your SGPA, your CGPA and your attendance. Enter grades, marks or grade points, handle failed subjects and re-exams, and see what you need to reach your targets. Your entries are saved on this device.')+
+ '<div class="seg" id="ctabs" style="margin:16px 0"><a data-ct="sgpa" href="javascript:void 0">SGPA</a><a data-ct="cgpa" href="javascript:void 0">CGPA</a><a data-ct="att" href="javascript:void 0">Attendance</a></div><div id="cbody"></div>';
+ $$('ctabs').onclick=function(e){var t=e.target.dataset.ct;if(!t)return;C.tab=t;cSave();cView();};
+ cView();
+}
+function cView(){if(['sgpa','cgpa','att'].indexOf(C.tab)<0)C.tab='sgpa';
+ document.querySelectorAll('#ctabs a').forEach(function(a){a.classList.toggle('on',a.dataset.ct===C.tab);});
+ if(C.tab==='att')atView();else if(C.tab==='cgpa')cgView();else sgView();}
+function cOut(){if(C.tab==='sgpa')sgOut();else if(C.tab==='cgpa')cgOut();}
+
+/* ---------- pieces shared by SGPA and CGPA ---------- */
+function modeSeg(){return '<div class="seg" id="cmode">'+[['grade','Grades'],['marks','Marks'],['points','Grade points']].map(function(m){return '<a data-cm="'+m[0]+'" href="javascript:void 0"'+(C.mode===m[0]?' class="on"':'')+'>'+m[1]+'</a>';}).join('')+'</div>';}
+function attHtml(a,d){
+ var h='';
+ if(C.mode==='grade')return '<select data-k="g"'+d+' aria-label="Grade">'+gOpts(a.g)+'</select>';
+ if(C.mode==='points')return '<input type="text" inputmode="decimal" data-k="p"'+d+' value="'+esc(a.p)+'" placeholder="Grade points (0 to '+esc(maxGp())+')" aria-label="Grade points">';
+ if(!a.sp)h+='<div class="mk"><input type="text" inputmode="decimal" data-k="mo"'+d+' value="'+esc(a.mo)+'" placeholder="Marks you got" aria-label="Marks obtained"><span>out of</span><input type="text" inputmode="decimal" data-k="mm"'+d+' value="'+esc(a.mm)+'" placeholder="100" aria-label="Maximum marks"></div>';
+ else h+=[['t','Theory'],['i','Internal'],['r','Practical']].map(function(k){return '<div class="mk mk3"><label>'+k[1]+'</label><input type="text" inputmode="decimal" data-k="'+k[0]+'O"'+d+' value="'+esc(a[k[0]][0])+'" placeholder="Got" aria-label="'+k[1]+' marks obtained"><span>/</span><input type="text" inputmode="decimal" data-k="'+k[0]+'M"'+d+' value="'+esc(a[k[0]][1])+'" placeholder="Max" aria-label="'+k[1]+' maximum marks"></div>';}).join('');
+ h+='<button class="lnk" data-sp="'+d.match(/data-sc="([^"]+)" data-r="(\d+)" data-x="(\d)"/).slice(1).join(':')+'">'+(a.sp?'Use total marks only':'Split into Theory, Internal and Practical')+'</button>';
+ return h;}
+function rowHtml(sc,ri,r,allowX){
+ var d=' data-sc="'+sc+'" data-r="'+ri+'"',h='<div class="cj"><div class="cj-h"><input type="text" data-k="n"'+d+' data-x="0" value="'+esc(r.n)+'" placeholder="Subject '+(ri+1)+'" maxlength="40" aria-label="Subject name"><input type="number" inputmode="decimal" min="0" step="0.5" data-k="c"'+d+' data-x="0" value="'+esc(r.c)+'" placeholder="Credits" aria-label="Credits"><button class="rm" data-rr="'+sc+':'+ri+'" aria-label="Remove subject">'+ico('x',16)+'</button></div>'+
+  '<div class="cj-b">'+attHtml(r,d+' data-x="0"')+'</div><div class="rl" id="rl-'+sc+'-'+ri+'"></div>';
+ if(allowX){if(r.x)h+='<div class="cj-x"><div class="cj-xh"><b>Re-exam or improvement</b><button class="lnk" data-xr="'+sc+':'+ri+'">Remove</button></div>'+attHtml(r.x,d+' data-x="1"')+'<div class="rl" id="rx-'+sc+'-'+ri+'"></div></div>';
+  else h+='<button class="lnk" data-xa="'+sc+':'+ri+'">+ Add a re-exam or improvement result</button>';}
+ return h+'</div>';}
+function rlOne(x,c){
+ if(x.st==='pass')return {k:'',h:[x.g?'<b>'+esc(x.g)+'</b>':'',f2(x.gp)+' grade points',c>0?f2(c*x.gp)+' credit points':'',x.pct!=null?f2(x.pct)+'%':'',x.capped?'capped at the lowest passing grade':''].filter(Boolean).join(' · ')};
+ if(x.st==='fail')return {k:'bad',h:'<b>Failed</b> · '+esc(x.why)+' · '+(C.fp==='ignore'?'left out of the average':'counts as 0 grade points')};
+ if(x.st==='bad')return {k:'bad',h:esc(x.why)};
+ return {k:'',h:''};}
+function paintRows(sc,rows,allowX){
+ rows.forEach(function(r,i){var F=rowFinal(r,allowX),c=nm(r.c),e=$$('rl-'+sc+'-'+i);
+  if(e){var o=rlOne(F.a,c);e.className='rl'+(o.k?' '+o.k:'');e.innerHTML=o.h;}
+  var xe=$$('rx-'+sc+'-'+i);
+  if(xe){var xr=F.x||F.xbad,o2=xr?rlOne(xr,c):{k:'',h:''};
+   if(F.x)o2.h+=(F.f===F.x?' · <b>this result is counted</b>':' · your better first result is counted');
+   xe.className='rl'+(o2.k?' '+o2.k:'');xe.innerHTML=o2.h;}});}
+function setHtml(tab){
+ var presets=Object.keys(GS).map(function(k){return '<option value="'+k+'"'+(C.sc.p===k?' selected':'')+'>'+esc(GS[k].n)+'</option>';}).join('')+'<option value="custom"'+(C.sc.p==='custom'?' selected':'')+'>Custom (edited)</option>';
+ var h='<details class="card csd" id="cset"'+(C.so?' open':'')+'><summary><b>Grading scale and rules</b><span class="hint">'+esc(GS[C.sc.p]?GS[C.sc.p].n:'Custom (edited)')+'</span></summary>';
+ h+='<div class="stack"><label class="hint">Grading scale<br><select class="sel" id="cgsc">'+presets+'</select></label>';
+ h+='<div class="gt" id="gt"><div class="gtr gth"><span>Grade</span><span>Points</span><span>Min %</span><span>Fail</span><span></span></div>'+gtab().map(function(x,i){return '<div class="gtr"><input type="text" data-gt="'+i+':n" value="'+esc(x.n)+'" maxlength="6" aria-label="Grade name"><input type="text" inputmode="decimal" data-gt="'+i+':p" value="'+esc(x.p)+'" aria-label="Grade points"><input type="text" inputmode="decimal" data-gt="'+i+':m" value="'+esc(x.m)+'" aria-label="Minimum percentage"><label class="gtf"><input type="checkbox" data-gt="'+i+':f"'+(x.f?' checked':'')+' aria-label="Failing grade"></label><button class="rm" data-gd="'+i+'" aria-label="Remove grade">'+ico('x',16)+'</button></div>';}).join('')+'</div>';
+ h+='<div class="bar" style="margin:0"><button class="btn" id="gadd">+ Add grade</button><button class="btn" id="grst">Reset to '+esc(GS[C.sc.b]?GS[C.sc.b].n.split(' (')[0]:'preset')+'</button></div>';
+ h+='<p class="hint" style="margin:0">Min % is the lowest percentage that earns a grade when you enter marks. The lowest passing grade sets the pass mark (now <b id="pmk">'+f2(passMin())+'</b>%). Tick Fail for grades like F or Ab.'+(C.sc.p==='univ'?' Your marksheet shows OO+, OO, OA, AB+, AB and BB+. The other grades follow the same half-point pattern, so please check them against your university\'s grading chart and edit anything that differs.':'')+'</p>';
+ h+='<label class="hint">A failed subject counts<br><select class="sel" id="cfp"><option value="zero"'+(C.fp==='zero'?' selected':'')+'>With 0 grade points (standard)</option><option value="ignore"'+(C.fp==='ignore'?' selected':'')+'>Left out of the average</option></select></label>';
+ h+='<label class="hint">Also fail a subject when Theory, Internal or Practical marks are below this % of their own maximum<br><input type="text" inputmode="decimal" id="ccm" value="'+esc(C.cm)+'" placeholder="Leave empty if not used" style="max-width:200px"></label>';
+ if(tab==='cgpa'){
+  h+='<label class="hint">When a subject is taken again<br><select class="sel" id="cre"><option value="latest"'+(C.re==='latest'?' selected':'')+'>Use the new result</option><option value="best"'+(C.re==='best'?' selected':'')+'>Use the better result</option></select></label>';
+  h+='<label class="opt"><input type="checkbox" id="ccap"'+(C.cap?' checked':'')+'> A passed re-exam is capped at the lowest passing grade</label>';
+  h+='<label class="hint">CGPA method<br><select class="sel" id="cmeth"><option value="credit"'+(C.meth==='credit'?' selected':'')+'>Credit weighted (all credit points / all credits)</option><option value="avg"'+(C.meth==='avg'?' selected':'')+'>Average of semester SGPAs</option></select></label>';
+  if(maxGp()>=10)h+='<label class="hint">Percentage = CGPA ×<br><input type="number" id="cmult" min="1" max="20" step="0.1" value="'+esc(C.mult)+'" style="width:90px"></label>';}
+ return h+'</div></details>';}
+function tgtHtml(id,lead,remLabel,t){return '<div class="card"><b>Target planner</b><p class="hint" style="margin:4px 0 0">'+lead+'</p><div class="row" style="margin-top:10px"><label class="hint">Target '+id.toUpperCase()+'<br><input type="number" id="'+id+'t" inputmode="decimal" min="0" step="0.01" value="'+esc(t.t)+'" style="width:110px"></label><label class="hint">'+remLabel+'<br><input type="number" id="'+id+'r" inputmode="decimal" min="0" step="0.5" value="'+esc(t.rem)+'" style="width:130px"></label></div><div id="'+id+'o"></div></div>';}
+function msgH(k,m){return '<div class="msg '+k+'"><span class="dotk"></span><div>'+m+'</div></div>';}
+function failsH(list,withSem){return list.map(function(f){return '<b>'+esc(f.n)+'</b> ('+(Math.round(f.c*100)/100)+' cr'+(withSem?', semester '+(f.s+1):'')+'): '+esc(f.why);}).join('<br>');}
+function policyMsg(zero,pass){
+ if(isNaN(zero)||isNaN(pass))return '';
+ return C.fp==='ignore'?msgH('','Failed subjects are left out of the average. Counting them as 0 grade points it would be <b>'+f2(zero)+'</b>.'):msgH('','Failed subjects count with 0 grade points, so they pull the average down. Without them it would be <b>'+f2(pass)+'</b>.');}
+function whatHtml(cp,cr,ea,fc,what){
+ var w=whatIfClear(cp,cr,ea,fc);if(!w)return '';
+ var opts=gPass().slice().sort(function(a,b){return nm(a.p)-nm(b.p);}).map(function(x){return '<option value="'+esc(x.n)+'" data-short="'+esc(x.n)+'"'+(x.n===w.e.n?' selected':'')+'>'+esc(x.n)+' ('+esc(String(nm(x.p)))+')</option>';}).join('');
+ return '<div class="card"><b>If you clear your failed subjects</b><p class="hint" style="margin:4px 0 0">See '+what+' once the failed subjects are passed with a grade of your choice.</p><div class="row" style="margin-top:10px"><label class="hint">Grade you get<br><select class="sel" id="cwi">'+opts+'</select></label></div>'+msgH('good','With <b>'+esc(w.e.n)+'</b> in every failed subject, '+what+' becomes <b>'+f2(w.v)+'</b>.')+'</div>';}
+
+/* ---------- SGPA ---------- */
+function sgView(){
+ var h='<div class="card cres"><div class="hint" style="color:rgba(255,255,255,.8);margin:0">Your SGPA</div><div class="big" id="sgv">-</div><div class="chipsr" style="margin-top:14px" id="sgc"></div><div style="margin-top:12px"><button class="btn" id="sgcopy">Copy result</button></div></div><div id="sgm"></div>';
+ h+='<div class="card" style="margin-top:14px"><div class="row"><b>Subjects of this semester</b><span class="sp"></span>'+modeSeg()+'</div><p class="hint" style="margin:8px 0 0">'+(C.mode==='marks'?'Enter the marks you got and the maximum. Use the split option to enter Theory, Internal and Practical separately. Subjects can have different credits (for example 2 or 3) and different maximum marks.':C.mode==='points'?'Type the grade points printed on your marksheet for each subject, and its credits.':'Pick the grade printed on your marksheet for each subject, and type its credits. Subjects can have different credits.')+'</p><div id="sgrows">';
+ C.sg.rows.forEach(function(r,i){h+=rowHtml('sg',i,r,false);});
+ h+='</div><div class="bar" style="margin-bottom:0"><button class="btn" data-ac="sg">+ Add subject</button><span class="sp"></span><button class="btn" id="sgclr">Clear all</button></div></div>';
+ h+='<div id="sgw"></div>'+setHtml('sgpa')+tgtHtml('sg','Find the average grade you need in the credits you still have to reach a target SGPA.','Credits still to come',C.sg.tgt);
+ h+='<div class="bar"><button class="btn pri" id="sgtocg">Add this semester to my CGPA</button></div>';
+ $$('cbody').innerHTML=h;cBind();sgOut();}
+function sgOut(){
+ var A=agg(C.sg.rows,false),v=$$('sgv');if(!v)return;
+ paintRows('sg',C.sg.rows,false);
+ v.textContent=isNaN(A.gpa)?'-':f2(A.gpa);
+ var ch='';
+ if(A.n>0){ch+='<span class="pill">'+(Math.round(A.cr*100)/100)+' credits'+(A.ea<A.cr?' · '+(Math.round(A.ea*100)/100)+' earned':'')+'</span><span class="pill">'+f2(A.cp)+' credit points</span>';
+  if(A.mk===A.n&&A.m>0)ch+='<span class="pill">'+f2(A.o/A.m*100)+'% ('+(Math.round(A.o*100)/100)+' / '+(Math.round(A.m*100)/100)+' marks)</span>';
+  ch+='<span class="pill">'+(A.fails.length?'Result: not cleared in '+A.fails.length:'Result: PASS')+'</span>';}
+ else ch='<span class="pill">Enter credits and a result for each subject</span>';
+ $$('sgc').innerHTML=ch;
+ var m='';if(A.fails.length)m+=msgH('bad','<b>'+A.fails.length+' subject'+(A.fails.length===1?'':'s')+' not cleared</b><br>'+failsH(A.fails,false))+policyMsg(A.gpaZ,A.gpaP);
+ $$('sgm').innerHTML=m?'<div style="margin-top:10px">'+m+'</div>':'';
+ $$('sgw').innerHTML=A.fails.length?'<div style="margin-top:14px">'+whatHtml(A.cp,A.cr,A.ea,A.fc,'your SGPA')+'</div>':'';
+ var t=nm(C.sg.tgt.t),rem=nm(C.sg.tgt.rem),n=needFor(t,rem,A.cp,A.crU),o=$$('sgo');if(o)o.innerHTML=n?msgH(n.k,n.m):'';}
+
+/* ---------- CGPA ---------- */
+function cgView(){
+ var h='<div class="card cres"><div class="hint" style="color:rgba(255,255,255,.8);margin:0">Your CGPA</div><div class="big" id="cgv">-</div><div class="chipsr" style="margin-top:14px" id="cgc"></div></div><div id="cgm"></div><div id="cgb"></div>';
+ h+='<div class="card" style="margin-top:14px"><div class="row"><b>Entering results</b><span class="sp"></span>'+modeSeg()+'</div><p class="hint" style="margin:8px 0 0">Add a card for every semester. Use Subjects to enter each subject (needed for failed subjects and re-exams), or Quick if you only know the SGPA and credits. If you failed a subject and passed it later, add the re-exam result under that subject.</p></div>';
+ h+='<div id="cgs">';
+ C.cg.sems.forEach(function(s,si){
+  h+='<div class="card" style="margin-top:14px"><div class="row"><b>Semester '+(si+1)+'</b><span class="pl2" id="ss'+si+'">GPA -</span><span class="sp"></span><div class="seg sm"><a data-sm="'+si+':d" href="javascript:void 0"'+(s.m==='d'?' class="on"':'')+'>Subjects</a><a data-sm="'+si+':q" href="javascript:void 0"'+(s.m==='q'?' class="on"':'')+'>Quick</a></div><button class="btn" data-rs="'+si+'" aria-label="Remove semester">'+ico('x',14,2.5)+'</button></div>';
+  if(s.m==='q')h+='<div class="row" style="margin-top:12px"><label class="hint">SGPA<br><input type="text" inputmode="decimal" data-q="'+si+':s" value="'+esc(s.q.s)+'" placeholder="e.g. 7.74" style="width:110px"></label><label class="hint">Credits it was based on<br><input type="number" inputmode="decimal" min="0" step="0.5" data-q="'+si+':c" value="'+esc(s.q.c)+'" placeholder="e.g. 27" style="width:140px"></label></div><p class="hint" style="margin:10px 0 0">Quick entry cannot show failed subjects. Switch to Subjects for those.</p>';
+  else{s.rows.forEach(function(r,ri){h+=rowHtml(String(si),ri,r,true);});h+='<div class="bar" style="margin-bottom:0"><button class="btn" data-ac="'+si+'">+ Add subject</button></div>';}
+  h+='</div>';});
+ h+='</div><div class="bar"><button class="btn" id="addsem">+ Add semester</button><span class="sp"></span><button class="btn" id="cgclr">Clear all</button></div>';
+ h+='<div id="cgw"></div>'+setHtml('cgpa')+tgtHtml('cg','Find the average grade you need in the credits still to come to reach a target CGPA.','Credits still to take',C.cg.tgt);
+ $$('cbody').innerHTML=h;cBind();cgOut();}
+function cgOut(){
+ var T=cgAll(),v=$$('cgv');if(!v)return;
+ C.cg.sems.forEach(function(s,si){if(s.m==='d')paintRows(String(si),s.rows,true);var e=$$('ss'+si),A=T.sems[si];if(e)e.textContent=isNaN(A.gpa)?'GPA -':'GPA '+f2(A.gpa)+' · '+(Math.round(A.cr*100)/100)+' cr';});
+ v.textContent=isNaN(T.cgpa)?'-':f2(T.cgpa);
+ var ch='';
+ if(T.cr>0){ch+='<span class="pill">'+(Math.round(T.cr*100)/100)+' credits'+(T.ea<T.cr?' · '+(Math.round(T.ea*100)/100)+' earned':'')+'</span><span class="pill">out of '+esc(maxGp())+'</span>';
+  if(maxGp()>=10&&nm(C.mult)>0&&!isNaN(T.cgpa))ch+='<span class="pill">Approx. '+f1(Math.min(100,T.cgpa*nm(C.mult)))+'%</span>';
+  if(T.mk>0&&T.mk===T.n&&T.m>0)ch+='<span class="pill">Marks '+f2(T.o/T.m*100)+'%</span>';
+  if(T.fails.length)ch+='<span class="pill">'+T.fails.length+' backlog'+(T.fails.length===1?'':'s')+'</span>';}
+ else ch='<span class="pill">Enter credits and results to see your CGPA</span>';
+ $$('cgc').innerHTML=ch;
+ var m='';if(T.fails.length)m=msgH('bad','<b>'+T.fails.length+' subject'+(T.fails.length===1?'':'s')+' still not cleared</b><br>'+failsH(T.fails,true))+(C.meth==='credit'?policyMsg(T.cgpaZ,T.cgpaP):'');
+ $$('cgm').innerHTML=m?'<div style="margin-top:10px">'+m+'</div>':'';
+ var b='',cnt=T.sems.filter(function(A){return !isNaN(A.gpa);}).length;
+ if(cnt>0){var mx=maxGp();b='<div class="card" style="margin-top:14px"><b>SGPA by semester</b><div class="bars">'+T.sems.map(function(A,i){var g=A.gpa;return '<div class="bc"><span class="bv">'+(isNaN(g)?'-':f2(g))+'</span><div class="bt"><div class="bf" style="height:'+(isNaN(g)?0:Math.max(4,Math.min(100,g/mx*100)))+'%"></div></div><span class="bl">S'+(i+1)+'</span></div>';}).join('')+'</div>';
+  var ds=Object.keys(T.dist).map(function(k){var e=gByName(k);return [k,T.dist[k],e?nm(e.p):-1];}).sort(function(a,c){return c[2]-a[2];});
+  if(ds.length)b+='<p class="hint" style="margin:12px 0 6px">Grades so far</p><div class="gchips">'+ds.map(function(x){return '<span class="pl2">'+esc(x[0])+' × '+x[1]+'</span>';}).join('')+'</div>';
+  b+='</div>';}
+ $$('cgb').innerHTML=b;
+ $$('cgw').innerHTML=(T.fails.length&&C.meth==='credit')?'<div style="margin-top:14px">'+whatHtml(T.cp,T.cr,T.ea,T.fc,'your CGPA')+'</div>':'';
+ var t=nm(C.cg.tgt.t),rem=nm(C.cg.tgt.rem),n=needFor(t,rem,T.cp,T.crU),o=$$('cgo');if(o)o.innerHTML=n?msgH(n.k,C.meth==='avg'?n.m+'<br><span class="hint">This uses the credit weighted method.</span>':n.m):'';}
+
+/* ---------- events for SGPA and CGPA ---------- */
+function gRefresh(){document.querySelectorAll('select[data-k="g"]').forEach(function(s){var cur=s.value;s.innerHTML=gOpts(cur);s.value=cur;if(s._cs)s._cs.sync();});
+ var p=$$('cgsc');if(p){p.value=C.sc.p;if(p._cs)p._cs.sync();}var pm=$$('pmk');if(pm)pm.textContent=f2(passMin());}
+function cBind(){
+ var b=$$('cbody'),cs=$$('cset');
+ if(cs)cs.ontoggle=function(){C.so=cs.open;cSave();};
+ b.oninput=b.onchange=function(e){var t=e.target,d=t.dataset;
+  if(d.k!=null&&d.sc!=null){var r=getRows(d.sc)[+d.r],o=d.x==='1'?r.x:r;if(!o)return;setF(o,d.k,t.value);cSave();cOut();return;}
+  if(d.q){var p=d.q.split(':');C.cg.sems[+p[0]].q[p[1]]=t.value;cSave();cgOut();return;}
+  if(d.gt){var q=d.gt.split(':'),g=C.sc.g[+q[0]];if(!g)return;if(q[1]==='f')g.f=t.checked?1:0;else g[q[1]]=t.value;C.sc.p='custom';cSave();gRefresh();cOut();return;}
+  var id=t.id;
+  if(id==='cgsc'){if(t.value!==C.sc.p&&GS[t.value]){C.sc={p:t.value,b:t.value,g:gsCopy(t.value)};cSave();cView();}return;}
+  if(id==='cfp')C.fp=t.value;else if(id==='ccm')C.cm=t.value;else if(id==='cre')C.re=t.value;else if(id==='ccap')C.cap=t.checked;
+  else if(id==='cmeth')C.meth=t.value;else if(id==='cmult')C.mult=t.value;else if(id==='cwi')C.wi=t.value;
+  else if(id==='sgt')C.sg.tgt.t=t.value;else if(id==='sgr')C.sg.tgt.rem=t.value;else if(id==='cgt')C.cg.tgt.t=t.value;else if(id==='cgr')C.cg.tgt.rem=t.value;
+  else return;
+  cSave();cOut();};
+ b.onclick=function(e){var el=e.target.closest('a,button');if(!el)return;var d=el.dataset,done=true;
+  if(d.cm){if(C.mode!==d.cm){C.mode=d.cm;cSave();cView();}return;}
+  if(d.sm){var p=d.sm.split(':');C.cg.sems[+p[0]].m=p[1];}
+  else if(d.sp){var s=d.sp.split(':'),r=getRows(s[0])[+s[1]],o=s[2]==='1'?r.x:r;o.sp=!o.sp;}
+  else if(d.xa){var s2=d.xa.split(':');getRows(s2[0])[+s2[1]].x=blankAtt();}
+  else if(d.xr){var s3=d.xr.split(':');getRows(s3[0])[+s3[1]].x=null;}
+  else if(d.rr){var s4=d.rr.split(':'),rows=getRows(s4[0]);if(rows.length>1)rows.splice(+s4[1],1);else rows[0]=blankRow();}
+  else if(d.ac!=null){getRows(d.ac).push(blankRow());}
+  else if(d.rs!=null){if(C.cg.sems.length>1)C.cg.sems.splice(+d.rs,1);else C.cg.sems[0]=newSem();}
+  else if(d.gd!=null){if(C.sc.g.length>1){C.sc.g.splice(+d.gd,1);C.sc.p='custom';}}
+  else if(el.id==='gadd'){C.sc.g.push({n:'',p:'',m:'',f:0});C.sc.p='custom';}
+  else if(el.id==='grst'){var bb=GS[C.sc.b]?C.sc.b:'univ';C.sc={p:bb,b:bb,g:gsCopy(bb)};}
+  else if(el.id==='addsem'){C.cg.sems.push(newSem());}
+  else if(el.id==='sgclr'){C.sg=cDef().sg;}
+  else if(el.id==='cgclr'){C.cg=cDef().cg;}
+  else if(el.id==='sgtocg'){var rows2=C.sg.rows.filter(function(r){return r.c!==''||r.g!==''||r.p!==''||r.mo!==''||r.sp;});if(!rows2.length){toast('Add some subjects to this semester first.');return;}
+   var ns=newSem();ns.rows=JSON.parse(JSON.stringify(rows2));if(C.cg.sems.length===1&&C.cg.sems[0].m==='d'&&C.cg.sems[0].rows.every(function(r){return r.c===''&&r.g===''&&r.p===''&&r.mo==='';}))C.cg.sems=[ns];else C.cg.sems.push(ns);
+   C.tab='cgpa';cSave();toast('Added as Semester '+C.cg.sems.length+' in your CGPA.');cPage2();return;}
+  else if(el.id==='sgcopy'){copyRes();return;}
+  else done=false;
+  if(!done)return;
+  cSave();cView();};
+}
+function cPage2(){document.querySelectorAll('#ctabs a').forEach(function(a){a.classList.toggle('on',a.dataset.ct===C.tab);});cView();window.scrollTo(0,0);}
+function copyRes(){var A=agg(C.sg.rows,false);if(!(A.n>0)){toast('Nothing to copy yet.');return;}
+ var s='SGPA '+f2(A.gpa)+' | '+(Math.round(A.cr*100)/100)+' credits | '+f2(A.cp)+' credit points'+(A.mk===A.n&&A.m>0?' | '+f2(A.o/A.m*100)+'% ('+A.o+'/'+A.m+' marks)':'')+(A.fails.length?' | not cleared: '+A.fails.map(function(f){return f.n;}).join(', '):' | PASS')+' (Eve Sandbox)';
+ try{navigator.clipboard.writeText(s).then(function(){toast('Result copied.');},function(){toast('Could not copy. Select and copy it yourself.');});}catch(e){toast('Could not copy.');}}
+
 function atAdvice(a,t,req){var r=req/100,p=a/t*100;
  if(r>=1)return a===t?{k:'warn',m:'Perfect so far. You cannot miss any class.'}:{k:'bad',m:'100% can no longer be reached.'};
  if(p+1e-9>=req){var x=Math.floor(a/r-t+1e-9);return x>0?{k:'good',m:'You can miss '+x+' more class'+(x===1?'':'es')+' and stay at '+req+'% or above.'}:{k:'warn',m:'Right at the limit. Missing the next class drops you below '+req+'%.'};}
  var y=Math.ceil((r*t-a)/(1-r)-1e-9);return {k:'bad',m:'Attend the next '+y+' class'+(y===1?'':'es')+' in a row to reach '+req+'%.'};}
 function atCalc(){var A=0,T=0,rows=C.at.rows.map(function(r){var a=nm(r.a),t=nm(r.t),ok=t>0&&a>=0&&a<=t;if(ok){A+=a;T+=t;}return {ok:ok,bad:(r.a!==''||r.t!=='')&&!ok,a:a,t:t};});return {A:A,T:T,rows:rows};}
 function reqPct(){var q=nm(C.at.req);return (q>=1&&q<=100)?q:NaN;}
-
-function calcPage(){nav('calc');
- app.innerHTML=toolHd('calc','Work out your CGPA and your attendance, and see what you need to reach your targets. Your entries are saved on this device.')+
- '<div class="seg" id="ctabs" style="margin:16px 0"><a data-ct="cgpa" href="javascript:void 0">CGPA</a><a data-ct="att" href="javascript:void 0">Attendance</a></div><div id="cbody"></div>';
- $$('ctabs').onclick=function(e){var t=e.target.dataset.ct;if(!t)return;C.tab=t;cSave();cView();};
- cView();
-}
-function cView(){document.querySelectorAll('#ctabs a').forEach(function(a){a.classList.toggle('on',a.dataset.ct===C.tab);});if(C.tab==='att')atView();else cgView();}
-
-function cgView(){
- var cg=C.cg,sc=cg.scale,L=sc==='10'?G10:G4,h='';
- h+='<div class="card cres"><div class="hint" style="color:rgba(255,255,255,.8);margin:0">Your CGPA</div><div class="big" id="cgv">-</div><div class="chipsr" style="margin-top:14px" id="cgc"></div></div>';
- h+='<div class="card" style="margin-top:14px"><b>Settings</b><div class="row" style="margin-top:10px">'+
-  '<label class="hint">Grading scale<br><select class="sel" id="cgsc"><option value="10"'+(sc==='10'?' selected':'')+'>10 point (O, A+, A...)</option><option value="4"'+(sc==='4'?' selected':'')+'>4.0 scale (A, B+, B...)</option><option value="custom"'+(sc==='custom'?' selected':'')+'>Type grade points</option></select></label>'+
-  '<label class="hint">CGPA method<br><select class="sel" id="cgm"><option value="credit"'+(cg.method==='credit'?' selected':'')+'>Credit weighted</option><option value="avg"'+(cg.method==='avg'?' selected':'')+'>Average of semester GPAs</option></select></label>'+
-  (sc==='10'?'<label class="hint">Percentage = CGPA ×<br><input type="number" id="cgx" min="1" max="20" step="0.1" value="'+esc(cg.mult)+'" style="width:90px"></label>':'')+
-  (sc==='custom'?'<label class="hint">Highest grade point<br><input type="number" id="cgmx" min="1" step="0.5" value="'+esc(cg.max)+'" style="width:90px"></label>':'')+'</div>'+
-  '<p class="hint" style="margin:10px 0 0">Rows with no credits or no grade are skipped. Some universities use a different percentage formula, so you can change the multiplier.</p></div>';
- h+='<div id="cgs">';
- cg.sems.forEach(function(s,si){
-  h+='<div class="card" style="margin-top:14px"><div class="row"><b>Semester '+(si+1)+'</b><span class="pl2" id="sg'+si+'">GPA -</span><span class="sp"></span><button class="btn" data-rs="'+si+'" aria-label="Remove semester">'+ico('x',14,2.5)+'</button></div>'+
-  '<div class="cr ch"><span>Course</span><span>Credits</span><span>Grade</span><span></span></div>';
-  s.rows.forEach(function(r,ri){
-   var d=' data-s="'+si+'" data-r="'+ri+'"';
-   var gc=sc==='custom'?'<input type="number" inputmode="decimal" min="0" step="0.1" data-k="g"'+d+' value="'+esc(r.g)+'" placeholder="0-'+esc(maxGp())+'" aria-label="Grade points">':
-    '<select data-k="g"'+d+' aria-label="Grade"><option value="">-</option>'+L.map(function(g){return '<option'+(g[0]===r.g?' selected':'')+'>'+esc(g[0])+'</option>';}).join('')+'</select>';
-   h+='<div class="cr"><input type="text" data-k="n"'+d+' value="'+esc(r.n)+'" placeholder="Optional" maxlength="40" aria-label="Course name"><input type="number" inputmode="decimal" min="0" step="0.5" data-k="c"'+d+' value="'+esc(r.c)+'" placeholder="0" aria-label="Credits">'+gc+'<button class="rm" data-rr="'+si+':'+ri+'" aria-label="Remove course">'+ico('x',16)+'</button></div>';});
-  h+='<div class="bar" style="margin-bottom:0"><button class="btn" data-ac="'+si+'">+ Add course</button></div></div>';});
- h+='</div><div class="bar"><button class="btn" id="addsem">+ Add semester</button><span class="sp"></span><button class="btn" id="cgclr">Clear all</button></div>';
- h+='<div class="card"><b>Target planner</b><p class="hint" style="margin:4px 0 0">Find the average grade you need in your remaining credits to reach a target CGPA (credit weighted).</p><div class="row" style="margin-top:10px"><label class="hint">Target CGPA<br><input type="number" id="tgt" inputmode="decimal" min="0" step="0.01" value="'+esc(cg.tgt.t)+'" style="width:110px"></label><label class="hint">Credits still to take<br><input type="number" id="trem" inputmode="decimal" min="0" step="0.5" value="'+esc(cg.tgt.rem)+'" style="width:130px"></label></div><div id="tgo"></div></div>';
- $$('cbody').innerHTML=h;
- var b=$$('cbody');
- b.oninput=b.onchange=function(e){var t=e.target,k=t.dataset.k;
-  if(k){C.cg.sems[+t.dataset.s].rows[+t.dataset.r][k]=t.value;}
-  else if(t.id==='cgx')C.cg.mult=t.value;else if(t.id==='cgmx'){C.cg.max=t.value;}
-  else if(t.id==='tgt')C.cg.tgt.t=t.value;else if(t.id==='trem')C.cg.tgt.rem=t.value;
-  else if(t.id==='cgm')C.cg.method=t.value;
-  else if(t.id==='cgsc'&&e.type==='change'){if(t.value!==C.cg.scale){C.cg.scale=t.value;C.cg.sems.forEach(function(s){s.rows.forEach(function(r){r.g='';});});cSave();cgView();return;}}
-  else return;
-  cSave();cgOut();};
- b.onclick=function(e){var t=e.target.closest('button');if(!t)return;
-  if(t.dataset.ac!=null){C.cg.sems[+t.dataset.ac].rows.push({n:'',c:'',g:''});}
-  else if(t.dataset.rr){var p=t.dataset.rr.split(':'),rows=C.cg.sems[+p[0]].rows;if(rows.length>1)rows.splice(+p[1],1);else rows[0]={n:'',c:'',g:''};}
-  else if(t.dataset.rs!=null){if(C.cg.sems.length>1)C.cg.sems.splice(+t.dataset.rs,1);else C.cg.sems[0].rows=cRows(5,function(){return {n:'',c:'',g:''};});}
-  else if(t.id==='addsem'){C.cg.sems.push({rows:cRows(5,function(){return {n:'',c:'',g:''};})});}
-  else if(t.id==='cgclr'){C.cg=cDef().cg;}
-  else return;
-  cSave();cgView();};
- cgOut();
-}
-function cgOut(){var cg=C.cg,r=cgCalc(),v=$$('cgv');if(!v)return;
- v.textContent=isNaN(r.cgpa)?'-':f2(r.cgpa);
- var chips='';
- if(!isNaN(r.cgpa)){if(cg.scale==='10'&&nm(cg.mult)>0)chips+='<span class="pill">Approx. '+f1(Math.min(100,r.cgpa*nm(cg.mult)))+'%</span>';chips+='<span class="pill">out of '+maxGp()+'</span><span class="pill">'+(Math.round(r.TC*100)/100)+' credits counted</span>';}
- else chips='<span class="pill">Enter credits and grades to see your CGPA</span>';
- $$('cgc').innerHTML=chips;
- r.sg.forEach(function(s,i){var e=$$('sg'+i);if(e)e.textContent=isNaN(s.sgpa)?'GPA -':'GPA '+f2(s.sgpa)+' · '+(Math.round(s.cr*100)/100)+' cr';});
- var t=nm(cg.tgt.t),rem=nm(cg.tgt.rem),o=$$('tgo'),m='';
- if(t>=0&&rem>0&&r.TC>0){var mx=maxGp(),need=(t*(r.TC+rem)-r.TP)/rem,best=(r.TP+mx*rem)/(r.TC+rem);
-  if(t>mx)m='<div class="msg bad"><span class="dotk"></span>Your target is above the top of the scale ('+mx+').</div>';
-  else if(need<=0)m='<div class="msg good"><span class="dotk"></span>You already have enough. Even scoring 0 in the rest keeps you at '+f2(r.TP/(r.TC+rem))+' or above.</div>';
-  else if(need>mx+1e-9)m='<div class="msg bad"><span class="dotk"></span>Not reachable. Even top grades in all '+rem+' credits would give a CGPA of '+f2(best)+'.</div>';
-  else m='<div class="msg good"><span class="dotk"></span>You need an average of <b>'+f2(need)+'</b> over the next '+rem+' credits to finish at '+f2(t)+'.</div>';}
- else if(t>=0&&rem>0)m='<div class="msg"><span class="dotk"></span>Add your grades above first.</div>';
- o.innerHTML=m;}
 
 function atView(){
  var at=C.at,h='';
