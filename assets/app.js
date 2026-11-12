@@ -274,6 +274,18 @@ async function planPdf(){
   document.getElementById('prev').src=cv.toDataURL('image/png');document.getElementById('modal').classList.add('show');
  }
 }
+function fnShort(n,max){n=String(n||'');var m=/(\.[A-Za-z0-9]{1,6})$/.exec(n),ex=m?m[1]:'',b=ex?n.slice(0,-ex.length):n;function w(c){return c.charCodeAt(0)>0x2E7F||/[\uD800-\uDBFF]/.test(c)?2:1;}
+ var tot=0,i;for(i=0;i<n.length;i++)tot+=w(n.charAt(i));if(tot<=max)return n;
+ var room=Math.max(6,max-ex.length-1),acc=0,out='',ch=Array.from?Array.from(b):b.split('');for(i=0;i<ch.length;i++){var c=w(ch[i]);if(acc+c>room)break;acc+=c;out+=ch[i];}return out+'\u2026'+ex;}
+var DLN={m:{},n:{}};
+// A very long file name (a pasted caption, a long Japanese title...) makes the phone's own "Downloading..." bubble look broken, so past 40 characters
+// (wide letters such as Japanese count as two) the file is saved as image, image1, image2... (audio / video / file for other kinds). The same name is remembered, so the button and the saved file agree.
+function dlName(name){name=String(name||'file');if(DLN.m[name])return DLN.m[name];
+ var m=/(\.[A-Za-z0-9]{1,6})$/.exec(name),ex=m?m[1]:'',tot=0,i;
+ for(i=0;i<name.length;i++){var c=name.charCodeAt(i);tot+=(c>0x2E7F&&!(c>=0xDC00&&c<=0xDFFF))?2:1;}
+ if(tot<=40)return name;
+ var e=ex.toLowerCase().slice(1),k=/^(png|jpe?g|webp|gif|bmp|svg|avif|heic|ico|tiff?)$/.test(e)?'image':/^(mp3|wav|ogg|m4a|flac|aac)$/.test(e)?'audio':/^(mp4|webm|mov|mkv|avi)$/.test(e)?'video':'file';
+ var n=DLN.n[k]||0;DLN.n[k]=n+1;return DLN.m[name]=k+(n?n:'')+ex;}
 function toast(m){var t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.k);toast.k=setTimeout(function(){t.style.display='none';},2600);}
 
 function render(){
@@ -317,6 +329,7 @@ function fb(n){return n>1048576?(n/1048576).toFixed(2)+' MB':Math.max(1,Math.rou
 function cl(v,a,b){return Math.max(a,Math.min(b,v));}
 var $$=function(i){return document.getElementById(i);};
 async function fileSave(b,name){
+ name=dlName(name);
  var dls=null;try{dls=window.claude&&await window.claude.use('downloads');}catch(e){}
  if(dls){try{await dls.save({filename:name,data:b});toast('Saved!');return true;}catch(e){if(e&&e.code==='declined')return true;}}
  if(window.showSaveFilePicker&&window.isSecureContext){
@@ -329,7 +342,7 @@ async function fileSave(b,name){
   var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=name;a.rel='noopener';a.style.display='none';
   document.body.appendChild(a);a.click();
   setTimeout(function(){a.remove();URL.revokeObjectURL(u);},4000);
-  toast('Downloading '+name);return true;
+  toast('Downloading '+fnShort(name,26));return true;
  }catch(e){return false;}
 }
 async function saveBlob(b,name){
@@ -3961,7 +3974,7 @@ function fcRows(){
   if(f.status==='busy')res='<span class="hint" id="fcs'+f.id+'">Converting...</span>';
   else if(f.status==='err')res='<div class="note bad" style="margin-top:8px">'+esc(f.msg)+'</div>';
   else if(f.status==='done'){
-   res='<div class="fcres">'+f.out.map(function(o,i){return '<button class="btn pri" data-dl="'+f.id+':'+i+'">'+ico('dlbox',15,2.4)+' '+esc(o.name.length>34?o.name.slice(0,30)+'...'+fcExt(o.name):o.name)+' <span style="opacity:.8;font-weight:500">'+fb(o.blob.size)+'</span></button>';}).join('')+(f.out.length>1?'<button class="btn" data-zip="'+f.id+'">Download all (.zip)</button>':'')+'</div>'+(f.warn.length?'<p class="hint" style="margin:8px 0 0">'+f.warn.map(esc).join(' ')+'</p>':'');
+   res='<div class="fcres">'+f.out.map(function(o,i){return '<button class="btn pri" data-dl="'+f.id+':'+i+'">'+ico('dlbox',15,2.4)+' <span class="fn">'+esc(fnShort(dlName(o.name),30))+'</span> <span style="opacity:.8;font-weight:500;white-space:nowrap">'+fb(o.blob.size)+'</span></button>';}).join('')+(f.out.length>1?'<button class="btn" data-zip="'+f.id+'">Download all (.zip)</button>':'')+'</div>'+(f.warn.length?'<p class="hint" style="margin:8px 0 0">'+f.warn.map(esc).join(' ')+'</p>':'');
   }
   return '<div class="card fcrow"><div class="fctop"><div style="min-width:0"><b class="gbtt" style="-webkit-line-clamp:1">'+esc(f.file.name)+'</b><span class="hint">'+fb(f.file.size)+'</span></div><button class="rm" data-rm="'+f.id+'" aria-label="Remove">'+ico('x',16,2.4)+'</button></div><div style="margin-top:8px">'+body+'</div>'+res+'</div>';}).join('');
  var go=FC.rows.some(function(r){return r.kind&&r.target&&r.status!=='done'&&r.status!=='busy';});
@@ -4489,7 +4502,7 @@ function aiPage(){
  $$('aiat').onclick=function(){$$('aifile').click();};
  $$('aifile').onchange=async function(e){
   var f=e.target.files[0];e.target.value='';if(!f)return;
-  toast('Reading '+f.name+'...');
+  toast('Reading '+fnShort(f.name,26)+'...');
   try{AI.notes=await aiReadNotes(f);aiSave();aiNotesUI();toast('Eve has your notes. Ask her about them!');}
   catch(x){toast((x&&x.message)||'I could not read that file');}
  };
