@@ -1360,7 +1360,7 @@ function cgOut(){
  var m='';if(T.fails.length)m=msgH('bad','<b>'+T.fails.length+' subject'+(T.fails.length===1?'':'s')+' still not cleared</b><br>'+failsH(T.fails,true))+(C.meth==='credit'?policyMsg(T.cgpaZ,T.cgpaP):'');
  $$('cgm').innerHTML=m?'<div style="margin-top:10px">'+m+'</div>':'';
  var b='',cnt=T.sems.filter(function(A){return !isNaN(A.gpa);}).length;
- if(cnt>0){var mx=maxGp();b='<div class="card" style="margin-top:14px"><b>SGPA by semester</b><div class="bars">'+T.sems.map(function(A,i){var g=A.gpa;return '<div class="bc"><span class="bv">'+(isNaN(g)?'-':f2(g))+'</span><div class="bt"><div class="bf" style="height:'+(isNaN(g)?0:Math.max(4,Math.min(100,g/mx*100)))+'%"></div></div><span class="bl">S'+(i+1)+'</span></div>';}).join('')+'</div>';
+ if(cnt>0){var mx=maxGp();b='<div class="card" style="margin-top:14px"><b>SGPA by semester</b><div class="bars">'+T.sems.map(function(A,i){var g=A.gpa;return '<div class="bc"><span class="bv">'+(isNaN(g)?'-':f2(g))+'</span><div class="bt"><div class="bf" style="height:'+(isNaN(g)?0:Math.max(4,Math.min(100,g/mx*100)))+'%"></div></div><span class="bbl">S'+(i+1)+'</span></div>';}).join('')+'</div>';
   var ds=Object.keys(T.dist).map(function(k){var e=gByName(k);return [k,T.dist[k],e?nm(e.p):-1];}).sort(function(a,c){return c[2]-a[2];});
   if(ds.length)b+='<p class="hint" style="margin:12px 0 6px">Grades so far</p><div class="gchips">'+ds.map(function(x){return '<span class="pl2">'+esc(x[0])+' × '+x[1]+'</span>';}).join('')+'</div>';
   b+='</div>';}
@@ -4469,6 +4469,7 @@ function aiOpts(){
  $$('aihint').onclick=function(){AI.hints=!AI.hints;this.classList.toggle('on',AI.hints);this.setAttribute('aria-pressed',AI.hints);aiSave();toast(AI.hints?'Hints first is on. Eve will guide you before giving answers.':'Hints first is off');};
  $$('aideep').onclick=function(){AI.deep=!AI.deep;this.classList.toggle('on',AI.deep);this.setAttribute('aria-pressed',AI.deep);aiSave();toast(AI.deep?'Think deeper is on. Replies are slower but better for hard problems.':'Think deeper is off');};
 }
+document.addEventListener('scroll',function(){if(window.scrollX>0&&document.querySelector('.aiw'))window.scrollTo(0,window.scrollY);},{passive:true});
 function aiPage(){
  nav('eve');aiVoiceInit();
  if(!AI.loaded){aiLoad();AI.loaded=true;}
