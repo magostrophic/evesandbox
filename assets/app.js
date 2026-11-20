@@ -352,7 +352,7 @@ async function saveBlob(b,name){
 }
 function imagetool(){
  nav('image');
- app.innerHTML=toolHd('image','Compress, resize, crop and remove plain backgrounds. Everything happens on your device, so nothing is uploaded.')+
+ app.innerHTML=toolHd('image','Compress, resize, crop, enhance and cut out backgrounds. Everything happens on your device, so nothing is uploaded.')+
  '<label class="card drop" id="drop"><input type="file" id="file" accept="image/*" hidden>'+ico('upload',28)+'<b>Choose an image</b><span class="hint">or drop it here</span></label><div id="ws"></div>';
  $$('file').onchange=function(e){if(e.target.files[0])loadImg(e.target.files[0]);};
  var d=$$('drop');d.ondragover=function(e){e.preventDefault();};
@@ -388,20 +388,20 @@ function loadImg(file){
  var u=URL.createObjectURL(file),im=new Image();
  im.onload=function(){
   var c=scaled(im);URL.revokeObjectURL(u);
-  I={file:file,snap:null,vw:0,vh:0,orig:c,cur:c,hist:[],name:file.name.replace(/\.[^.]+$/,'')||'image',size:file.size,tab:'compress',fmt:file.type==='image/png'?'image/png':'image/jpeg',q:.8,tol:30,contig:true,soft:2,gaps:0,bgm:'brush',z:1,pan:false,pd:null,tool:'erase',bs:6,paint:null,last:null,base:null,bgc:null,sel:null,ratio:0,drag:null,est:0};
+  I={file:file,snap:null,vw:0,vh:0,orig:c,cur:c,hist:[],name:file.name.replace(/\.[^.]+$/,'')||'image',size:file.size,tab:'compress',fmt:file.type==='image/png'?'image/png':'image/jpeg',q:.8,tol:30,contig:true,soft:2,gaps:0,bgm:'ai',aik:cutDef(),aish:0,aisf:1,aib:0,ais:null,aic:null,en:enDef(),enp:null,z:1,pan:false,pd:null,tool:'erase',bs:6,paint:null,last:null,base:null,bgc:null,sel:null,ratio:0,drag:null,est:0};
   workspace();
  };
  im.onerror=function(){toast("Couldn't read that image");};im.src=u;
 }
 function workspace(){
- var T=[['compress','Compress'],['resize','Resize'],['crop','Crop'],['bg','Remove BG']];
+ var T=[['compress','Compress'],['resize','Resize'],['crop','Crop'],['enhance','Enhance'],['bg','Remove BG']];
  $$('ws').innerHTML='<div class="seg" id="tabs" style="margin:16px 0">'+T.map(function(t){return '<a data-tab="'+t[0]+'" href="javascript:void 0">'+t[1]+'</a>';}).join('')+'</div>'+
  '<div class="card pcard"><div class="row zb" id="zb"><button class="btn" id="zout" aria-label="Zoom out">'+ico('minus',16,2.5)+'</button><span id="zl">100%</span><button class="btn" id="zin" aria-label="Zoom in">'+ico('plus',16,2.5)+'</button><button class="btn" id="zfit">'+ico('fit',16)+' Fit</button><button class="btn" id="z100">100%</button><button class="btn" id="zpan" aria-label="Move image">'+ico('hand',16)+' Move</button></div><div class="pvw" id="pw"><div id="pin"><canvas id="pv"></canvas><div class="selbox" id="sb"><i style="left:-7px;top:-7px"></i><i style="right:-7px;top:-7px"></i><i style="left:-7px;bottom:-7px"></i><i style="right:-7px;bottom:-7px"></i></div></div></div><p class="hint" id="info" style="margin:8px 0 0"></p></div>'+
  '<div class="card" id="ctl" style="margin-top:14px"></div>'+
  '<div class="bar"><button class="btn" id="undo">Undo</button><button class="btn" id="reset">Reset</button><span class="sp"></span><button class="btn pri" id="save">Download</button></div>';
- $$('tabs').onclick=function(e){var t=e.target.dataset.tab;if(!t)return;I.tab=t;I.sel=null;tabs();ctl();sel();};
- $$('undo').onclick=function(){if(I.hist.length){I.cur=I.hist.pop();I.sel=null;if(I.base&&(I.base.width!==I.cur.width||I.base.height!==I.cur.height))I.base=null;paint();ctl();}};
- $$('reset').onclick=function(){I.cur=I.orig;I.hist=[];I.sel=null;I.base=null;paint();ctl();};
+ $$('tabs').onclick=function(e){var t=e.target.dataset.tab;if(!t)return;var was=I.tab;I.tab=t;I.sel=null;if(was==='enhance'&&t!=='enhance')paint();tabs();ctl();sel();};
+ $$('undo').onclick=function(){if(I.hist.length){I.cur=I.hist.pop();I.sel=null;I.en=enDef();if(I.base&&(I.base.width!==I.cur.width||I.base.height!==I.cur.height))I.base=null;paint();ctl();}};
+ $$('reset').onclick=function(){I.cur=I.orig;I.hist=[];I.sel=null;I.base=null;I.en=enDef();paint();ctl();};
  $$('save').onclick=function(){blobOf(function(b){if(!b){toast('Could not create the image');return;}
   saveBlob(b,I.name+'-edited.'+({'image/jpeg':'jpg','image/webp':'webp','image/png':'png'}[b.type]||'png'));});};
  var pw=$$('pw');
@@ -413,7 +413,7 @@ function workspace(){
    else{I.drag=p;I.sel={x:p.x,y:p.y,w:0,h:0};}
    sel();}
   else if(I.tab==='bg'&&I.bgm==='plain'){var d=I.cur.getContext('2d').getImageData(Math.floor(p.x),Math.floor(p.y),1,1).data;I.bgc=[d[0],d[1],d[2]];ctl();}
-  else if(I.tab==='bg'){startBrush();I.paint=1;I.last=p;pw.setPointerCapture(e.pointerId);stroke(p);}};
+  else if(I.tab==='bg'&&I.bgm==='brush'){startBrush();I.paint=1;I.last=p;pw.setPointerCapture(e.pointerId);stroke(p);}};
  pw.onpointermove=function(e){if(I.pd){pw.scrollLeft=I.pd.l-(e.clientX-I.pd.x);pw.scrollTop=I.pd.t-(e.clientY-I.pd.y);return;}if(I.paint){stroke(pt(e));return;}
   if(I.mv){var q=pt(e),s0=I.sel,c0=I.cur;I.sel={x:cl(q.x-I.mv.dx,0,c0.width-s0.w),y:cl(q.y-I.mv.dy,0,c0.height-s0.h),w:s0.w,h:s0.h};sel();return;}
   if(!I.drag){if(I.tab==='crop'&&!I.pan){var hh0=cropHit(pt(e));pw.style.cursor=!hh0?'':hh0.k==='move'?'move':(hh0.k==='nw'||hh0.k==='se')?'nwse-resize':'nesw-resize';}return;}var p=pt(e),a=I.drag,c=I.cur,w=p.x-a.x,h=p.y-a.y,aw=Math.abs(w),ah=Math.abs(h);
@@ -458,7 +458,7 @@ function est(){clearTimeout(est.k);est.k=setTimeout(function(){blobOf(function(b
 function apply(c){I.hist.push(I.cur);if(I.hist.length>6)I.hist.shift();I.cur=c;I.sel=null;I.base=null;paint();ctl();}
 function ctl(){
  var el=$$('ctl'),t=I.tab,c=I.cur,h='';
- var modeH='<div class="row" style="margin-bottom:12px"><button class="btn'+(I.bgm==='brush'?' pri':'')+'" data-bm="brush">Eraser brush</button><button class="btn'+(I.bgm==='plain'?' pri':'')+'" data-bm="plain">Plain color</button></div>';
+ var modeH='<div class="row" style="margin-bottom:12px"><button class="btn'+(I.bgm==='ai'?' pri':'')+'" data-bm="ai">AI cut</button><button class="btn'+(I.bgm==='brush'?' pri':'')+'" data-bm="brush">Eraser brush</button><button class="btn'+(I.bgm==='plain'?' pri':'')+'" data-bm="plain">Plain color</button></div>';
  var brush=t==='bg'&&I.bgm==='brush';
  $$('pw').className='pvw '+(t==='crop'||brush?'crop':t==='bg'?'bg':'')+(I.pan?' pan':'');
  if(t==='compress'){
@@ -470,9 +470,24 @@ function ctl(){
   '<div class="row" style="margin-top:12px"><button class="btn" data-p="75">75%</button><button class="btn" data-p="50">50%</button><button class="btn" data-p="25">25%</button><span class="sp"></span><button class="btn pri" id="ap">Apply resize</button></div>';
  }else if(t==='crop'){
   h='<p class="hint" style="margin-top:0">Drag on the image to choose the area to keep. Then drag inside the box to move it, or drag a corner to resize it.</p><div class="row">'+[['Free',0],['1:1',1],['4:3',4/3],['16:9',16/9]].map(function(r){return '<button class="btn'+(I.ratio===r[1]?' pri':'')+'" data-ra="'+r[1]+'">'+r[0]+'</button>';}).join('')+'<span class="sp"></span><button class="btn pri" id="ap">Apply crop</button></div>';
+ }else if(t==='enhance'){
+  var E=I.en,SL=[['br','Brightness',-100,100],['ct','Contrast',-100,100],['sh','Shadows',-100,100],['hl','Highlights',-100,100],['sa','Color',-100,100],['wm','Warmth',-100,100],['sp','Sharpness',0,100],['dn','Smoothing',0,100]];
+  h='<p class="hint" style="margin-top:0">Tap Auto enhance for a quick fix, then fine-tune with the sliders. Hold Compare to see the original. Nothing changes until you tap Apply.</p>'+
+  '<div class="row"><button class="btn pri" id="enauto">Auto enhance</button><button class="btn" id="encmp">Hold to compare</button><button class="btn" id="enrst">Reset sliders</button></div>'+
+  '<div class="eng">'+SL.map(function(s){return '<label class="enl"><span>'+s[1]+' <b id="env_'+s[0]+'">'+E[s[0]]+'</b></span><input type="range" data-en="'+s[0]+'" min="'+s[2]+'" max="'+s[3]+'" step="1" data-ks="2" value="'+E[s[0]]+'"></label>';}).join('')+'</div>'+
+  '<div class="row" style="margin-top:12px"><span class="sp"></span><button class="btn pri" id="enap">Apply</button></div>'+
+  '<p class="hint">Smoothing softens grain and noise while keeping edges. Everything is done on your device.</p>';
  }else if(brush){
   h=modeH+'<p class="hint" style="margin-top:0">Rub over the background to erase it. Switch to Restore to bring back anything removed by mistake. Use a smaller brush near edges.</p>'+
    '<div class="row"><button class="btn'+(I.tool==='erase'?' pri':'')+'" data-tool="erase">Erase</button><button class="btn'+(I.tool==='restore'?' pri':'')+'" data-tool="restore">Restore</button><label>Brush size <input type="range" id="bs" min="1" max="20" step="0.1" data-ks="1" value="'+I.bs+'"></label></div>';
+ }else if(I.bgm==='ai'){
+  var bz=!!I.aib;
+  h=modeH+'<p class="hint" style="margin-top:0">One tap finds the main subject and removes the background, even a busy one. It runs on your device, so your picture is never uploaded.</p>'+
+  '<div class="row"><label>Quality <select id="aik" style="width:auto;background:var(--fill);padding:8px 12px;color:var(--ink)"'+(bz?' disabled':'')+'>'+[['fast','Fast (about 5 MB download)'],['best','Best quality (about 88 MB, first time only)']].map(function(o){return '<option value="'+o[0]+'"'+(I.aik===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></label>'+
+  '<label>Edge shift <input type="range" id="aish" min="-3" max="3" step="0.1" data-ks="0.5" value="'+I.aish+'"></label><label>Edge softness <input type="range" id="aisf" min="0" max="3" step="0.1" data-ks="0.5" value="'+I.aisf+'"></label></div>'+
+  '<div class="row" style="margin-top:12px"><span class="sp"></span><button class="btn pri" id="ap"'+(bz?' disabled':'')+'>'+(bz?'Working…':'Cut out background')+'</button></div>'+
+  '<div id="aip" style="display:'+(I.ais?'block':'none')+';margin-top:12px"><div class="aib"><i id="aibar" style="width:'+(I.ais?Math.round(I.ais.p):0)+'%"></i></div><p class="hint" id="aist" style="margin:6px 0 0">'+esc(I.ais?I.ais.t:'')+'</p></div>'+
+  '<p class="hint">Best quality keeps fine detail such as hair and thin parts, but it is slower (often 10 to 30 seconds) and works best on a computer. Fast is good for simple pictures and phones. If an edge looks off, tap Undo, change Edge shift or Edge softness and cut again (the second time is instant). You can also tidy up with the Eraser brush. The result is saved as PNG to keep transparency.</p>';
  }else{
   if(!I.bgc)I.bgc=edgeColor(c);
   h=modeH+'<p class="hint" style="margin-top:0">Click the background on the image to pick its color (the edge color is picked automatically).</p>'+
@@ -497,9 +512,21 @@ function ctl(){
   el.querySelectorAll('[data-ra]').forEach(function(b){b.onclick=function(){I.ratio=+b.dataset.ra;I.sel=null;ctl();sel();};});
   g('ap').onclick=function(){var s=I.sel;if(!s||s.w<4||s.h<4){toast('Drag on the image to choose an area first');return;}
    var w=Math.round(s.w),hh=Math.round(s.h),m=mk(w,hh);m.getContext('2d').drawImage(c,Math.round(s.x),Math.round(s.y),w,hh,0,0,w,hh);apply(m);};
+ }else if(t==='enhance'){
+  el.querySelectorAll('[data-en]').forEach(function(sl){sl.oninput=function(){var k=sl.dataset.en;I.en[k]=+sl.value;var b=$$('env_'+k);if(b)b.textContent=sl.value;enPreview();};});
+  g('enauto').onclick=enAuto;
+  g('enrst').onclick=function(){I.en=enDef();ctl();enPreview();};
+  var cb=g('encmp'),cmp=function(on){return function(e){if(e&&e.preventDefault&&on)e.preventDefault();I.encmp=on;enPreview();};};
+  cb.onpointerdown=cmp(true);cb.onpointerup=cb.onpointerleave=cb.onpointercancel=cmp(false);cb.oncontextmenu=function(e){e.preventDefault();};
+  g('enap').onclick=enApply;
+  enPreview();
  }else if(brush){
   el.querySelectorAll('[data-tool]').forEach(function(b){b.onclick=function(){I.tool=b.dataset.tool;ctl();};});
   g('bs').oninput=function(e){I.bs=+e.target.value;};
+ }else if(I.bgm==='ai'){
+  g('aik').onchange=function(e){I.aik=e.target.value;};
+  g('aish').oninput=function(e){I.aish=+e.target.value;};g('aisf').oninput=function(e){I.aisf=+e.target.value;};
+  g('ap').onclick=cutGo;
  }else{
   g('tol').oninput=function(e){I.tol=+e.target.value;};
   g('sf').oninput=function(e){I.soft=+e.target.value;};g('gp').onchange=function(e){I.gaps=+e.target.value;};
@@ -578,6 +605,240 @@ function removeBg(){
  I.fmt='image/png';apply(out);I.base=keep;toast('Background removed. Use Undo to go back.');
 }
 
+
+/* ---------- AI background cut and Enhance (Image Tool) ----------
+   The AI cut runs a small image model in a background worker on this device (free, nothing is uploaded). The model files are public and are kept
+   by the browser after the first time. Two sizes: Fast (about 5 MB) and Best quality (about 88 MB). Each file is checked against its fingerprint before use. */
+function cutWorker(){
+ var ort=null,sess=null,cfg=null,CN='eve-ai-cut-1';
+ function say(m){postMessage(m);}
+ async function bytes(lo,hi){
+  var size=cfg.size,out=new Uint8Array(size),off=0;
+  for(var i=0;i<cfg.files.length;i++){
+   var ok=false,last=null;
+   for(var b=0;b<cfg.bases.length&&!ok;b++){
+    var st=off;
+    try{
+     var r=await fetch(cfg.bases[b]+cfg.pkg+cfg.files[i]);if(!r.ok)throw new Error('http '+r.status);
+     var rd=r.body&&r.body.getReader();
+     if(rd){for(;;){var x=await rd.read();if(x.done)break;if(off+x.value.length>size)throw new Error('size');out.set(x.value,off);off+=x.value.length;say({t:'prog',p:lo+(hi-lo)*off/size});}}
+     else{var ab=new Uint8Array(await r.arrayBuffer());if(off+ab.length>size)throw new Error('size');out.set(ab,off);off+=ab.length;say({t:'prog',p:lo+(hi-lo)*off/size});}
+     ok=true;
+    }catch(e){off=st;last=e;}
+   }
+   if(!ok)throw last||new Error('download');
+  }
+  if(off!==size)throw new Error('size');
+  return out;}
+ async function runtime(){
+  var err=null;
+  for(var b=0;b<cfg.bases.length;b++){try{var o=cfg.bases[b]+'onnxruntime-web@1.20.1/dist/',m=await import(o+'ort.wasm.min.mjs');m.env.wasm.wasmPaths=o;return m;}catch(e){err=e;}}
+  throw err||new Error('runtime');}
+ async function load(c){
+  cfg=c;say({t:'prog',p:1});
+  ort=await runtime();ort.env.wasm.numThreads=1;ort.env.wasm.proxy=false;ort.env.logLevel='error';
+  var u8=null,ca=null,key=c.origin+'/__eve-model/'+c.name+'-'+c.sha.slice(0,12);
+  try{ca=await caches.open(CN);var hit=await ca.match(key);if(hit){u8=new Uint8Array(await hit.arrayBuffer());if(u8.length!==c.size)u8=null;else say({t:'prog',p:90});}}catch(e){ca=null;u8=null;}
+  if(!u8){
+   u8=await bytes(3,90);
+   var dg=new Uint8Array(await crypto.subtle.digest('SHA-256',u8)),hex='';dg.forEach(function(v){hex+=(v<16?'0':'')+v.toString(16);});
+   if(hex!==c.sha)throw new Error('check');
+   if(ca){try{await ca.put(key,new Response(u8,{headers:{'content-type':'application/octet-stream'}}));}catch(e){}}
+  }
+  say({t:'prog',p:92});
+  sess=await ort.InferenceSession.create(u8,{executionProviders:['wasm'],graphOptimizationLevel:'all'});
+  u8=null;}
+ async function run(m){
+  var S=cfg.res,N=S*S,px=new Uint8ClampedArray(m.buf),t=new Float32Array(3*N),i,mean=[0.485,0.456,0.406],sd=cfg.std,mx=255;
+  if(cfg.norm==='max'){mx=1;for(i=0;i<N;i++){var a=px[i*4],b=px[i*4+1],c=px[i*4+2];if(a>mx)mx=a;if(b>mx)mx=b;if(c>mx)mx=c;}}
+  for(i=0;i<N;i++){t[i]=(px[i*4]/mx-mean[0])/sd[0];t[N+i]=(px[i*4+1]/mx-mean[1])/sd[1];t[2*N+i]=(px[i*4+2]/mx-mean[2])/sd[2];}
+  var f={},nm=sess.outputNames[0];f[sess.inputNames[0]]=new ort.Tensor('float32',t,[1,3,S,S]);t=null;
+  var o=await sess.run(f,[nm]),d=o[nm].data,lo=1e9,hi=-1e9,v;
+  for(i=0;i<N;i++){v=d[i];if(v<lo)lo=v;if(v>hi)hi=v;}
+  var sig=lo<0||hi>1,tmp=new Float32Array(N),l2=1e9,h2=-1e9,out=new Uint8Array(N);
+  for(i=0;i<N;i++){v=d[i];if(sig)v=1/(1+Math.exp(-v));tmp[i]=v;if(v<l2)l2=v;if(v>h2)h2=v;}
+  var rg=Math.max(1e-6,h2-l2);for(i=0;i<N;i++)out[i]=Math.round((tmp[i]-l2)/rg*255);
+  try{o[nm].dispose();}catch(e){}
+  return out;}
+ onmessage=async function(e){var m=e.data;try{
+  if(m.t==='load'){await load(m.cfg);say({t:'ready'});}
+  else if(m.t==='run'){var r=await run(m);postMessage({t:'done',id:m.id,mask:r},[r.buffer]);}
+ }catch(err){say({t:'err',id:m.id,e:String(err&&err.message||err)});}};
+}
+var CUT={bases:['https://cdn.jsdelivr.net/npm/','https://unpkg.com/'],w:null,key:'',idle:0,
+ M:{fast:{name:'u2netp',pkg:'@rmbg/model-u2netp@0.0.1/',files:['u2netp.onnx'],size:4574861,sha:'309c8469258dda742793dce0ebea8e6dd393174f89934733ecc8b14c76f4ddd8',res:320,norm:'max',std:[0.229,0.224,0.225]},
+    best:{name:'general',pkg:'@rmbg/model-general@0.0.1/',files:['general-1.onnx','general-2.onnx','general-3.onnx','general-4.onnx','general-5.onnx','general-6.onnx','general-7.onnx','general-8.onnx','general-9.onnx'],size:88188479,sha:'b6e8497ba978a6f5fbb647e419d2696cd80df5a23cb6a8ea532021911bd76acb',res:1024,norm:'one',std:[1,1,1]}}};
+function cutStop(){clearTimeout(CUT.idle);var P=CUT.w;CUT.w=null;CUT.key='';if(!P)return;try{P.w.terminate();}catch(e){}Object.keys(P.q).forEach(function(k){clearTimeout(P.q[k].tm);try{P.q[k].rej(new Error('stopped'));}catch(e){}});}
+function cutDef(){var m=navigator.deviceMemory,t=window.matchMedia&&matchMedia('(hover:none)').matches;return (t||(m&&m<4))?'fast':'best';}
+function cutLoad(kind,onprog){
+ clearTimeout(CUT.idle);
+ if(CUT.w&&CUT.key===kind&&CUT.w.ready)return Promise.resolve(CUT.w);
+ cutStop();
+ return new Promise(function(res,rej){
+  var w,P,stall=0;
+  try{w=new Worker(URL.createObjectURL(new Blob(['('+cutWorker.toString()+')()'],{type:'text/javascript'})),{type:'module'});}catch(e){rej(new Error('worker'));return;}
+  P={w:w,q:{},n:0,ready:false};CUT.w=P;CUT.key=kind;
+  function arm(){clearTimeout(stall);stall=setTimeout(function(){fail(new Error('stall'));},60000);}
+  function fail(e){clearTimeout(stall);if(CUT.w===P)cutStop();else{try{w.terminate();}catch(x){}}rej(e);}
+  w.onmessage=function(e){var d=e.data;
+   if(d.t==='prog'){arm();if(onprog)onprog(d.p);}
+   else if(d.t==='ready'){clearTimeout(stall);P.ready=true;res(P);}
+   else if(d.t==='err'&&!d.id)fail(new Error(d.e));
+   else if(d.id&&P.q[d.id]){var q=P.q[d.id];delete P.q[d.id];clearTimeout(q.tm);d.t==='err'?q.rej(new Error(d.e)):q.res(d);}};
+  w.onerror=function(){if(!P.ready)fail(new Error('worker'));else{Object.keys(P.q).forEach(function(k){clearTimeout(P.q[k].tm);try{P.q[k].rej(new Error('worker'));}catch(x){}});if(CUT.w===P)cutStop();}};
+  arm();var m=CUT.M[kind];
+  w.postMessage({t:'load',cfg:{bases:CUT.bases,pkg:m.pkg,files:m.files,size:m.size,sha:m.sha,res:m.res,norm:m.norm,std:m.std,name:m.name,origin:location.origin}});
+ });}
+function cutRun(P,px){return new Promise(function(res,rej){var id=++P.n;P.q[id]={res:res,rej:rej,tm:setTimeout(function(){delete P.q[id];rej(new Error('slow'));},300000)};P.w.postMessage({t:'run',id:id,buf:px.buffer},[px.buffer]);});}
+function cutSay(t,p){if(!I)return;I.ais={t:t,p:p};var b=$$('aibar'),s=$$('aist'),bx=$$('aip');if(bx)bx.style.display='block';if(b)b.style.width=Math.round(p)+'%';if(s)s.textContent=t;}
+function cutMsg(e){var m=String(e&&e.message||e);
+ if(/check|size/.test(m))return 'The cut-out model did not download correctly. Please try again.';
+ if(/stall|download|http|runtime|Failed to fetch|NetworkError|import/i.test(m))return 'Could not download the cut-out model. Check your connection and try again.';
+ if(/slow/.test(m))return 'That took too long. Try the Fast quality, or a smaller picture.';
+ return 'The cut-out could not finish on this device. Try the Fast quality.';}
+async function cutMask(c,kind){
+ var S1=I,ch=S1.aic;if(ch&&ch.cv===c&&ch.k===kind)return ch;
+ var m=CUT.M[kind];
+ cutSay(kind==='best'?'Getting the best-quality model ready. The first time it downloads about 88 MB.':'Getting the cut-out model ready.',2);
+ var P=await cutLoad(kind,function(p){cutSay(p<91?'Downloading the model… '+cl(Math.round((p-3)/87*100),0,100)+'%':'Preparing the model…',Math.min(90,p)*.9);});
+ cutSay('Finding the subject. This can take a little while.',92);
+ await tick();
+ var s=mk(m.res,m.res),x=s.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,m.res,m.res);x.imageSmoothingQuality='high';x.drawImage(c,0,0,m.res,m.res);
+ var px=new Uint8ClampedArray(x.getImageData(0,0,m.res,m.res).data);
+ var r=await cutRun(P,px);
+ var out={cv:c,k:kind,m:new Uint8Array(r.mask),S:m.res};S1.aic=out;return out;}
+/* box average (window 2r+1) with the edges handled; a and o are Float32Array(w*h) and may be the same array */
+function bxf(a,w,h,r,o){
+ var t=bxf.t;if(!t||t.length<a.length)t=bxf.t=new Float32Array(a.length);
+ var x,y,s,b,u,l,cs=new Float64Array(w);
+ for(y=0;y<h;y++){b=y*w;s=0;for(x=0;x<=r&&x<w;x++)s+=a[b+x];
+  for(x=0;x<w;x++){if(x>0){u=x+r;l=x-r-1;if(u<w)s+=a[b+u];if(l>=0)s-=a[b+l];}t[b+x]=s/(Math.min(w-1,x+r)-Math.max(0,x-r)+1);}}
+ for(y=0;y<=r&&y<h;y++)for(x=0;x<w;x++)cs[x]+=t[y*w+x];
+ for(y=0;y<h;y++){if(y>0){u=y+r;l=y-r-1;if(u<h)for(x=0;x<w;x++)cs[x]+=t[u*w+x];if(l>=0)for(x=0;x<w;x++)cs[x]-=t[l*w+x];}
+  var n=Math.min(h-1,y+r)-Math.max(0,y-r)+1;for(x=0;x<w;x++)o[y*w+x]=cs[x]/n;}}
+/* guided filter: smooths p but keeps it lined up with the edges of the guide picture g (He et al.) */
+function gfilt(g,p,w,h,r,eps){
+ var N=w*h,mg=new Float32Array(N),mp=new Float32Array(N),gp=new Float32Array(N),gg=new Float32Array(N),i;
+ bxf(g,w,h,r,mg);bxf(p,w,h,r,mp);
+ for(i=0;i<N;i++){gp[i]=g[i]*p[i];gg[i]=g[i]*g[i];}
+ bxf(gp,w,h,r,gp);bxf(gg,w,h,r,gg);
+ for(i=0;i<N;i++){var a=(gp[i]-mg[i]*mp[i])/(gg[i]-mg[i]*mg[i]+eps);gg[i]=a;gp[i]=mp[i]-a*mg[i];}
+ bxf(gg,w,h,r,gg);bxf(gp,w,h,r,gp);
+ for(i=0;i<N;i++){var v=gg[i]*g[i]+gp[i];p[i]=v<0?0:v>1?1:v;}
+ return p;}
+/* smooth enlargement of a grey plane */
+function upF(s,sw,sh,dw,dh){
+ var o=new Float32Array(dw*dh),fx=sw/dw,fy=sh/dh,x,y,xs=new Int32Array(dw),xf=new Float32Array(dw);
+ for(x=0;x<dw;x++){var sx=(x+.5)*fx-.5;sx=sx<0?0:sx>sw-1?sw-1:sx;xs[x]=sx|0;xf[x]=sx-(sx|0);}
+ for(y=0;y<dh;y++){var sy=(y+.5)*fy-.5;sy=sy<0?0:sy>sh-1?sh-1:sy;var j0=sy|0,j1=Math.min(sh-1,j0+1),wy=sy-j0,r0=j0*sw,r1=j1*sw,ob=y*dw;
+  for(x=0;x<dw;x++){var i0=xs[x],i1=Math.min(sw-1,i0+1),wx=xf[x];o[ob+x]=(s[r0+i0]*(1-wx)+s[r0+i1]*wx)*(1-wy)+(s[r1+i0]*(1-wx)+s[r1+i1]*wx)*wy;}}
+ return o;}
+/* model mask -> sharp, clean cut-out of the picture c. o.sh moves the edge in or out, o.sf makes it softer or crisper */
+function cutPost(c,m8,S,o){
+ var W=c.width,H=c.height,N=W*H,k=Math.min(1,Math.sqrt(2.2e6/N)),w=Math.max(16,Math.round(W*k)),h=Math.max(16,Math.round(H*k)),wn=w*h,i;
+ var wc=mk(w,h),wx=wc.getContext('2d');wx.imageSmoothingQuality='high';wx.drawImage(c,0,0,w,h);var sd=wx.getImageData(0,0,w,h).data;
+ var G=new Float32Array(wn),A=upF(m8,S,S,w,h);
+ for(i=0;i<wn;i++){G[i]=(0.299*sd[i*4]+0.587*sd[i*4+1]+0.114*sd[i*4+2])/255;A[i]/=255;}
+ gfilt(G,A,w,h,Math.max(2,Math.round(Math.max(w,h)/220)),1e-4);
+ var c0=0.5-o.sh*0.09,wd=0.12+o.sf*0.1,lo=c0-wd/2;
+ for(i=0;i<wn;i++){var v=(A[i]-lo)/wd;v=v<0?0:v>1?1:v;A[i]=v*v*(3-2*v);}
+ /* colors of the semi-transparent edge are replaced by the colors of the solid area next to them, so no old background shows as a halo */
+ var Wt=new Float32Array(wn),R=new Float32Array(wn),Gc=new Float32Array(wn),B=new Float32Array(wn);
+ for(i=0;i<wn;i++){var t=(A[i]-0.9)*10;t=t<0?0:t>1?1:t;Wt[i]=t;R[i]=sd[i*4]*t;Gc[i]=sd[i*4+1]*t;B[i]=sd[i*4+2]*t;}
+ var rd=Math.max(2,Math.round(Math.max(w,h)/260));
+ bxf(Wt,w,h,rd,Wt);bxf(R,w,h,rd,R);bxf(Gc,w,h,rd,Gc);bxf(B,w,h,rd,B);
+ var Fd=new Uint8ClampedArray(wn*4);
+ for(i=0;i<wn;i++){var q=Wt[i],p=i*4;if(q>0.002){Fd[p]=R[i]/q;Fd[p+1]=Gc[i]/q;Fd[p+2]=B[i]/q;}else{Fd[p]=sd[p];Fd[p+1]=sd[p+1];Fd[p+2]=sd[p+2];}Fd[p+3]=255;}
+ var Af=A,fd=Fd;
+ if(w!==W||h!==H){
+  Af=upF(A,w,h,W,H);
+  var fc=mk(w,h);fc.getContext('2d').putImageData(new ImageData(Fd,w,h),0,0);
+  var fb2=mk(W,H),fx2=fb2.getContext('2d');fx2.imageSmoothingQuality='high';fx2.drawImage(fc,0,0,W,H);fd=fx2.getImageData(0,0,W,H).data;}
+ var d=c.getContext('2d').getImageData(0,0,W,H).data,out=new Uint8ClampedArray(d);
+ for(i=0;i<N;i++){var a=Af[i],p4=i*4;
+  if(a<=0.003){out[p4+3]=0;continue;}
+  var tt=(0.97-a)/0.3;tt=tt<0?0:tt>1?1:tt;
+  if(tt>0){out[p4]=d[p4]*(1-tt)+fd[p4]*tt;out[p4+1]=d[p4+1]*(1-tt)+fd[p4+1]*tt;out[p4+2]=d[p4+2]*(1-tt)+fd[p4+2]*tt;}
+  out[p4+3]=Math.round(a*d[p4+3]);}
+ var res=mk(W,H);res.getContext('2d').putImageData(new ImageData(out,W,H),0,0);return res;}
+async function cutGo(){
+ var S0=I;if(S0.aib)return;
+ var c=S0.cur,tok=S0.aiTok=(S0.aiTok||0)+1,kind=S0.aik,done=false;S0.aib=1;S0.ais={t:'Starting…',p:1};ctl();
+ try{
+  var mk2;
+  for(;;){
+   try{mk2=await cutMask(c,kind);break;}
+   catch(e){if(kind==='best'&&I===S0&&S0.aiTok===tok){kind='fast';S0.aik='fast';cutSay('Best quality did not work on this device. Switching to Fast.',3);continue;}throw e;}
+  }
+  if(I!==S0||S0.aiTok!==tok||S0.cur!==c)return;
+  cutSay('Smoothing the edges…',97);await tick();
+  var out=cutPost(c,mk2.m,mk2.S,{sh:S0.aish,sf:S0.aisf});
+  if(I!==S0||S0.cur!==c)return;
+  var keep=(S0.base&&S0.base.width===c.width&&S0.base.height===c.height)?S0.base:c;
+  S0.fmt='image/png';S0.ais=null;S0.aib=0;done=true;apply(out);S0.base=keep;toast('Background removed. Use Undo to go back.');
+ }catch(e){try{console.warn("AI cut",e&&e.stack||e);}catch(x){}if(I===S0)toast(cutMsg(e));}
+ finally{S0.aib=0;if(!done)S0.ais=null;clearTimeout(CUT.idle);CUT.idle=setTimeout(cutStop,120000);if(I===S0&&$$('ctl')&&S0.tab==='bg')ctl();}
+}
+
+/* ---------- Enhance: Auto enhance and sliders. The preview works on a smaller copy so the sliders stay smooth; Apply works on the full picture ---------- */
+function enDef(){return {br:0,ct:0,sh:0,hl:0,sa:0,wm:0,sp:0,dn:0,lo:0,hi:1};}
+function enIsDef(v){return !(v.br||v.ct||v.sh||v.hl||v.sa||v.wm||v.sp||v.dn)&&v.lo===0&&v.hi===1;}
+function enRun(src,w,h,v){
+ var N=w*h,o=new Uint8ClampedArray(src),i,k,m=Math.max(w,h);
+ if(v.dn>0){
+  var G=new Float32Array(N),P=new Float32Array(N),r=Math.max(2,Math.round(m/400)),e=2e-4+Math.pow(v.dn/100,2)*6e-3;
+  for(i=0;i<N;i++)G[i]=(0.299*o[i*4]+0.587*o[i*4+1]+0.114*o[i*4+2])/255;
+  for(k=0;k<3;k++){for(i=0;i<N;i++)P[i]=o[i*4+k]/255;gfilt(G,P,w,h,r,e);for(i=0;i<N;i++)o[i*4+k]=P[i]*255;}
+ }
+ var lut=new Float32Array(256),gm=Math.pow(2,-v.br/100),ct=v.ct>=0?1+v.ct/100*0.8:1+v.ct/100*0.7,sp=v.hi-v.lo;
+ for(i=0;i<256;i++){var x=(i/255-v.lo)/sp;x=x<0?0:x>1?1:x;x=Math.pow(x,gm);lut[i]=(x-.5)*ct+.5;}
+ var sh=v.sh/100*0.4,hl=v.hl/100*0.35,sa=1+v.sa/100,wm=v.wm/100*0.15,useSH=!!(v.sh||v.hl);
+ for(i=0;i<N;i++){var p=i*4,r1=lut[o[p]],g1=lut[o[p+1]],b1=lut[o[p+2]];
+  if(useSH){var L=0.2126*r1+0.7152*g1+0.0722*b1,q=1-L;L=L<0?0:L>1?1:L;q=q<0?0:q>1?1:q;var dl=sh*q*q*q+hl*L*L*L;r1+=dl;g1+=dl;b1+=dl;}
+  if(wm){r1*=1+wm;b1*=1-wm;}
+  if(sa!==1){var y=0.2126*r1+0.7152*g1+0.0722*b1;r1=y+(r1-y)*sa;g1=y+(g1-y)*sa;b1=y+(b1-y)*sa;}
+  o[p]=r1*255;o[p+1]=g1*255;o[p+2]=b1*255;}
+ if(v.sp>0){
+  var Y=new Float32Array(N),Yb=new Float32Array(N),rr=Math.max(1,Math.round(m/700)),am=v.sp/100*1.6*255;
+  for(i=0;i<N;i++)Y[i]=(0.299*o[i*4]+0.587*o[i*4+1]+0.114*o[i*4+2])/255;
+  bxf(Y,w,h,rr,Yb);bxf(Yb,w,h,rr,Yb);
+  for(i=0;i<N;i++){var df=(Y[i]-Yb[i])*am,p2=i*4;o[p2]+=df;o[p2+1]+=df;o[p2+2]+=df;}
+ }
+ return o;}
+function enProxy(){
+ if(I.enp&&I.enp.cv===I.cur)return I.enp;
+ var c=I.cur,k=Math.min(1,1280/Math.max(c.width,c.height)),w=Math.max(1,Math.round(c.width*k)),h=Math.max(1,Math.round(c.height*k)),t=mk(w,h),x=t.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(c,0,0,w,h);
+ return I.enp={cv:c,w:w,h:h,d:x.getImageData(0,0,w,h).data};}
+function enPreview(){
+ if(!I||I.tab!=='enhance'||!$$('pv'))return;
+ var S0=I;
+ if(S0.enRaf)return;
+ S0.enRaf=requestAnimationFrame(function(){S0.enRaf=0;if(I!==S0||S0.tab!=='enhance'||!$$('pv'))return;
+  var pv=$$('pv'),x=pv.getContext('2d');
+  if(enIsDef(S0.en)||S0.encmp){x.clearRect(0,0,pv.width,pv.height);x.drawImage(S0.cur,0,0);return;}
+  var P=enProxy(),o=enRun(P.d,P.w,P.h,S0.en),t=mk(P.w,P.h);t.getContext('2d').putImageData(new ImageData(o,P.w,P.h),0,0);
+  x.clearRect(0,0,pv.width,pv.height);x.imageSmoothingQuality='high';x.drawImage(t,0,0,pv.width,pv.height);});}
+function enAuto(){
+ var P=enProxy(),d=P.d,N=P.w*P.h,hist=new Uint32Array(256),i,n=0,nn=0,nr=0,nb=0,sl=0,ss=0;
+ for(i=0;i<N;i++){var p=i*4;if(d[p+3]<16)continue;var r=d[p],g=d[p+1],b=d[p+2],L=(0.2126*r+0.7152*g+0.0722*b)|0;hist[L]++;n++;sl+=L;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),sv=mx?(mx-mn)/mx:0;ss+=sv;if(sv<0.2&&L>40&&L<215){nn++;nr+=r;nb+=b;}}
+ if(!n){toast('There is nothing to enhance in this picture');return;}
+ function pc(q){var a=0,t=q*n;for(var j=0;j<256;j++){a+=hist[j];if(a>=t)return j/255;}return 1;}
+ var lo=Math.min(pc(0.005),0.15),hi=Math.max(pc(0.995),lo+0.45),rg=hi-lo,mean=cl((sl/n/255-lo)/rg,0.02,0.98),gm=Math.log(0.47)/Math.log(mean),br=(mean>0.38&&mean<0.6)?0:cl(Math.round(-80*Math.log2(gm)),-30,45);
+ if(Math.abs(br)<6)br=0;
+ var gg=Math.pow(2,-br/100),q5=Math.pow(cl((pc(0.05)-lo)/rg,0,1),gg),q95=Math.pow(cl((pc(0.95)-lo)/rg,0,1),gg),
+  sh=cl(Math.round((0.14-q5)*250),0,35),hl=-cl(Math.round((q95-0.93)*400),0,30),sat=ss/n,sa=Math.round(cl((0.38-sat)*60,3,18)),
+  cast=nn>n*0.03?(nb-nr)/Math.max(1,nb+nr):0,wm=Math.abs(cast)>0.05?cl(Math.round(cast*60),-18,18):0;
+ I.en={br:br,ct:0,sh:sh,hl:hl,sa:sa,wm:wm,sp:30,dn:0,lo:lo<0.01?0:lo,hi:hi>0.99?1:hi};
+ ctl();enPreview();}
+async function enApply(){
+ var S0=I,v=Object.assign({},S0.en);
+ if(enIsDef(v)){toast('Move a slider or tap Auto enhance first');return;}
+ if(S0.enb)return;S0.enb=1;toast('Applying…');await tick();
+ try{var c=S0.cur,x=c.getContext('2d'),id=x.getImageData(0,0,c.width,c.height),o=enRun(id.data,c.width,c.height,v),m=mk(c.width,c.height);
+  m.getContext('2d').putImageData(new ImageData(o,c.width,c.height),0,0);
+  if(I!==S0||S0.cur!==c)return;S0.en=enDef();apply(m);toast('Enhancement applied. Use Undo to go back.');
+ }catch(e){toast('Could not apply that on this device. Try a smaller picture.');}
+ finally{S0.enb=0;}}
 
 var P={tool:'maker',files:[],out:null};
 var TOOLS=[['maker','PDF Maker'],['merge','Merger'],['split','Splitter'],['compress','Compressor'],['protect','Protect'],['unlock','Remove password']];
@@ -861,7 +1122,7 @@ var TL=[
  {r:'eve',c:'i1',ic:'spark',n:'Eve AI',d:'Your caring study buddy. Ask questions, get step-by-step help, make flashcards and practice tests, and learn from your own notes.'},
  {r:'ide',c:'i8',ic:'code',n:'Eve IDE',d:'Write and run Python, C and Java programs, with input and output right on the page.'},
  {r:'convert',c:'i8',ic:'swap',n:'File Converter',d:'Turn pictures, PDFs, documents, spreadsheets and audio into another format, right on your device.'},
-   {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop and remove plain backgrounds from images.'},
+   {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop, enhance and cut out the background of images.'},
  {r:'translate',c:'i12',ic:'globe',n:'Live Translate',d:'Speak in one language and read it in another as you talk, or share your screen and see it translated in real time.'},
  {r:'pdf',c:'i3',ic:'pdf',n:'PDF Tool',d:'Make, merge, split and compress PDFs, and add or remove passwords.'},
  {r:'qr',c:'i9',ic:'qr',n:'QR Code Generator',d:'Make a QR code for a link, text, Wi-Fi, email, phone number or contact card, and download it as PNG or SVG.'},
@@ -871,7 +1132,7 @@ var TL=[
  {r:'virus',c:'i4',ic:'shield',n:'Virus Checker',d:'Check whether a website or link looks safe before you open it.'}];
 function toolHd(r,lead){var t=TL.filter(function(x){return x.r===r;})[0]||{n:'',ic:'spark'};return '<div class="dl-hd"><div class="ic bl">'+ico(t.ic,26)+'</div><h1>'+t.n+'</h1></div>'+(lead?'<p class="lead dl-lead">'+lead+'</p>':'');}
 var LOCKED={};TL.forEach(function(t){if(t.lock)LOCKED[t.r]=1;});
-/*RANKDATA*/var RANKD={"stages":[["a","Arcane Stage"],["0","Stage Zero"],["1","Stage One"],["2","Stage Two"],["3","Stage Three"],["4","Stage Four"],["5","Stage Five"],["6","Stage Six"],["7","Stage Seven"],["8","Stage Eight"],["9","Stage Nine"]],"tools":{"eve":["0","The most capable tool here. It answers questions, teaches step by step, makes flashcards and practice tests, and works from your own notes."],"translate":["1","Turns speech and the text on a shared screen into another language as it happens, across many languages."],"ide":["2","Runs real Python, C and Java programs with live input and output, right on the page."],"convert":["3","Converts pictures, PDFs, documents, spreadsheets and audio between many formats, right on your device."],"tts":["4","Two ways to listen: hear words read out as you type, or turn a paragraph into a downloadable audio file, with voices for many countries."],"pdf":["5","Several useful jobs in one place: make, merge, split and compress PDFs, and add or remove passwords."],"virus":["6","Weighs several signals about a link, such as warning lists and domain age, without ever opening it. A good first look, not a full scan."],"image":["6","Compresses, resizes, crops and removes plain backgrounds. A few jobs done well, each one fairly simple."],"drawww":["3","A full diagram editor for ER drawings: entity, relationship and attribute shapes, tables with joinable columns, lines with crow's foot signs, undo, zoom and downloads. Built for one kind of drawing rather than every kind."],"deal":["7","Helps you decide what to buy and sends you to the right stores. It guides your shopping rather than fetching every price itself."],"qr":["7","Makes codes for links, text, Wi-Fi, email, phone numbers and contacts. One job, done cleanly."],"calc":["8","Works out CGPA and attendance and shows what you need for your targets. Useful, but a small single-purpose tool."],"planner":["8","A simple weekly grid you can print or save as a picture. Easy to use and light on features."],"share":["5","Shares a note and files through a short code and deletes everything on its own when the timer you chose runs out, up to two hours."]}};/*ENDRANKDATA*/
+/*RANKDATA*/var RANKD={"stages":[["a","Arcane Stage"],["0","Stage Zero"],["1","Stage One"],["2","Stage Two"],["3","Stage Three"],["4","Stage Four"],["5","Stage Five"],["6","Stage Six"],["7","Stage Seven"],["8","Stage Eight"],["9","Stage Nine"]],"tools":{"eve":["0","The most capable tool here. It answers questions, teaches step by step, makes flashcards and practice tests, and works from your own notes."],"translate":["1","Turns speech and the text on a shared screen into another language as it happens, across many languages."],"ide":["2","Runs real Python, C and Java programs with live input and output, right on the page."],"convert":["3","Converts pictures, PDFs, documents, spreadsheets and audio between many formats, right on your device."],"tts":["4","Two ways to listen: hear words read out as you type, or turn a paragraph into a downloadable audio file, with voices for many countries."],"pdf":["5","Several useful jobs in one place: make, merge, split and compress PDFs, and add or remove passwords."],"virus":["6","Weighs several signals about a link, such as warning lists and domain age, without ever opening it. A good first look, not a full scan."],"image":["6","Compresses, resizes, crops, enhances and cuts out backgrounds, including an AI cut-out for busy pictures. Handy and private, though each job is kept fairly simple."],"drawww":["3","A full diagram editor for ER drawings: entity, relationship and attribute shapes, tables with joinable columns, lines with crow's foot signs, undo, zoom and downloads. Built for one kind of drawing rather than every kind."],"deal":["7","Helps you decide what to buy and sends you to the right stores. It guides your shopping rather than fetching every price itself."],"qr":["7","Makes codes for links, text, Wi-Fi, email, phone numbers and contacts. One job, done cleanly."],"calc":["8","Works out CGPA and attendance and shows what you need for your targets. Useful, but a small single-purpose tool."],"planner":["8","A simple weekly grid you can print or save as a picture. Easy to use and light on features."],"share":["5","Shares a note and files through a short code and deletes everything on its own when the timer you chose runs out, up to two hours."]}};/*ENDRANKDATA*/
 function rankBadge(k){var s=RANKD.stages.filter(function(x){return x[0]===k;})[0];return '<span class="rk s'+k+'">'+(k==='a'?ico('spark',12,2.4):'')+s[1]+'</span>';}
 function rankList(){return '<div class="rkl">'+RANKD.stages.map(function(s){
  var ts=TL.filter(function(t){var r=RANKD.tools[t.r];return r&&r[0]===s[0];}).sort(function(a,b){return a.n<b.n?-1:1;});
