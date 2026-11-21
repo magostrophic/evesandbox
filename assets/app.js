@@ -474,8 +474,8 @@ function ctl(){
   var E=I.en,SL=[['br','Brightness',-100,100],['ct','Contrast',-100,100],['sh','Shadows',-100,100],['hl','Highlights',-100,100],['sa','Color',-100,100],['wm','Warmth',-100,100],['sp','Sharpness',0,100],['dn','Smoothing',0,100]];
   h='<p class="hint" style="margin-top:0">Tap Auto enhance for a quick fix, then fine-tune with the sliders. Hold Compare to see the original. Nothing changes until you tap Apply.</p>'+
   '<div class="row"><button class="btn pri" id="enauto">Auto enhance</button><button class="btn" id="encmp">Hold to compare</button><button class="btn" id="enrst">Reset sliders</button></div>'+
-  '<div class="eng">'+SL.map(function(s){return '<label class="enl"><span>'+s[1]+' <b id="env_'+s[0]+'">'+E[s[0]]+'</b></span><input type="range" data-en="'+s[0]+'" min="'+s[2]+'" max="'+s[3]+'" step="1" data-ks="2" value="'+E[s[0]]+'"></label>';}).join('')+'</div>'+
-  '<div class="row" style="margin-top:12px"><span class="sp"></span><button class="btn pri" id="enap">Apply</button></div>'+
+  '<div class="eng">'+SL.map(function(s){return '<label class="enl"><span>'+s[1]+' <b id="env_'+s[0]+'">'+E[s[0]]+'</b></span><input type="range" data-en="'+s[0]+'" min="'+s[2]+'" max="'+s[3]+'" step="1" data-ks="2" value="'+E[s[0]]+'"'+(I.enb?' disabled':'')+'></label>';}).join('')+'</div>'+
+  '<div class="row" style="margin-top:12px"><span class="sp"></span><button class="btn pri" id="enap"'+(I.enb?' disabled':'')+'>'+(I.enb?'Applying\u2026':'Apply')+'</button></div>'+
   '<p class="hint">Smoothing softens grain and noise while keeping edges. Everything is done on your device.</p>';
  }else if(brush){
   h=modeH+'<p class="hint" style="margin-top:0">Rub over the background to erase it. Switch to Restore to bring back anything removed by mistake. Use a smaller brush near edges.</p>'+
@@ -717,14 +717,14 @@ function bxf(a,w,h,r,o){
  for(y=0;y<h;y++){if(y>0){u=y+r;l=y-r-1;if(u<h)for(x=0;x<w;x++)cs[x]+=t[u*w+x];if(l>=0)for(x=0;x<w;x++)cs[x]-=t[l*w+x];}
   var n=Math.min(h-1,y+r)-Math.max(0,y-r)+1;for(x=0;x<w;x++)o[y*w+x]=cs[x]/n;}}
 /* guided filter: smooths p but keeps it lined up with the edges of the guide picture g (He et al.) */
-function gfilt(g,p,w,h,r,eps){
- var N=w*h,mg=new Float32Array(N),mp=new Float32Array(N),gp=new Float32Array(N),gg=new Float32Array(N),i;
- bxf(g,w,h,r,mg);bxf(p,w,h,r,mp);
- for(i=0;i<N;i++){gp[i]=g[i]*p[i];gg[i]=g[i]*g[i];}
- bxf(gp,w,h,r,gp);bxf(gg,w,h,r,gg);
- for(i=0;i<N;i++){var a=(gp[i]-mg[i]*mp[i])/(gg[i]-mg[i]*mg[i]+eps);gg[i]=a;gp[i]=mp[i]-a*mg[i];}
- bxf(gg,w,h,r,gg);bxf(gp,w,h,r,gp);
- for(i=0;i<N;i++){var v=gg[i]*g[i]+gp[i];p[i]=v<0?0:v>1?1:v;}
+function gfilt(g,p,w,h,r,eps,st){
+ var N=w*h,i,mg,vg;
+ if(st){mg=st.mg;vg=st.vg;}else{mg=new Float32Array(N);vg=new Float32Array(N);bxf(g,w,h,r,mg);for(i=0;i<N;i++)vg[i]=g[i]*g[i];bxf(vg,w,h,r,vg);for(i=0;i<N;i++)vg[i]-=mg[i]*mg[i];}
+ var mp=new Float32Array(N),gp=new Float32Array(N),a=new Float32Array(N);
+ bxf(p,w,h,r,mp);for(i=0;i<N;i++)gp[i]=g[i]*p[i];bxf(gp,w,h,r,gp);
+ for(i=0;i<N;i++){var q=(gp[i]-mg[i]*mp[i])/(vg[i]+eps);a[i]=q;gp[i]=mp[i]-q*mg[i];}
+ bxf(a,w,h,r,a);bxf(gp,w,h,r,gp);
+ for(i=0;i<N;i++){var v=a[i]*g[i]+gp[i];p[i]=v<0?0:v>1?1:v;}
  return p;}
 /* smooth enlargement of a grey plane */
 function upF(s,sw,sh,dw,dh){
@@ -733,11 +733,10 @@ function upF(s,sw,sh,dw,dh){
  for(y=0;y<dh;y++){var sy=(y+.5)*fy-.5;sy=sy<0?0:sy>sh-1?sh-1:sy;var j0=sy|0,j1=Math.min(sh-1,j0+1),wy=sy-j0,r0=j0*sw,r1=j1*sw,ob=y*dw;
   for(x=0;x<dw;x++){var i0=xs[x],i1=Math.min(sw-1,i0+1),wx=xf[x];o[ob+x]=(s[r0+i0]*(1-wx)+s[r0+i1]*wx)*(1-wy)+(s[r1+i0]*(1-wx)+s[r1+i1]*wx)*wy;}}
  return o;}
-/* model mask -> sharp, clean cut-out of the picture c. o.sh moves the edge in or out, o.sf makes it softer or crisper */
-function cutPost(c,m8,S,o){
- var W=c.width,H=c.height,N=W*H,k=Math.min(1,Math.sqrt(2.2e6/N)),w=Math.max(16,Math.round(W*k)),h=Math.max(16,Math.round(H*k)),wn=w*h,i;
- var wc=mk(w,h),wx=wc.getContext('2d');wx.imageSmoothingQuality='high';wx.drawImage(c,0,0,w,h);var sd=wx.getImageData(0,0,w,h).data;
- var G=new Float32Array(wn),A=upF(m8,S,S,w,h);
+/* model mask -> sharp, clean cut-out. This is the heavy part, so it runs in the background worker (see enWk). It works on plain pixel data only.
+   sd = small copy of the picture (w x h), m8 = model mask (S x S), d = the full picture (W x H), changed in place. o.sh moves the edge in or out, o.sf makes it softer or crisper */
+function cutCore(sd,w,h,m8,S,o,W,H,d){
+ var wn=w*h,i,G=new Float32Array(wn),A=upF(m8,S,S,w,h);
  for(i=0;i<wn;i++){G[i]=(0.299*sd[i*4]+0.587*sd[i*4+1]+0.114*sd[i*4+2])/255;A[i]/=255;}
  gfilt(G,A,w,h,Math.max(2,Math.round(Math.max(w,h)/220)),1e-4);
  var c0=0.5-o.sh*0.09,wd=0.12+o.sf*0.1,lo=c0-wd/2;
@@ -749,18 +748,29 @@ function cutPost(c,m8,S,o){
  bxf(Wt,w,h,rd,Wt);bxf(R,w,h,rd,R);bxf(Gc,w,h,rd,Gc);bxf(B,w,h,rd,B);
  var Fd=new Uint8ClampedArray(wn*4);
  for(i=0;i<wn;i++){var q=Wt[i],p=i*4;if(q>0.002){Fd[p]=R[i]/q;Fd[p+1]=Gc[i]/q;Fd[p+2]=B[i]/q;}else{Fd[p]=sd[p];Fd[p+1]=sd[p+1];Fd[p+2]=sd[p+2];}Fd[p+3]=255;}
- var Af=A,fd=Fd;
- if(w!==W||h!==H){
-  Af=upF(A,w,h,W,H);
-  var fc=mk(w,h);fc.getContext('2d').putImageData(new ImageData(Fd,w,h),0,0);
-  var fb2=mk(W,H),fx2=fb2.getContext('2d');fx2.imageSmoothingQuality='high';fx2.drawImage(fc,0,0,W,H);fd=fx2.getImageData(0,0,W,H).data;}
- var d=c.getContext('2d').getImageData(0,0,W,H).data,out=new Uint8ClampedArray(d);
- for(i=0;i<N;i++){var a=Af[i],p4=i*4;
-  if(a<=0.003){out[p4+3]=0;continue;}
-  var tt=(0.97-a)/0.3;tt=tt<0?0:tt>1?1:tt;
-  if(tt>0){out[p4]=d[p4]*(1-tt)+fd[p4]*tt;out[p4+1]=d[p4+1]*(1-tt)+fd[p4+1]*tt;out[p4+2]=d[p4+2]*(1-tt)+fd[p4+2]*tt;}
-  out[p4+3]=Math.round(a*d[p4+3]);}
- var res=mk(W,H);res.getContext('2d').putImageData(new ImageData(out,W,H),0,0);return res;}
+ var fx=w/W,fy=h/H,x,y,xs=new Int32Array(W),xf=new Float32Array(W);
+ for(x=0;x<W;x++){var sx=(x+.5)*fx-.5;sx=sx<0?0:sx>w-1?w-1:sx;xs[x]=sx|0;xf[x]=sx-(sx|0);}
+ for(y=0;y<H;y++){
+  var sy=(y+.5)*fy-.5;sy=sy<0?0:sy>h-1?h-1:sy;var j0=sy|0,j1=Math.min(h-1,j0+1),wy=sy-j0,r0=j0*w,r1=j1*w;
+  for(x=0;x<W;x++){
+   var i0=xs[x],i1=Math.min(w-1,i0+1),wx=xf[x],p4=(y*W+x)*4,a=(A[r0+i0]*(1-wx)+A[r0+i1]*wx)*(1-wy)+(A[r1+i0]*(1-wx)+A[r1+i1]*wx)*wy;
+   if(a<=0.003){d[p4+3]=0;continue;}
+   var tt=(0.97-a)/0.3;tt=tt<0?0:tt>1?1:tt;
+   if(tt>0){
+    var q0=(r0+i0)*4,q1=(r0+i1)*4,q2=(r1+i0)*4,q3=(r1+i1)*4,w0=(1-wx)*(1-wy),w1=wx*(1-wy),w2=(1-wx)*wy,w3=wx*wy;
+    for(var ch=0;ch<3;ch++){var fv=Fd[q0+ch]*w0+Fd[q1+ch]*w1+Fd[q2+ch]*w2+Fd[q3+ch]*w3;d[p4+ch]=d[p4+ch]*(1-tt)+fv*tt;}}
+   d[p4+3]=Math.round(a*d[p4+3]);}}
+ return d;}
+async function cutPost(c,m8,S,o){
+ var W=c.width,H=c.height,k=Math.min(1,Math.sqrt(2.2e6/(W*H))),w=Math.max(16,Math.round(W*k)),h=Math.max(16,Math.round(H*k));
+ var wc=mk(w,h),wx=wc.getContext('2d');wx.imageSmoothingQuality='high';wx.drawImage(c,0,0,w,h);
+ var cx=c.getContext('2d'),sd=wx.getImageData(0,0,w,h).data,d=cx.getImageData(0,0,W,H).data,buf=null,wk=enWk();
+ if(wk){
+  try{buf=await new Promise(function(res,rej){var j=++EN.job,sb=sd.buffer,db=d.buffer;EN.cb[j]=function(r){r.t==='done'?res(r.buf):rej(new Error('worker'));};wk.postMessage({t:'cut',id:j,sd:sb,w:w,h:h,m:m8.slice().buffer,S:S,o:o,W:W,H:H,d:db},[sb,db]);});}
+  catch(e){buf=null;sd=wx.getImageData(0,0,w,h).data;d=cx.getImageData(0,0,W,H).data;}
+ }
+ if(!buf)buf=cutCore(sd,w,h,m8,S,o,W,H,d).buffer;
+ var res=mk(W,H);res.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(buf),W,H),0,0);return res;}
 async function cutGo(){
  var S0=I;if(S0.aib)return;
  var c=S0.cur,tok=S0.aiTok=(S0.aiTok||0)+1,kind=S0.aik,done=false;S0.aib=1;S0.ais={t:'Starting…',p:1};ctl();
@@ -772,7 +782,7 @@ async function cutGo(){
   }
   if(I!==S0||S0.aiTok!==tok||S0.cur!==c)return;
   cutSay('Smoothing the edges…',97);await tick();
-  var out=cutPost(c,mk2.m,mk2.S,{sh:S0.aish,sf:S0.aisf});
+  var out=await cutPost(c,mk2.m,mk2.S,{sh:S0.aish,sf:S0.aisf});
   if(I!==S0||S0.cur!==c)return;
   var keep=(S0.base&&S0.base.width===c.width&&S0.base.height===c.height)?S0.base:c;
   S0.fmt='image/png';S0.ais=null;S0.aib=0;done=true;apply(out);S0.base=keep;toast('Background removed. Use Undo to go back.');
@@ -788,7 +798,8 @@ function enRun(src,w,h,v){
  if(v.dn>0){
   var G=new Float32Array(N),P=new Float32Array(N),r=Math.max(2,Math.round(m/400)),e=2e-4+Math.pow(v.dn/100,2)*6e-3;
   for(i=0;i<N;i++)G[i]=(0.299*o[i*4]+0.587*o[i*4+1]+0.114*o[i*4+2])/255;
-  for(k=0;k<3;k++){for(i=0;i<N;i++)P[i]=o[i*4+k]/255;gfilt(G,P,w,h,r,e);for(i=0;i<N;i++)o[i*4+k]=P[i]*255;}
+  var st={mg:new Float32Array(N),vg:new Float32Array(N)};bxf(G,w,h,r,st.mg);for(i=0;i<N;i++)st.vg[i]=G[i]*G[i];bxf(st.vg,w,h,r,st.vg);for(i=0;i<N;i++)st.vg[i]-=st.mg[i]*st.mg[i];
+  for(k=0;k<3;k++){for(i=0;i<N;i++)P[i]=o[i*4+k]/255;gfilt(G,P,w,h,r,e,st);for(i=0;i<N;i++)o[i*4+k]=P[i]*255;}
  }
  var lut=new Float32Array(256),gm=Math.pow(2,-v.br/100),ct=v.ct>=0?1+v.ct/100*0.8:1+v.ct/100*0.7,sp=v.hi-v.lo;
  for(i=0;i<256;i++){var x=(i/255-v.lo)/sp;x=x<0?0:x>1?1:x;x=Math.pow(x,gm);lut[i]=(x-.5)*ct+.5;}
@@ -809,16 +820,38 @@ function enProxy(){
  if(I.enp&&I.enp.cv===I.cur)return I.enp;
  var c=I.cur,k=Math.min(1,1280/Math.max(c.width,c.height)),w=Math.max(1,Math.round(c.width*k)),h=Math.max(1,Math.round(c.height*k)),t=mk(w,h),x=t.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(c,0,0,w,h);
  return I.enp={cv:c,w:w,h:h,d:x.getImageData(0,0,w,h).data};}
+/* the enhancing maths runs in a background worker, so the page never freezes. While a slider is moving, only the newest setting is worked on */
+var EN={w:null,cb:{},job:0,key:null,dead:false,tc:null};
+function enWk(){
+ if(EN.w)return EN.w;if(EN.dead)return null;
+ try{
+  var src=[bxf,gfilt,upF,enRun,cutCore].map(function(f){return f.toString();}).join('\n')+'\nvar P=null;onmessage=function(e){var m=e.data,o;try{if(m.t==="src"){P={d:new Uint8ClampedArray(m.buf),w:m.w,h:m.h};return;}o=m.t==="cut"?cutCore(new Uint8ClampedArray(m.sd),m.w,m.h,new Uint8Array(m.m),m.S,m.o,m.W,m.H,new Uint8ClampedArray(m.d)):m.t==="full"?enRun(new Uint8ClampedArray(m.buf),m.w,m.h,m.v):enRun(P.d,P.w,P.h,m.v);postMessage({t:"done",id:m.id,buf:o.buffer},[o.buffer]);}catch(err){postMessage({t:"err",id:m.id,e:String(err&&err.message||err)});}};';
+  var w=new Worker(URL.createObjectURL(new Blob([src],{type:'text/javascript'})));
+  w.onmessage=function(e){var d=e.data,f=EN.cb[d.id];if(f){delete EN.cb[d.id];f(d);}};
+  w.onerror=function(){enWkFail();};
+  EN.w=w;return w;
+ }catch(e){EN.dead=true;return null;}}
+function enWkFail(){EN.dead=true;var w=EN.w,cb=EN.cb;EN.w=null;EN.key=null;EN.cb={};try{if(w)w.terminate();}catch(e){}Object.keys(cb).forEach(function(k){cb[k]({t:'err',id:+k});});}
+function enDraw(S0,P,buf){
+ var pv=$$('pv');if(!pv||I!==S0||S0.tab!=='enhance'||S0.encmp||enIsDef(S0.en)||P.cv!==S0.cur)return;
+ var t=EN.tc;if(!t||t.width!==P.w||t.height!==P.h)t=EN.tc=mk(P.w,P.h);
+ t.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(buf),P.w,P.h),0,0);
+ var x=pv.getContext('2d');x.clearRect(0,0,pv.width,pv.height);x.imageSmoothingQuality='high';x.drawImage(t,0,0,pv.width,pv.height);}
+function enPump(S0){
+ if(S0.enBusy||!S0.enWant)return;
+ var v=S0.enWant,P=enProxy(),w=enWk();S0.enWant=null;
+ if(!w){S0.enBusy=1;requestAnimationFrame(function(){S0.enBusy=0;if(I!==S0)return;enDraw(S0,P,enRun(P.d,P.w,P.h,v).buffer);if(S0.enWant)enPump(S0);});return;}
+ if(EN.key!==P){var cp=P.d.slice();w.postMessage({t:'src',buf:cp.buffer,w:P.w,h:P.h},[cp.buffer]);EN.key=P;}
+ S0.enBusy=1;var id=++EN.job;
+ EN.cb[id]=function(d){S0.enBusy=0;if(d.t==='done')enDraw(S0,P,d.buf);if(I===S0&&S0.enWant)enPump(S0);};
+ w.postMessage({t:'prev',id:id,v:v});}
 function enPreview(){
  if(!I||I.tab!=='enhance'||!$$('pv'))return;
  var S0=I;
- if(S0.enRaf)return;
- S0.enRaf=requestAnimationFrame(function(){S0.enRaf=0;if(I!==S0||S0.tab!=='enhance'||!$$('pv'))return;
-  var pv=$$('pv'),x=pv.getContext('2d');
-  if(enIsDef(S0.en)||S0.encmp){x.clearRect(0,0,pv.width,pv.height);x.drawImage(S0.cur,0,0);return;}
-  var P=enProxy(),o=enRun(P.d,P.w,P.h,S0.en),t=mk(P.w,P.h);t.getContext('2d').putImageData(new ImageData(o,P.w,P.h),0,0);
-  x.clearRect(0,0,pv.width,pv.height);x.imageSmoothingQuality='high';x.drawImage(t,0,0,pv.width,pv.height);});}
+ if(enIsDef(S0.en)||S0.encmp){var pv=$$('pv'),x=pv.getContext('2d');x.clearRect(0,0,pv.width,pv.height);x.drawImage(S0.cur,0,0);return;}
+ S0.enWant=Object.assign({},S0.en);enPump(S0);}
 function enAuto(){
+ if(I.enb)return;
  var P=enProxy(),d=P.d,N=P.w*P.h,hist=new Uint32Array(256),i,n=0,nn=0,nr=0,nb=0,sl=0,ss=0;
  for(i=0;i<N;i++){var p=i*4;if(d[p+3]<16)continue;var r=d[p],g=d[p+1],b=d[p+2],L=(0.2126*r+0.7152*g+0.0722*b)|0;hist[L]++;n++;sl+=L;var mx=Math.max(r,g,b),mn=Math.min(r,g,b),sv=mx?(mx-mn)/mx:0;ss+=sv;if(sv<0.2&&L>40&&L<215){nn++;nr+=r;nb+=b;}}
  if(!n){toast('There is nothing to enhance in this picture');return;}
@@ -833,12 +866,15 @@ function enAuto(){
 async function enApply(){
  var S0=I,v=Object.assign({},S0.en);
  if(enIsDef(v)){toast('Move a slider or tap Auto enhance first');return;}
- if(S0.enb)return;S0.enb=1;toast('Applying…');await tick();
- try{var c=S0.cur,x=c.getContext('2d'),id=x.getImageData(0,0,c.width,c.height),o=enRun(id.data,c.width,c.height,v),m=mk(c.width,c.height);
-  m.getContext('2d').putImageData(new ImageData(o,c.width,c.height),0,0);
-  if(I!==S0||S0.cur!==c)return;S0.en=enDef();apply(m);toast('Enhancement applied. Use Undo to go back.');
+ if(S0.enb)return;S0.enb=1;ctl();await tick();
+ try{
+  var c=S0.cur,id=c.getContext('2d').getImageData(0,0,c.width,c.height),w=enWk(),buf=null;
+  if(w){try{buf=await new Promise(function(res,rej){var j=++EN.job;EN.cb[j]=function(d){d.t==='done'?res(d.buf):rej(new Error('worker'));};w.postMessage({t:'full',id:j,buf:id.data.buffer,w:c.width,h:c.height,v:v},[id.data.buffer]);});}catch(e){buf=null;id=c.getContext('2d').getImageData(0,0,c.width,c.height);}}
+  if(!buf)buf=enRun(id.data,c.width,c.height,v).buffer;
+  var m=mk(c.width,c.height);m.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(buf),c.width,c.height),0,0);
+  if(I!==S0||S0.cur!==c)return;S0.en=enDef();S0.enb=0;apply(m);toast('Enhancement applied. Use Undo to go back.');
  }catch(e){toast('Could not apply that on this device. Try a smaller picture.');}
- finally{S0.enb=0;}}
+ finally{S0.enb=0;if(I===S0&&S0.tab==='enhance'&&$$('ctl'))ctl();}}
 
 var P={tool:'maker',files:[],out:null};
 var TOOLS=[['maker','PDF Maker'],['merge','Merger'],['split','Splitter'],['compress','Compressor'],['protect','Protect'],['unlock','Remove password']];
