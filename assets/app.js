@@ -200,7 +200,7 @@ function colorOf(n){for(var i=0;i<S.subjects.length;i++)if(S.subjects[i].n===n)r
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var app=document.getElementById('app');
 
-function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',deal:'tools',drawww:'tools',tts:'tools',share:'tools',qr:'tools',convert:'tools',ide:'tools',eve:'tools',translate:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
+function nav(r){r=({planner:'tools',image:'tools',pdf:'tools',virus:'tools',calc:'tools',deal:'tools',drawww:'tools',tts:'tools',share:'tools',liner:'tools',qr:'tools',convert:'tools',ide:'tools',eve:'tools',translate:'tools',privacy:'terms'})[r]||r;document.querySelectorAll('#hdr .link').forEach(function(a){a.classList.toggle('on',a.dataset.r===r);});}
 
 function planner(){
  nav('planner');
@@ -1150,7 +1150,7 @@ function vDraw(){
  o.innerHTML=h;
 }
 
-var CFG=Object.assign({email:'',phone:'',legalName:'',address:'',donate:[],donateApi:'',dealApi:'',runApi:'',aiApi:'',shareApi:'',turnstileKey:''},window.EVE_CFG||{});
+var CFG=Object.assign({email:'',phone:'',legalName:'',address:'',donate:[],donateApi:'',dealApi:'',runApi:'',aiApi:'',shareApi:'',linerApi:'',turnstileKey:''},window.EVE_CFG||{});
 var TL=[
  {r:'calc',c:'i5',ic:'calc',n:'Complex Calculator',d:'Work out your SGPA, CGPA and attendance, with marks or grades, failed subjects and re-exams, and see what you need to hit your targets.'},
  {r:'deal',c:'i10',ic:'tag',n:'Deal or No Deal',d:'Tell Eve what you want to buy. She suggests what to look for, links the top stores and shows which price is the real best deal.'},
@@ -1159,6 +1159,7 @@ var TL=[
  {r:'ide',c:'i8',ic:'code',n:'Eve IDE',d:'Write and run Python, C and Java programs, with input and output right on the page.'},
  {r:'convert',c:'i8',ic:'swap',n:'File Converter',d:'Turn pictures, PDFs, documents, spreadsheets and audio into another format, right on your device.'},
    {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop, enhance and cut out the background of images.'},
+ {r:'liner',c:'i13',ic:'liner',n:'Liner',d:'Type a code to join a chat room, pick a name and talk with up to 10 people. Share files up to 10 MB per room. Every room has a 2 hour timer, then it is deleted on its own.'},
  {r:'translate',c:'i12',ic:'globe',n:'Live Translate',d:'Speak in one language and read it in another as you talk, or share your screen and see it translated in real time.'},
  {r:'pdf',c:'i3',ic:'pdf',n:'PDF Tool',d:'Make, merge, split and compress PDFs, and add or remove passwords.'},
  {r:'qr',c:'i9',ic:'qr',n:'QR Code Generator',d:'Make a QR code for a link, text, Wi-Fi, email, phone number or contact card, and download it as PNG or SVG.'},
@@ -1168,7 +1169,7 @@ var TL=[
  {r:'virus',c:'i4',ic:'shield',n:'Virus Checker',d:'Check whether a website or link looks safe before you open it.'}];
 function toolHd(r,lead){var t=TL.filter(function(x){return x.r===r;})[0]||{n:'',ic:'spark'};return '<div class="dl-hd"><div class="ic bl">'+ico(t.ic,26)+'</div><h1>'+t.n+'</h1></div>'+(lead?'<p class="lead dl-lead">'+lead+'</p>':'');}
 var LOCKED={};TL.forEach(function(t){if(t.lock)LOCKED[t.r]=1;});
-/*RANKDATA*/var RANKD={"stages":[["a","Arcane Stage"],["0","Stage Zero"],["1","Stage One"],["2","Stage Two"],["3","Stage Three"],["4","Stage Four"],["5","Stage Five"],["6","Stage Six"],["7","Stage Seven"],["8","Stage Eight"],["9","Stage Nine"]],"tools":{"eve":["0","The most capable tool here. It answers questions, teaches step by step, makes flashcards and practice tests, and works from your own notes."],"translate":["1","Turns speech and the text on a shared screen into another language as it happens, across many languages."],"ide":["2","Runs real Python, C and Java programs with live input and output, right on the page."],"convert":["3","Converts pictures, PDFs, documents, spreadsheets and audio between many formats, right on your device."],"tts":["4","Two ways to listen: hear words read out as you type, or turn a paragraph into a downloadable audio file, with voices for many countries."],"pdf":["5","Several useful jobs in one place: make, merge, split and compress PDFs, and add or remove passwords."],"virus":["6","Weighs several signals about a link, such as warning lists and domain age, without ever opening it. A good first look, not a full scan."],"image":["6","Compresses, resizes, crops, enhances and cuts out backgrounds, including an AI cut-out for busy pictures. Handy and private, though each job is kept fairly simple."],"drawww":["3","A full diagram editor for ER drawings: entity, relationship and attribute shapes, tables with joinable columns, lines with crow's foot signs, undo, zoom and downloads. Built for one kind of drawing rather than every kind."],"deal":["7","Helps you decide what to buy and sends you to the right stores. It guides your shopping rather than fetching every price itself."],"qr":["7","Makes codes for links, text, Wi-Fi, email, phone numbers and contacts. One job, done cleanly."],"calc":["8","Works out CGPA and attendance and shows what you need for your targets. Useful, but a small single-purpose tool."],"planner":["8","A simple weekly grid you can print or save as a picture. Easy to use and light on features."],"share":["5","Shares a note and files through a short code and deletes everything on its own when the timer you chose runs out, up to two hours."]}};/*ENDRANKDATA*/
+/*RANKDATA*/var RANKD={"stages":[["a","Arcane Stage"],["0","Stage Zero"],["1","Stage One"],["2","Stage Two"],["3","Stage Three"],["4","Stage Four"],["5","Stage Five"],["6","Stage Six"],["7","Stage Seven"],["8","Stage Eight"],["9","Stage Nine"]],"tools":{"eve":["0","The most capable tool here. It answers questions, teaches step by step, makes flashcards and practice tests, and works from your own notes."],"translate":["1","Turns speech and the text on a shared screen into another language as it happens, across many languages."],"ide":["2","Runs real Python, C and Java programs with live input and output, right on the page."],"convert":["3","Converts pictures, PDFs, documents, spreadsheets and audio between many formats, right on your device."],"tts":["4","Two ways to listen: hear words read out as you type, or turn a paragraph into a downloadable audio file, with voices for many countries."],"pdf":["5","Several useful jobs in one place: make, merge, split and compress PDFs, and add or remove passwords."],"virus":["6","Weighs several signals about a link, such as warning lists and domain age, without ever opening it. A good first look, not a full scan."],"image":["6","Compresses, resizes, crops, enhances and cuts out backgrounds, including an AI cut-out for busy pictures. Handy and private, though each job is kept fairly simple."],"drawww":["3","A full diagram editor for ER drawings: entity, relationship and attribute shapes, tables with joinable columns, lines with crow's foot signs, undo, zoom and downloads. Built for one kind of drawing rather than every kind."],"deal":["7","Helps you decide what to buy and sends you to the right stores. It guides your shopping rather than fetching every price itself."],"qr":["7","Makes codes for links, text, Wi-Fi, email, phone numbers and contacts. One job, done cleanly."],"calc":["8","Works out CGPA and attendance and shows what you need for your targets. Useful, but a small single-purpose tool."],"planner":["8","A simple weekly grid you can print or save as a picture. Easy to use and light on features."],"liner":["4","Live chat rooms opened with a code, with names on every message, up to ten people and shared files, and a 2 hour timer after which the room and everything in it is deleted on its own."],"share":["5","Shares a note and files through a short code and deletes everything on its own when the timer you chose runs out, up to two hours."]}};/*ENDRANKDATA*/
 function rankBadge(k){var s=RANKD.stages.filter(function(x){return x[0]===k;})[0];return '<span class="rk s'+k+'">'+(k==='a'?ico('spark',12,2.4):'')+s[1]+'</span>';}
 function rankList(){return '<div class="rkl">'+RANKD.stages.map(function(s){
  var ts=TL.filter(function(t){var r=RANKD.tools[t.r];return r&&r[0]===s[0];}).sort(function(a,b){return a.n<b.n?-1:1;});
@@ -1376,11 +1377,12 @@ function termsPage(){nav('terms');
  '<h2>4. Virus Checker</h2><p>The Virus Checker gives an automated opinion based on the look of an address and on third-party services. It is not a guarantee that a site is safe or unsafe. Use your own judgment, and do not enter passwords or payment details on a site you are unsure about.</p>'+
  '<h2>5. Prices and suggestions</h2><p>Suggestions, price ranges and verdicts in Deal or No Deal and Eve AI are automated estimates, not live prices or professional advice. Prices, offers and stock change often, so check everything on the store’s own page before you pay. Product links come from an automated web search and can be out of date, sold out or not exactly what you meant. Eve Sandbox does not sell products and is not connected to the stores it links to.</p>'+
  '<h2>6. Text and File Sharing</h2><p>Shares are temporary. They are deleted automatically when their time ends (never more than 2 hours later) and we cannot bring them back. Anyone who has a share’s code can open it, so you are responsible for what you share and for who you give the code to. Do not share anything unlawful, harmful or that you have no right to share, including malware, other people’s private information and content that infringes someone’s rights. We may remove shares and limit use to keep the service safe and available for everyone.</p>'+
- '<h2>7. Community</h2><p>The Community is a separate part of Eve Sandbox where signed-in people can post (text and pictures), reply (text only), vote, report and keep a public profile with a picture, a short bio and links. What you post, including pictures and everything on your profile, is public and can be read by anyone, including people who are not signed in, and may be shared by others using its link. You are responsible for what you post. Do not use a username, picture, bio or link that is unlawful, hateful, misleading, or pretends to be another person or Eve Sandbox, and do not post anything unlawful, hateful, threatening, sexual involving minors, misleading or spam, other people’s private information, malware, or anything you have no right to post. Be kind and keep to the topic. You keep the rights to your words and pictures, and you give Eve Sandbox permission to show them in the Community for as long as they stay posted. We may remove posts or replies, and limit or block accounts, to keep the Community safe, with or without notice. You can delete your own posts and replies at any time; deleting a post also deletes its replies and pictures. Votes and replies are the opinions of the people who wrote them, not of Eve Sandbox.</p>'+
- '<h2>8. No warranty</h2><p>The site and its tools are provided “as is” and “as available”, without promises of accuracy, availability or fitness for a particular purpose. To the fullest extent the law allows, we are not liable for any loss or damage from using the site or relying on its results.</p>'+
- '<h2>9. Third-party services and links</h2><p>Some features use or link to services run by others, such as lookup services, security-checking websites and payment and email services. We do not control them and are not responsible for their content or policies.</p>'+
- '<h2>10. Changes</h2><p>We may change the site or these terms from time to time. Continuing to use the site after a change means you accept the updated terms.</p>'+
- '<h2>11. Contact</h2><p>Questions about these terms? Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
+ '<h2>7. Liner</h2><p>Liner rooms are temporary chat spaces. A room holds up to 10 people and up to 10 MB of shared files, and every room has a 2 hour timer that starts when the room is made. When the timer ends, the room is deleted with everything in it, so we cannot bring a room or its messages back. Anyone who has a room’s code can join while there is space, so you are responsible for what you say and share and for who you give the code to. Other people in the room can see your name, your messages and your files, and they can save them. Do not use Liner to harass anyone, or to share anything unlawful, harmful or that you have no right to share, including malware and other people’s private information. We may close rooms and limit use to keep the service safe and available for everyone.</p>'+
+ '<h2>8. Community</h2><p>The Community is a separate part of Eve Sandbox where signed-in people can post (text and pictures), reply (text only), vote, report and keep a public profile with a picture, a short bio and links. What you post, including pictures and everything on your profile, is public and can be read by anyone, including people who are not signed in, and may be shared by others using its link. You are responsible for what you post. Do not use a username, picture, bio or link that is unlawful, hateful, misleading, or pretends to be another person or Eve Sandbox, and do not post anything unlawful, hateful, threatening, sexual involving minors, misleading or spam, other people’s private information, malware, or anything you have no right to post. Be kind and keep to the topic. You keep the rights to your words and pictures, and you give Eve Sandbox permission to show them in the Community for as long as they stay posted. We may remove posts or replies, and limit or block accounts, to keep the Community safe, with or without notice. You can delete your own posts and replies at any time; deleting a post also deletes its replies and pictures. Votes and replies are the opinions of the people who wrote them, not of Eve Sandbox.</p>'+
+ '<h2>9. No warranty</h2><p>The site and its tools are provided “as is” and “as available”, without promises of accuracy, availability or fitness for a particular purpose. To the fullest extent the law allows, we are not liable for any loss or damage from using the site or relying on its results.</p>'+
+ '<h2>10. Third-party services and links</h2><p>Some features use or link to services run by others, such as lookup services, security-checking websites and payment and email services. We do not control them and are not responsible for their content or policies.</p>'+
+ '<h2>11. Changes</h2><p>We may change the site or these terms from time to time. Continuing to use the site after a change means you accept the updated terms.</p>'+
+ '<h2>12. Contact</h2><p>Questions about these terms? Use the <a href="#/contact" style="color:var(--brand)">Contact</a> page.</p></div>';}
 function privacyPage(){nav('privacy');
  app.innerHTML=banner('Legal','Privacy','Last updated: November 14, 2026')+
  '<div class="wrapc doc" style="max-width:760px"><h2 style="margin-top:0">The short version</h2><p>No account is needed for the tools. Your images and PDFs stay on your device. We do not add analytics or advertising code to this site. The one place that uses sign-in is the Community, described below.</p>'+
@@ -1395,17 +1397,18 @@ function privacyPage(){nav('privacy');
  '<li><b>Deal or No Deal:</b> what you type about the item you want, your budget, and any prices you add are sent to an AI service so it can write its suggestions, and to a web search service that looks for matching product pages. They are not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Text to Speech:</b> the Speak as you type section runs on your device and sends nothing. When you make an audio file, the paragraph you wrote is sent to a speech service so it can create the audio. It is not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Live Translate:</b> in Speak, your browser’s own speech service turns what you say into text. If that service cannot be used, short clips of your voice are sent to a speech service instead so they can be turned into text, and they are not stored by this website. In Screen, the picture of your screen never leaves your device; the words on it are read on your device. The words are then translated on your device when your browser can do that, or sent to a translation service so they can be translated. They are not stored by this website. Please do not share private personal details.</li>'+
+ '<li><b>Liner:</b> the name you type, your messages and any files you add are sent to us and kept only while the room exists, so that other people in the room can see them. Every room has a 2 hour timer that starts when it is made, and when it ends the room and everything in it is deleted automatically. Anyone who has the room code can join and see the recent messages, so please do not share passwords or private personal details.</li>'+
  '<li><b>Text and File Sharing:</b> the note and files you share are sent to us and kept in storage only until the time you pick, which is never more than 2 hours. Then they are deleted automatically, or sooner if you stop the share. Anyone who has the share’s code can open it until then. A security check is used before a share is made, and its provider may look at technical details of your browser to do this. Please do not share passwords or private personal details.</li>'+
  '<li><b>Community:</b> to post, reply or vote you sign in with an email address and password, or with an existing account, through a sign-in service. From it we receive your email address, a sign-in ID and, if you use an existing account, its name. We never see or store your password; the sign-in service keeps it. Your email address is never shown to others and is never put on your posts. The display name and username you choose, your profile picture, bio and links, and the posts, pictures, replies, votes and reports you make, are stored on our servers. Your display name, username, profile picture, bio, links, posts, pictures, replies, and the lists of who you follow and who follows you, are public, and anyone can see them, even without signing in, so please do not put personal details in them. Before a photo is uploaded, the page removes hidden details such as where it was taken from JPEG photos, but pictures in other formats are stored as they are. Your votes are private to you, and only the totals are shown, unless you turn on the setting that shows the posts you liked on your profile. The people you follow and the people who follow you are stored too, and those lists are public. You can delete your own posts and replies at any time, which also deletes a post’s replies and pictures. You can also delete your whole Community account yourself, at any time, from Settings in the Community (see “Deleting your Community account” below).</li>'+
  '<li><b>Links you open</b> take you to other websites with their own policies.</li>'+
  '<li><b>Contact form:</b> the form uses a security check to tell people from automated programs, and the check provider may look at technical details of your browser to do this. The name, email and message you type are sent to us by email so they reach us. We use them only to read and answer your message.</li>'+
  '<li><b>Donations:</b> if you donate, the amount and the mobile number you type (plus the name and email, if you give them) are sent to our payment partner to start the payment, and you pay on their page under their own privacy policy. Eve Sandbox does not store your payment details or your mobile number.</li></ul>'+
  '<h2>Hosting</h2><p>Whoever hosts the site may keep ordinary server logs, such as IP addresses and page requests, under their own policy.</p>'+
- '<h2>Information we collect, in short</h2><ul><li><b>Community account:</b> your email address, a sign-in ID, the name from your sign-in account if you use one, and the display name, username, profile picture, bio and links you choose.</li><li><b>What you post:</b> posts, pictures, replies, votes and reports in the Community.</li><li><b>Messages to us:</b> the name, email and message you send through the Contact page.</li><li><b>Short-lived items:</b> notes and files you share with Text and File Sharing, kept for the time you pick (never more than 2 hours).</li><li><b>Ordinary technical data:</b> the hosting logs described above.</li></ul><p>We do not collect anything else about you, and the tools that run on your device send us nothing.</p>'+
+ '<h2>Information we collect, in short</h2><ul><li><b>Community account:</b> your email address, a sign-in ID, the name from your sign-in account if you use one, and the display name, username, profile picture, bio and links you choose.</li><li><b>What you post:</b> posts, pictures, replies, votes and reports in the Community.</li><li><b>Messages to us:</b> the name, email and message you send through the Contact page.</li><li><b>Short-lived items:</b> notes and files you share with Text and File Sharing, kept for the time you pick (never more than 2 hours), and the name, messages and files you put in a Liner room, kept until the room’s 2 hour timer ends.</li><li><b>Ordinary technical data:</b> the hosting logs described above.</li></ul><p>We do not collect anything else about you, and the tools that run on your device send us nothing.</p>'+
  '<h2>Signing in with your Google account</h2><p>If you choose to sign in to the Community with Google, we ask for only your basic profile information: your name and email address, plus a sign-in ID. We use it only to create your Community account, to recognise you when you come back and to keep one account per person. We do not read or collect anything else from your Google account, such as your mail, contacts, files or calendar. We do not sell this information, use it for advertising or share it with anyone, except the services that run the sign-in for us. You can stop Google sign-in at any time by removing Eve Sandbox from your Google account’s connected apps, and you can delete your Community account yourself, as described below.</p>'+
  '<h2>How we use information</h2><ul><li>To run the tools and the Community and to show you what you asked for.</li><li>To sign you in and keep your account and your posts under your control.</li><li>To read and answer the messages you send us.</li><li>To keep the site safe, for example by reviewing reports and removing posts that break the rules, and by blocking misuse.</li></ul><p>We do not use your information for advertising and we do not build profiles of you.</p>'+
  '<h2>Who we share it with</h2><p>We do not sell or rent your information. It is shared only in these cases: what you post in the Community is public, as described above; the outside services named under “What leaves your device” receive only what a feature needs to work; the services that host the site, store its data and handle sign-in process information for us under their own policies; and we may share information if the law requires it or to protect people from harm.</p>'+
- '<h2>How long we keep it</h2><ul><li>Items you share with Text and File Sharing are deleted automatically when your chosen time ends, never later than 2 hours.</li><li>Community accounts and posts are kept until you delete them or delete your account. When you delete your account, your profile, picture, votes, reports and follows are removed straight away, and so is anything you chose to delete along with it.</li><li>Messages sent through the Contact page are kept only as long as we need to answer them.</li><li>Anything saved in your browser stays there until you clear it.</li></ul>'+
+ '<h2>How long we keep it</h2><ul><li>Items you share with Text and File Sharing are deleted automatically when your chosen time ends, never later than 2 hours.</li><li>Liner rooms, with their messages, names and files, are deleted automatically when the room’s 2 hour timer ends.</li><li>Community accounts and posts are kept until you delete them or delete your account. When you delete your account, your profile, picture, votes, reports and follows are removed straight away, and so is anything you chose to delete along with it.</li><li>Messages sent through the Contact page are kept only as long as we need to answer them.</li><li>Anything saved in your browser stays there until you clear it.</li></ul>'+
  '<h2>Security</h2><p>Information moves between your device and this website over encrypted connections. We never see or store your password, and the Community accepts only people who have confirmed their email address. Access to the stored data is limited to the people who run the site. No website can promise perfect security, so please do not put sensitive personal details into any public post.</p>'+
  '<h2>Your choices and rights</h2><ul><li>You can change your display name, username, profile picture, bio, links and the setting that shows your liked posts at any time from your profile.</li><li>You can delete your own posts and replies at any time.</li><li>You can delete your whole Community account yourself at any time (see below).</li><li>You can ask to see or correct the information we hold about you, or ask us for help with deleting it, through the <a href="#/contact" style="color:var(--brand)">Contact</a> page. We will check that the request really comes from you and then act on it as soon as we reasonably can.</li><li>You can clear what is saved in your browser at any time through your browser’s settings.</li></ul>'+
  '<h2>Deleting your Community account</h2><p>You can delete your Community account yourself at any time. Open Settings in the Community and choose Delete my account. To make sure it is really you, you are asked to confirm with your password (or with Google, if that is how you signed in) and to type the word DELETE. This cannot be undone.</p><ul><li><b>Always removed:</b> your account, your email address, your display name and username, your profile picture, bio and links, your votes, your reports, and the lists of people you follow and who follow you. The sign-in record that lets you log in is removed too.</li><li><b>Your choice:</b> you can tick boxes to delete all your posts (with their pictures and the replies under them), only the pictures on your posts, and all your replies. Anything you leave unticked stays visible, but it is shown as “Deleted User” and is no longer connected to you or to any account.</li><li>Once an account is deleted we cannot bring it back, and the username becomes free for someone else to take.</li><li>Copies that other people made of what you posted, for example by saving or quoting it, are outside our control.</li></ul><p>If you cannot sign in, or something does not work, use the <a href="#/contact" style="color:var(--brand)">Contact</a> page and we will help. We will check that the request really comes from you.</p>'+
@@ -1782,8 +1785,8 @@ var FULL={tools:toolsPage,about:aboutPage,contact:contactPage,donate:donatePage,
 
 /* ---------- pages and addresses ---------- */
 var PAGE=EVE_PAGE,PM=!!PAGE,BASEP=EVE_BASE,INIT404=PAGE==='404';
-var ROUTES=['tools','about','contact','donate','terms','privacy','planner','image','pdf','virus','calc','deal','drawww','tts','qr','convert','ide','eve','translate','share'];
-var TITLES={home:'Home',tools:'Tools',about:'About',contact:'Contact',donate:'Donate',terms:'Terms of Service',privacy:'Privacy',planner:'Study Planner',image:'Image Tool',pdf:'PDF Tool',virus:'Virus Checker',calc:'Complex Calculator',deal:'Deal or No Deal',drawww:'Drawww',tts:'Text to Speech',qr:'QR Code Generator',convert:'File Converter',ide:'Eve IDE',eve:'Eve AI',translate:'Live Translate',share:'Text and File Sharing','404':'Page Not Found'};
+var ROUTES=['tools','about','contact','donate','terms','privacy','planner','image','pdf','virus','calc','deal','drawww','tts','qr','convert','ide','eve','translate','share','liner'];
+var TITLES={home:'Home',tools:'Tools',about:'About',contact:'Contact',donate:'Donate',terms:'Terms of Service',privacy:'Privacy',planner:'Study Planner',image:'Image Tool',pdf:'PDF Tool',virus:'Virus Checker',calc:'Complex Calculator',deal:'Deal or No Deal',drawww:'Drawww',tts:'Text to Speech',qr:'QR Code Generator',convert:'File Converter',ide:'Eve IDE',eve:'Eve AI',translate:'Live Translate',share:'Text and File Sharing',liner:'Liner','404':'Page Not Found'};
 function U(r){r=(!r||r==='home')?'':r;return PM?BASEP+(r?r+'/':''):'#/'+r;}
 function curR(){
  if(!PM)return location.hash.replace('#/','');
@@ -1954,6 +1957,169 @@ function sharePage(){nav('share');
  $$('shopen').onclick=function(){shOpen(ci.value);};
  var sv=SH.mine||shGet(SHK);if(sv&&sv.code&&sv.key&&sv.end>Date.now()){SH.mine=sv;shMineDraw();}else{SH.mine=null;shSet(SHK,null);}
  shHealth();
+}
+/* ---------- Liner: chat rooms opened with a code (up to 10 people, 10 MB of files per room) ---------- */
+IC.liner='<path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3 21l1.9-5.6A8.5 8.5 0 1 1 21 11.5z"/>';
+var LN={api:'',cfg:null,ws:null,state:'join',code:'',name:'',tok:'',members:[],msgs:[],used:0,max:10485760,cap:10,gen:0,tries:0,rt:null,ping:null,rx:0,fatal:0,ended:false,up:[],busy:false,typeAt:0,typers:{},cnt:{},stuck:true,hooks:false};
+var LNK='eve-sandbox:liner:last',LNN='eve-sandbox:liner:name';
+var LNE={4001:'That room is full. Rooms hold up to 10 people, so please try again in a little while.',4002:'Someone in that room already uses that name. Please pick a different one.',4003:'Names need 2 to 20 characters: letters, numbers, spaces, dots, dashes or underscores.',4004:'That room code is not valid.',net:'We could not join the room. Please check your connection and try again. If you tried many times, wait a few minutes first.'};
+var LNU={big:'That file is bigger than the room’s 10 MB limit.',full:'There is not enough file space left in this room for that file.',key:'You are not connected to the room right now. Please try again in a moment.',gone:'This room has ended.',rate:'That is a lot of uploads in a short time. Please wait a little and try again.',size:'The upload did not finish. Please try again.',net:'The upload did not finish. Please check your connection and try again.'};
+var LNA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+function lnApi(){var a=String(CFG.linerApi||'').replace(/\/+$/,'');if(a)return a;var m=/^(https?:\/\/)eve-ai(\.[^\/]+)$/.exec(String(CFG.aiApi||'').replace(/\/+$/,''));return m?m[1]+'eve-liner'+m[2]:'';}
+function lnNorm(c){return String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');}
+function lnNameOk(n){var r;try{r=new RegExp('^[\\p{L}\\p{N}][\\p{L}\\p{N} ._-]{0,18}[\\p{L}\\p{N}]$','u');}catch(e){r=/^[A-Za-z0-9][A-Za-z0-9 ._-]{0,18}[A-Za-z0-9]$/;}return r.test(n);}
+function lnGen(){var o='',a=new Uint8Array(8);try{crypto.getRandomValues(a);}catch(e){for(var i=0;i<8;i++)a[i]=Math.floor(Math.random()*256);}for(var j=0;j<8;j++)o+=LNA.charAt(a[j]%LNA.length);return o;}
+function lnSz(n){return n<=0?'0 MB':n<1048576?Math.max(1,Math.round(n/1024))+' KB':(n/1048576).toFixed(1)+' MB';}
+function lnHue(n){var h=0,s=String(n).toLowerCase();for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h;}
+function lnTime(ts){try{return new Date(ts).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});}catch(e){return '';}}
+function lnLink(t){var out='',last=0,re=/https?:\/\/[^\s<>"']+/g,m;
+ while((m=re.exec(t))){var u=m[0],tail='',mm=/[.,;:!?)\]}]+$/.exec(u);if(mm){tail=mm[0];u=u.slice(0,u.length-tail.length);}
+  out+=esc(t.slice(last,m.index))+(u.length>10?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer nofollow">'+esc(u)+'</a>':esc(u))+esc(tail);last=m.index+m[0].length;}
+ return out+esc(t.slice(last));}
+function lnRead(){try{return JSON.parse(sessionStorage.getItem(LNK));}catch(e){return null;}}
+function lnSave(){try{sessionStorage.setItem(LNK,JSON.stringify({code:LN.code,name:LN.name,tok:LN.tok}));localStorage.setItem(LNN,LN.name);}catch(e){}}
+function lnForget(){try{sessionStorage.removeItem(LNK);}catch(e){}}
+function lnStop(){clearTimeout(LN.rt);clearInterval(LN.ping);clearInterval(LN.tick);LN.gen++;var w=LN.ws;LN.ws=null;if(w){w.onopen=w.onmessage=w.onclose=w.onerror=null;try{w.close(1000);}catch(e){}}}
+function lnLeave(){if(LN.state==='chat'||LN.ws)lnStop();LN.state='join';LN.up=[];LN.busy=false;}
+function lnEnd(){lnStop();LN.ended=true;lnBan('This room\u2019s 2 hours are up, so it was deleted with everything in it. You can start a new room any time.','warn');lnLock(true);var c=$$('lncd');if(c)c.textContent='0:00';}
+function lnTick(){var c=$$('lncd');if(!c){clearInterval(LN.tick);return;}var ms=LN.end-Date.now();if(ms<=0){lnEnd();return;}
+ c.textContent=shFmt(Math.ceil(ms/1000));var w=$$('lncdw');if(w)w.className='lnr-cd'+(ms<=300000?' soon':'');
+ if(ms<=300000&&!LN.warned){LN.warned=true;toast('This room ends in 5 minutes. Save anything you need.');}}
+function lnBan(t,k,btn){var b=$$('lnban');if(!b)return;
+ b.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span>'+(btn?'<button class="btn" id="lnretry" type="button" style="margin-left:auto">'+btn+'</button>':'')+'</div>':'';
+ var r=$$('lnretry');if(r)r.onclick=function(){LN.tries=0;LN.fatal=0;lnBan('Reconnecting...','warn');lnConnect();};}
+function lnHead(){var m=$$('lnmem');if(!m)return;var me=LN.name.toLowerCase();
+ m.innerHTML='<span>Here now ('+LN.members.length+' of '+LN.cap+'):</span>'+LN.members.map(function(n){return '<span class="lnr-c" style="--h:'+lnHue(n)+'"><i></i>'+esc(n)+(n.toLowerCase()===me?' (you)':'')+'</span>';}).join('');
+ var bar=$$('lnbar'),tx=$$('lnusetx');if(bar)bar.style.width=Math.min(100,LN.used/LN.max*100)+'%';if(tx)tx.textContent='Files: '+lnSz(LN.used)+' of '+lnSz(LN.max)+' used';}
+function lnMsgHtml(m,prev){
+ if(m.k==='sys')return '<div class="lnr-s">'+esc(m.text)+'</div>';
+ var grp=prev&&prev.k!=='sys'&&prev.name===m.name&&m.ts-prev.ts<300000,me=m.name.toLowerCase()===LN.name.toLowerCase(),b='';
+ if(m.k==='file'&&m.file){var f=m.file,u=LN.api+'/f/'+LN.code+'/'+f.id;
+  if(f.img)b+='<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer"><img class="lnr-img" loading="lazy" alt="'+esc(f.name)+'" src="'+esc(u)+'"></a>';
+  b+='<div class="lnr-f"><span class="nm">'+esc(f.name)+'</span><span class="sz">'+lnSz(f.size)+'</span><a class="btn" href="'+esc(u)+'" rel="noopener">'+ico('down',15,2.2)+'Save</a></div>';}
+ else b='<div class="lnr-b">'+lnLink(m.text||'')+'</div>';
+ return '<div class="lnr-m'+(me?' me':'')+(grp?' grp':'')+'">'+(grp?'':'<div class="lnr-h"><b style="--h:'+lnHue(m.name)+'">'+esc(m.name)+'</b>'+(me?'<span>you</span>':'')+'<span>'+lnTime(m.ts)+'</span></div>')+b+'</div>';}
+function lnList(){var box=$$('lnmsgs');if(!box)return;var h='';LN.msgs.forEach(function(m,i){h+=lnMsgHtml(m,LN.msgs[i-1]);});box.innerHTML=h;box.scrollTop=box.scrollHeight;LN.stuck=true;var n=$$('lnnew');if(n)n.hidden=true;}
+function lnAdd(m){LN.msgs.push(m);if(LN.msgs.length>300)LN.msgs.shift();var box=$$('lnmsgs');if(!box)return;
+ var near=box.scrollHeight-box.scrollTop-box.clientHeight<90,mine=m.name&&m.name.toLowerCase()===LN.name.toLowerCase(),d=document.createElement('div');
+ d.innerHTML=lnMsgHtml(m,LN.msgs[LN.msgs.length-2]);while(d.firstChild)box.appendChild(d.firstChild);
+ while(box.children.length>320)box.removeChild(box.firstChild);
+ if(near||mine){box.scrollTop=box.scrollHeight;var n=$$('lnnew');if(n)n.hidden=true;}else{var n2=$$('lnnew');if(n2)n2.hidden=false;}}
+function lnTyping(name){var t=LN.typers;clearTimeout(t[name]);t[name]=setTimeout(function(){delete t[name];lnTypDraw();},3000);lnTypDraw();}
+function lnTypDraw(){var e=$$('lntyp');if(!e)return;var n=Object.keys(LN.typers);e.textContent=!n.length?'':n.length===1?n[0]+' is typing...':n.length===2?n[0]+' and '+n[1]+' are typing...':'Several people are typing...';}
+function lnJoinFail(t){LN.state='join';lnStop();LN.ws=null;var b=$$('lnjoin'),c=$$('lnnewroom');if(b){b.disabled=false;b.textContent='Join room';}if(c)c.disabled=false;shMsg('lnm1',t,'bad');}
+function lnOn(d){
+ if(d.t==='welcome'){LN.tok=d.you.token;LN.name=d.you.name;LN.cap=d.room.maxPeople||10;LN.max=d.room.maxBytes||LN.max;LN.end=Date.now()+(typeof d.room.endsIn==='number'?d.room.endsIn:7200000);LN.warned=false;LN.used=d.room.usedBytes||0;LN.members=d.members||[];LN.msgs=d.history||[];LN.tries=0;LN.fatal=0;LN.ended=false;LN.typers={};LN.cnt={};
+  LN.msgs.forEach(function(m){if(m.k==='file'&&m.file)LN.cnt[m.file.id]=1;});lnSave();
+  clearInterval(LN.ping);LN.ping=setInterval(lnBeat,20000);clearInterval(LN.tick);LN.tick=setInterval(lnTick,500);
+  if(LN.state!=='chat'){LN.state='chat';lnChat();}else{lnBan('');lnHead();lnList();lnTypDraw();}
+ }else if(d.t==='msg'&&d.m){var m=d.m;if(m.k==='file'&&m.file&&!LN.cnt[m.file.id]){LN.cnt[m.file.id]=1;LN.used+=m.file.size;lnHead();}
+  if(m.k==='text'&&LN.typers[m.name]){clearTimeout(LN.typers[m.name]);delete LN.typers[m.name];lnTypDraw();}lnAdd(m);
+ }else if(d.t==='members'){LN.members=d.members||[];lnHead();
+ }else if(d.t==='typing'&&d.name){lnTyping(d.name);
+ }else if(d.t==='err'){if(typeof d.code==='number'){LN.fatal=d.code;if(LN.state!=='chat')lnJoinFail(LNE[d.code]||LNE.net);else{lnStop();lnBan(LNE[d.code]||LNE.net,'bad','Try again');}}else if(d.code==='slow')toast('You are sending messages too fast. Please slow down a little.');
+ }else if(d.t==='closed'){LN.ended=true;lnStop();lnEnd();}}
+function lnBeat(){if(!LN.ws)return;if(Date.now()-LN.rx>55000){lnDrop();return;}try{if(LN.ws.readyState===1)LN.ws.send('ping');}catch(e){}}
+function lnDrop(){var w=LN.ws;LN.gen++;LN.ws=null;if(w){w.onopen=w.onmessage=w.onclose=w.onerror=null;try{w.close();}catch(e){}}lnDown(1006);}
+function lnDown(code){
+ if(LN.fatal)return;
+ if(LN.state!=='chat'){lnJoinFail(LNE.net);return;}
+ if(LN.ended||code===4006){lnEnd();return;}
+ if(code===4010){lnStop();lnBan('This room was opened somewhere else with the same name, so this window was disconnected.','warn','Reconnect here');return;}
+ LN.tries++;if(LN.tries>12){lnBan('We lost the connection to the room.','bad','Reconnect');return;}
+ var wait=Math.min(10000,800*Math.pow(2,LN.tries-1));lnBan('Connection lost. Reconnecting...','warn');clearTimeout(LN.rt);LN.rt=setTimeout(lnConnect,wait);}
+function lnConnect(){
+ clearTimeout(LN.rt);var gen=++LN.gen,old=LN.ws;if(old){old.onopen=old.onmessage=old.onclose=old.onerror=null;try{old.close();}catch(e){}}
+ var url=LN.api.replace(/^http/,'ws')+'/ws/'+LN.code+'?name='+encodeURIComponent(LN.name)+(LN.tok?'&token='+encodeURIComponent(LN.tok):''),w;
+ try{w=new WebSocket(url);}catch(e){LN.ws=null;lnDown(1006);return;}
+ LN.ws=w;LN.rx=Date.now();
+ w.onmessage=function(e){if(gen!==LN.gen)return;LN.rx=Date.now();var d;try{d=JSON.parse(e.data);}catch(x){return;}lnOn(d);};
+ w.onclose=function(e){if(gen!==LN.gen)return;LN.ws=null;lnDown(e&&e.code);};
+ w.onerror=function(){};}
+function lnJoin(raw,nm){
+ var code=lnNorm(raw),name=String(nm||'').replace(/\s+/g,' ').trim();
+ if(!/^[A-Z0-9]{4,20}$/.test(code)){shMsg('lnm1','Room codes have 4 to 20 letters and numbers.','bad');return;}
+ if(!lnNameOk(name)){shMsg('lnm1',LNE[4003],'bad');return;}
+ shMsg('lnm1','');var b=$$('lnjoin'),c=$$('lnnewroom');b.disabled=true;c.disabled=true;b.textContent='Joining...';
+ var sv=lnRead();LN.code=code;LN.name=name;LN.tok=sv&&sv.code===code&&sv.name.toLowerCase()===name.toLowerCase()?sv.tok:'';LN.fatal=0;LN.tries=0;LN.state='join';
+ lnConnect();}
+function lnLock(off){['lntx','lnsend','lnatt'].forEach(function(i){var e=$$(i);if(e)e.disabled=!!off;});}
+function lnSend(){var t=$$('lntx'),v=t.value.replace(/\s+$/,'');if(!v.trim())return;
+ if(!LN.ws||LN.ws.readyState!==1){toast('Not connected right now. Please wait a moment.');return;}
+ LN.ws.send(JSON.stringify({t:'msg',text:v}));t.value='';t.style.height='';t.focus();}
+function lnUpRow(){var u=$$('lnup');if(!u)return;var q=LN.cur?[LN.cur].concat(LN.up):LN.up.slice();
+ u.innerHTML=q.map(function(f,i){return '<div class="shf"><span class="nm">'+esc(f.file.name)+'</span><span class="sz">'+(i===0&&LN.cur?(f.pct||0)+'%':'waiting')+'</span></div>';}).join('');}
+function lnFiles(list){var err='';Array.prototype.forEach.call(list||[],function(f){
+  if(!f.size){err='"'+f.name+'" is empty, so it was skipped.';return;}
+  if(f.size>LN.max){err='"'+f.name+'" is bigger than the room’s '+lnSz(LN.max)+' limit.';return;}
+  LN.up.push({file:f,pct:0});});
+ shMsg('lnm2',err,err?'warn':'');lnUpRow();lnPump();}
+function lnPump(){if(LN.busy||!LN.up.length)return;var it=LN.up.shift(),f=it.file;
+ if(LN.used+f.size>LN.max){shMsg('lnm2','"'+f.name+'" does not fit. This room has '+lnSz(Math.max(0,LN.max-LN.used))+' of file space left.','warn');lnUpRow();lnPump();return;}
+ if(!LN.ws||LN.ws.readyState!==1){shMsg('lnm2',LNU.key,'warn');lnUpRow();lnPump();return;}
+ LN.busy=true;LN.cur=it;shMsg('lnm2','');lnUpRow();
+ var x=new XMLHttpRequest();x.open('PUT',LN.api+'/file/'+LN.code+'?token='+encodeURIComponent(LN.tok)+'&name='+encodeURIComponent(f.name));
+ function end(err){LN.busy=false;LN.cur=null;lnUpRow();if(err)shMsg('lnm2',err,'bad');lnPump();}
+ x.upload.onprogress=function(e){if(e.lengthComputable){it.pct=Math.min(100,Math.round(e.loaded/e.total*100));lnUpRow();}};
+ x.onload=function(){var j=null;try{j=JSON.parse(x.responseText);}catch(e){}
+  if(x.status===200&&j&&j.ok){LN.cnt[j.id]=1;LN.used=Math.max(LN.used,j.used||0);lnHead();end('');}
+  else{var er=j&&j.error,msg=LNU[er]||LNU.size;if(er==='full'&&typeof j.left==='number')msg='"'+f.name+'" does not fit. This room has '+lnSz(j.left)+' of file space left.';end(msg);}};
+ x.onerror=function(){end(LNU.net);};x.ontimeout=x.onerror;x.timeout=5*60*1000;x.send(f);}
+function lnChat(){
+ app.innerHTML=toolHd('liner')+
+ '<section class="card lnr" id="lnbox">'+
+ '<div class="lnr-top"><div><div class="lnr-lbl">Room code</div><div class="lnr-code" id="lncode">'+esc(LN.code)+'</div><div class="lnr-cd" id="lncdw">Room ends in <b id="lncd"></b></div></div>'+
+ '<div class="lnr-act"><button class="btn" id="lncc" type="button">'+ico('copy',15,2.2)+'Copy code</button><button class="btn" id="lncl" type="button">'+ico('link',15,2.2)+'Copy link</button><button class="btn" id="lnbye" type="button">Leave</button></div></div>'+
+ '<div class="lnr-mem" id="lnmem"></div><div id="lnban"></div>'+
+ '<div class="lnr-wrap"><div class="lnr-msgs" id="lnmsgs" role="log" aria-live="polite" aria-label="Messages"></div><button class="lnr-new" id="lnnew" type="button" hidden>New messages '+ico('dn',14,2.4)+'</button></div>'+
+ '<div class="lnr-typ" id="lntyp" aria-live="polite"></div><div id="lnup"></div><div id="lnm2"></div>'+
+ '<div class="lnr-comp"><button class="lnr-ab" id="lnatt" type="button" aria-label="Attach a file">'+ico('clip',20,2.2)+'</button><input type="file" id="lnfi" multiple hidden>'+
+ '<textarea id="lntx" rows="1" maxlength="2000" aria-label="Message" placeholder="Write a message" autocomplete="off"></textarea>'+
+ '<button class="lnr-send" id="lnsend" type="button" aria-label="Send">'+ico('send',20,2.4)+'</button></div>'+
+ '<div class="lnr-use"><div class="lnr-bar"><i id="lnbar"></i></div><span id="lnusetx"></span></div></section>'+
+ '<p class="dl-note">Anyone who has this room code can join while there is space, so share it only with people you trust. Every room has a 2 hour timer. When it ends, the room and its files are deleted and cannot be brought back. Please do not share passwords or private details. See the <a href="#/terms" style="color:var(--brand)">Terms</a> and <a href="#/privacy" style="color:var(--brand)">Privacy</a> pages.</p>';
+ fixLinks(app);
+ lnHead();lnList();lnTick();
+ $$('lncc').onclick=function(){shCopy(LN.code,'code');};
+ $$('lncl').onclick=function(){shCopy(PM?location.origin+U('liner')+'?c='+LN.code:location.href.split('#')[0]+'#/liner','link');};
+ $$('lnbye').onclick=function(){lnForget();lnStop();LN.state='join';lnPage(true);};
+ var box=$$('lnmsgs');box.onscroll=function(){if(box.scrollHeight-box.scrollTop-box.clientHeight<40){var n=$$('lnnew');if(n)n.hidden=true;}};
+ $$('lnnew').onclick=function(){box.scrollTop=box.scrollHeight;this.hidden=true;};
+ var t=$$('lntx'),touch=false;try{touch=matchMedia('(hover:none)').matches;}catch(e){}
+ t.oninput=function(){t.style.height='auto';t.style.height=Math.min(120,t.scrollHeight)+'px';
+  if(t.value.trim()&&Date.now()-LN.typeAt>2500&&LN.ws&&LN.ws.readyState===1){LN.typeAt=Date.now();try{LN.ws.send(JSON.stringify({t:'typing'}));}catch(e){}}};
+ t.onkeydown=function(e){if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&!touch){e.preventDefault();lnSend();}};
+ $$('lnsend').onclick=lnSend;
+ var fi=$$('lnfi'),bx=$$('lnbox');$$('lnatt').onclick=function(){fi.click();};fi.onchange=function(){lnFiles(fi.files);fi.value='';};
+ bx.ondragover=function(e){e.preventDefault();};bx.ondrop=function(e){e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files.length)lnFiles(e.dataTransfer.files);};
+ if(!touch)t.focus();
+ if(!LN.hooks){LN.hooks=true;window.addEventListener('online',function(){if(LN.state==='chat'&&!LN.fatal&&!LN.ended&&(!LN.ws||LN.ws.readyState!==1)){LN.tries=0;lnConnect();}});
+  document.addEventListener('visibilitychange',function(){if(!document.hidden&&LN.state==='chat'&&!LN.fatal&&!LN.ended&&LN.ws&&LN.ws.readyState!==1&&LN.ws.readyState!==0){LN.tries=0;lnDrop();}});}}
+function lnHealth(){
+ var off=function(){shMsg('lnst','Liner is getting ready. Please check back soon.','warn');['lnjoin','lnnewroom'].forEach(function(i){var b=$$(i);if(b)b.disabled=true;});};
+ if(!LN.api){off();return;}
+ var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},9000);
+ fetch(LN.api+'/health',{signal:ctl.signal}).then(function(r){return r.json();}).then(function(j){clearTimeout(tm);if(!j||!j.ok||!j.storage)throw 0;LN.cfg=j;if(j.maxPeople>0)LN.cap=j.maxPeople;if(j.maxRoomBytes>0)LN.max=j.maxRoomBytes;}).catch(function(){clearTimeout(tm);off();});}
+function lnPage(again){nav('liner');
+ if(!again)lnLeave();else{LN.state='join';}
+ LN.api=lnApi();LN.cfg=null;
+ var q=PM&&/[?&]c=([A-Za-z0-9-]{1,24})/.exec(location.search),sv=lnRead(),nm='';try{nm=localStorage.getItem(LNN)||'';}catch(e){}
+ var c0=q?lnNorm(q[1]):(sv&&sv.code&&!again?sv.code:''),n0=nm||(sv&&sv.name)||'';
+ app.innerHTML=toolHd('liner')+
+ '<p class="lead dl-lead">Type a code to join a chat room. Pick a name, talk with up to 10 people and share files up to 10 MB per room. Every room has a 2 hour timer, then it is deleted on its own.</p>'+
+ '<div id="lnst"></div>'+
+ '<section class="card dl-sec dl-f"><div class="dl-sh"><span class="dl-n">1</span><div><h2>Join a room</h2><span class="hint">Everyone who types the same code lands in the same room.</span></div></div>'+
+ '<div class="lnr-fm"><label class="qfl" for="lncodei">Room code<input type="text" id="lncodei" maxlength="24" placeholder="For example TEAM42" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" value="'+esc(c0)+'"></label>'+
+ '<label class="qfl" for="lnname">Your name<input type="text" id="lnname" maxlength="20" placeholder="Shown next to your messages" autocomplete="nickname" value="'+esc(n0)+'"></label></div>'+
+ '<div class="dl-cta"><button class="btn pri dl-big" id="lnjoin" type="button">Join room</button><button class="btn dl-big" id="lnnewroom" type="button">Create a new room</button></div><div id="lnm1"></div></section>'+
+ '<p class="dl-note">Anyone who has a room code can join while there is space (10 people at most). Share codes only with people you trust, and please do not share passwords, private details or anything you do not have the right to share. See the <a href="#/terms" style="color:var(--brand)">Terms</a> and <a href="#/privacy" style="color:var(--brand)">Privacy</a> pages.</p>';
+ fixLinks(app);
+ var ci=$$('lncodei'),ni=$$('lnname');
+ ci.oninput=function(){ci.value=ci.value.toUpperCase().replace(/[^A-Z0-9-]/g,'');};
+ var go=function(e){if(e.key==='Enter'){e.preventDefault();lnJoin(ci.value,ni.value);}};ci.onkeydown=go;ni.onkeydown=go;
+ $$('lnjoin').onclick=function(){lnJoin(ci.value,ni.value);};
+ $$('lnnewroom').onclick=function(){ci.value=lnGen();if(lnNameOk(ni.value.replace(/\s+/g,' ').trim()))lnJoin(ci.value,ni.value);else{shMsg('lnm1','Your new room code is '+ci.value+'. Now type your name and press Join room.','good');ni.focus();}};
+ lnHealth();
 }
 /* ---------- Deal or No Deal ---------- */
 var DS={need:'',budget:'',pri:'value',cond:'new',state:'idle',err:'',plan:null,offers:[],judge:null,jstate:'idle',jerr:'',seq:0,run:0,fq:'',flt:{min:'',max:'',sort:'rel',rate:false,fast:false}};
@@ -5053,12 +5219,12 @@ function idePage(){nav('ide');
 window.addEventListener('hashchange',function(){if(curR()!=='eve')aiLeave();if(curR()!=='ide'&&IDE.w){ideWd(false);try{IDE.w.terminate();}catch(e){}IDE.w=null;IDE.wReady=false;IDE.busy=false;}});
 
 
-function route(){var r=curR();menu(false);app.onclick=null;tsStop();ltStop();dwLeave();
+function route(){var r=curR();menu(false);app.onclick=null;tsStop();ltStop();dwLeave();lnLeave();
  var known=r===''||r==='home'||r==='404'||ROUTES.indexOf(r)>=0;if(!known)r=PM?'404':'';
  setTitle(r===''?'home':r);
- app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||(!LOCKED[r]&&['planner','image','pdf','virus','calc','deal','drawww','tts','qr','convert','ide','eve','translate','share'].indexOf(r)<0));
+ app.classList.toggle('full',r===''||r==='home'||r==='404'||!!FULL[r]||(!LOCKED[r]&&['planner','image','pdf','virus','calc','deal','drawww','tts','qr','convert','ide','eve','translate','share','liner'].indexOf(r)<0));
  app.classList.toggle('wide',r==='drawww');
- if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='deal')dealPage();else if(r==='drawww')drawwwPage();else if(r==='tts')ttsPage();else if(r==='translate')translatePage();else if(r==='share')sharePage();else if(r==='qr')qrPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(FULL[r])FULL[r]();else home();
+ if(r==='404')notFound();else if(LOCKED[r])lockedPage(r);else if(r==='planner')planner();else if(r==='image')imagetool();else if(r==='pdf')pdftool();else if(r==='virus')vtool();else if(r==='calc')calcPage();else if(r==='deal')dealPage();else if(r==='drawww')drawwwPage();else if(r==='tts')ttsPage();else if(r==='translate')translatePage();else if(r==='share')sharePage();else if(r==='liner')lnPage();else if(r==='qr')qrPage();else if(r==='convert')convertPage();else if(r==='ide')idePage();else if(r==='eve')aiPage();else if(FULL[r])FULL[r]();else home();
  fixLinks(app);window.scrollTo(0,0);}
 
 document.getElementById('yr').textContent=new Date().getFullYear();
