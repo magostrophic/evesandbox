@@ -2061,10 +2061,11 @@ function lnTyping(name){var t=LN.typers;clearTimeout(t[name]);t[name]=setTimeout
 function lnTypDraw(){var e=$$('lntyp');if(!e)return;var n=Object.keys(LN.typers);e.textContent=!n.length?'':n.length===1?n[0]+' is typing...':n.length===2?n[0]+' and '+n[1]+' are typing...':'Several people are typing...';}
 function lnJoinFail(t){LN.state='join';lnStop();LN.ws=null;var b=$$('lnjoin'),c=$$('lnnewroom');if(b){b.disabled=false;b.textContent='Join room';}if(c)c.disabled=false;shMsg('lnm1',t,'bad');}
 function lnOn(d){
- if(d.t==='welcome'){LN.tok=d.you.token;LN.name=d.you.name;LN.cap=d.room.maxPeople||10;LN.max=d.room.maxBytes||LN.max;LN.end=Date.now()+(typeof d.room.endsIn==='number'?d.room.endsIn:7200000);LN.warned=false;LN.used=d.room.usedBytes||0;LN.members=d.members||[];LN.msgs=d.history||[];LN.tries=0;LN.fatal=0;LN.ended=false;LN.typers={};LN.cnt={};
+ if(d.t==='welcome'){LN.tok=d.you.token;LN.name=d.you.name;LN.old=!!(d.v&&d.v>2);LN.cap=d.room.maxPeople||10;LN.max=d.room.maxBytes||LN.max;LN.end=Date.now()+(typeof d.room.endsIn==='number'?d.room.endsIn:7200000);LN.warned=false;LN.used=d.room.usedBytes||0;LN.members=d.members||[];LN.msgs=d.history||[];LN.tries=0;LN.fatal=0;LN.ended=false;LN.typers={};LN.cnt={};
   LN.msgs.forEach(function(m){if(m.k==='file'&&m.file)LN.cnt[m.file.id]=1;});lnSave();
   clearInterval(LN.ping);LN.ping=setInterval(lnBeat,20000);clearInterval(LN.tick);LN.tick=setInterval(lnTick,500);
   if(LN.state!=='chat'){LN.state='chat';lnChat();}else{lnBan('');lnHead();lnList();lnTypDraw();}
+  if(LN.old){lnBan('Liner was updated while this page was open. Please reload the page to keep everything working.','warn','Reload');var rb=$$('lnretry');if(rb)rb.onclick=function(){location.reload();};}
  }else if(d.t==='msg'&&d.m){var m=d.m;if(m.k==='file'&&m.file&&!LN.cnt[m.file.id]){LN.cnt[m.file.id]=1;LN.used+=m.file.size;lnHead();}
   if(m.k==='text'&&LN.typers[m.name]){clearTimeout(LN.typers[m.name]);delete LN.typers[m.name];lnTypDraw();}lnAdd(m);
  }else if(d.t==='members'){LN.members=d.members||[];lnHead();
