@@ -1959,11 +1959,11 @@ function sharePage(){nav('share');
  shHealth();
 }
 /* ---------- Liner: chat rooms opened with a code (up to 10 people, 10 MB of files per room) ---------- */
-IC.lnp='<path d="M15 18l-6-6 6-6"/>';IC.lnn='<path d="M9 18l6-6-6-6"/>';
+IC.lndots='<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>';IC.lnp='<path d="M15 18l-6-6 6-6"/>';IC.lnn='<path d="M9 18l6-6-6-6"/>';
 IC.liner='<path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3 21l1.9-5.6A8.5 8.5 0 1 1 21 11.5z"/>';
-var LN={api:'',cfg:null,ws:null,state:'join',code:'',name:'',tok:'',members:[],msgs:[],used:0,max:10485760,cap:10,gen:0,tries:0,rt:null,ping:null,rx:0,fatal:0,ended:false,up:[],busy:false,typeAt:0,typers:{},cnt:{},blobs:{},idle:[],away:false,mode:'join',cf:{on:false,tok:'',tid:null},vclose:null,stuck:true,hooks:false};
+var LN={api:'',cfg:null,ws:null,state:'join',code:'',name:'',tok:'',members:[],msgs:[],used:0,max:10485760,cap:10,gen:0,tries:0,rt:null,ping:null,rx:0,fatal:0,ended:false,up:[],busy:false,typeAt:0,typers:{},cnt:{},blobs:{},idle:[],host:'',away:false,mode:'join',cf:{on:false,tok:'',tid:null},vclose:null,stuck:true,hooks:false};
 var LNK='eve-sandbox:liner:last',LNN='eve-sandbox:liner:name';
-var LNE={4001:'That room is full. Rooms hold up to 10 people, so please try again in a little while.',4002:'Someone in that room already uses that name. Please pick a different one.',4003:'Names need 2 to 20 characters: letters, numbers, spaces, dots, dashes or underscores.',4004:'No room is open with that code. Check the code, or press Create a new room to start one.',4007:'That code is already in use by an open room. Please press Create a new room again.',4008:'The security check did not pass. Please try again.',net:'We could not join the room. Please check your connection and try again. If you tried many times, wait a few minutes first.'};
+var LNE={4001:'That room is full. Rooms hold up to 10 people, so please try again in a little while.',4002:'Someone in that room already uses that name. Please pick a different one.',4003:'Names need 2 to 20 characters: letters, numbers, spaces, dots, dashes or underscores.',4004:'No room is open with that code. Check the code, or press Create a new room to start one.',4007:'That code is already in use by an open room. Please press Create a new room again.',4008:'The security check did not pass. Please try again.',4013:'The host of that room removed this name, so it cannot be used there. Please pick a different name.',net:'We could not join the room. Please check your connection and try again. If you tried many times, wait a few minutes first.'};
 var LNU={big:'That file is bigger than the room’s 10 MB limit.',full:'There is not enough file space left in this room for that file.',key:'You are not connected to the room right now. Please try again in a moment.',gone:'This room has ended.',rate:'That is a lot of uploads in a short time. Please wait a little and try again.',size:'The upload did not finish. Please try again.',net:'The upload did not finish. Please check your connection and try again.'};
 var LNA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 function lnApi(){var a=String(CFG.linerApi||'').replace(/\/+$/,'');if(a)return a;var m=/^(https?:\/\/)eve-ai(\.[^\/]+)$/.exec(String(CFG.aiApi||'').replace(/\/+$/,''));return m?m[1]+'eve-liner'+m[2]:'';}
@@ -1981,7 +1981,7 @@ function lnRead(){try{return JSON.parse(sessionStorage.getItem(LNK));}catch(e){r
 function lnSave(){try{sessionStorage.setItem(LNK,JSON.stringify({code:LN.code,name:LN.name,tok:LN.tok}));localStorage.setItem(LNN,LN.name);}catch(e){}}
 function lnForget(){try{sessionStorage.removeItem(LNK);}catch(e){}}
 function lnStop(){clearTimeout(LN.rt);clearInterval(LN.ping);clearInterval(LN.tick);LN.gen++;var w=LN.ws;LN.ws=null;if(w){w.onopen=w.onmessage=w.onclose=w.onerror=null;try{w.close(1000);}catch(e){}}}
-function lnFree(){lnVClose();for(var k in LN.blobs){if(LN.blobs[k]&&LN.blobs[k].u){try{URL.revokeObjectURL(LN.blobs[k].u);}catch(e){}}}LN.blobs={};}
+function lnFree(){lnVClose();lnMenuClose();for(var k in LN.blobs){if(LN.blobs[k]&&LN.blobs[k].u){try{URL.revokeObjectURL(LN.blobs[k].u);}catch(e){}}}LN.blobs={};}
 function lnLeave(){if(LN.state==='chat'||LN.ws)lnStop();lnFree();LN.state='join';LN.up=[];LN.busy=false;}
 function lnEnd(){lnStop();LN.ended=true;lnBan('This room\u2019s 2 hours are up, so it was deleted with everything in it. You can start a new room any time.','warn');lnLock(true);var c=$$('lncd');if(c)c.textContent='0:00';}
 function lnTick(){var c=$$('lncd');if(!c){clearInterval(LN.tick);return;}var ms=LN.end-Date.now();if(ms<=0){lnEnd();return;}
@@ -1990,8 +1990,11 @@ function lnTick(){var c=$$('lncd');if(!c){clearInterval(LN.tick);return;}var ms=
 function lnBan(t,k,btn){var b=$$('lnban');if(!b)return;
  b.innerHTML=t?'<div class="msg '+(k||'')+'"><span class="dotk"></span><span>'+esc(t)+'</span>'+(btn?'<button class="btn" id="lnretry" type="button" style="margin-left:auto">'+btn+'</button>':'')+'</div>':'';
  var r=$$('lnretry');if(r)r.onclick=function(){LN.tries=0;LN.fatal=0;lnBan('Reconnecting...','warn');lnConnect();};}
-function lnHead(){var m=$$('lnmem');if(!m)return;var me=LN.name.toLowerCase();
- m.innerHTML='<span>Here now ('+LN.members.length+' of '+LN.cap+'):</span>'+LN.members.map(function(n){var id=LN.idle.indexOf(n)>=0;return '<span class="lnr-c'+(id?' idle':'')+'" style="--h:'+lnHue(n)+'"><i></i>'+esc(n)+(n.toLowerCase()===me?' (you)':'')+(id?' \u00b7 idle':'')+'</span>';}).join('');
+function lnIsHost(){return !!LN.host&&LN.host.toLowerCase()===LN.name.toLowerCase();}
+function lnHead(){var m=$$('lnmem');if(!m)return;var me=LN.name.toLowerCase(),host=lnIsHost();
+ m.innerHTML='<span>Participants ('+LN.members.length+' of '+LN.cap+'):</span>'+LN.members.map(function(n){var id=LN.idle.indexOf(n)>=0,mine=n.toLowerCase()===me,hs=LN.host&&n.toLowerCase()===LN.host.toLowerCase(),kick=host&&!mine;
+  var inner='<i></i>'+esc(n)+(mine?' (You)':'')+(hs?'<em class="lnr-hb">Host</em>':'')+(id?' \u00b7 idle':''),cls='lnr-c'+(id?' idle':'')+(kick?' kickable':''),st=' style="--h:'+lnHue(n)+'"';
+  return kick?'<button type="button" class="'+cls+'"'+st+' data-name="'+esc(n)+'" aria-label="Options for '+esc(n)+'">'+inner+'</button>':'<span class="'+cls+'"'+st+'>'+inner+'</span>';}).join('');
  var bar=$$('lnbar'),tx=$$('lnusetx');if(bar)bar.style.width=Math.min(100,LN.used/LN.max*100)+'%';if(tx)tx.textContent='Files: '+lnSz(LN.used)+' of '+lnSz(LN.max)+' used';}
 function lnMsgHtml(m,prev){
  if(m.k==='sys')return '<div class="lnr-s">'+esc(m.text)+'</div>';
@@ -2000,7 +2003,7 @@ function lnMsgHtml(m,prev){
   if(f.img)b+='<button class="lnr-th'+(c&&c.u?' ok':'')+'" type="button" data-fid="'+esc(f.id)+'" aria-label="Open picture '+esc(f.name)+'">'+(c&&c.u?'<img class="lnr-img" alt="'+esc(f.name)+'" draggable="false" src="'+c.u+'">':'<span class="lnr-ld">Loading picture...</span>')+'</button>';
   b+='<div class="lnr-f"><span class="nm">'+esc(f.name)+'</span><span class="sz">'+lnSz(f.size)+'</span><button class="btn" type="button" data-save="'+esc(f.id)+'">'+ico('down',15,2.2)+'Save</button></div>';}
  else b='<div class="lnr-b">'+lnLink(m.text||'')+'</div>';
- return '<div class="lnr-m'+(me?' me':'')+(grp?' grp':'')+'" style="--h:'+lnHue(m.name)+'">'+(grp?'':'<div class="lnr-h"><b>'+esc(m.name)+'</b>'+(me?'<span>you</span>':'')+'<span>'+lnTime(m.ts)+'</span></div>')+b+'</div>';}
+ return '<div class="lnr-m'+(me?' me':'')+(grp?' grp':'')+'" style="--h:'+lnHue(m.name)+'">'+(grp?'':'<div class="lnr-h"><b>'+esc(m.name)+'</b>'+(me?'<span>You</span>':'')+(LN.host&&m.name.toLowerCase()===LN.host.toLowerCase()?'<em class="lnr-hb">Host</em>':'')+'<span>'+lnTime(m.ts)+'</span></div>')+b+'<button class="lnr-mb" type="button" data-mid="'+m.id+'" aria-label="Message options">'+ico('lndots',18,2.4)+'</button></div>';}
 /* Files are never opened from a link. The page fetches each one with the member's own key (a bare link is refused), shows pictures in its own viewer and saves other files as downloads. */
 function lnFile(id){for(var i=LN.msgs.length-1;i>=0;i--){var m=LN.msgs[i];if(m.k==='file'&&m.file&&m.file.id===id)return m.file;}return null;}
 function lnFetch(f){var c=LN.blobs[f.id];if(c)return c.p;
@@ -2051,7 +2054,7 @@ function lnView(id){
  root.addEventListener('contextmenu',function(e){e.preventDefault();});
  document.documentElement.classList.add('lnvlock');document.body.appendChild(root);document.addEventListener('keydown',onKey,true);window.addEventListener('resize',onRes);
  LN.vclose=close;show(i);root.querySelector('#lnvx').focus({preventScroll:true});}
-function lnList(){var box=$$('lnmsgs');if(!box)return;var h='';LN.msgs.forEach(function(m,i){h+=lnMsgHtml(m,LN.msgs[i-1]);});box.innerHTML=h;box.scrollTop=box.scrollHeight;LN.stuck=true;LN.pin=true;lnPaintAll();var n=$$('lnnew');if(n)n.hidden=true;}
+function lnList(keep){var box=$$('lnmsgs');if(!box)return;var h='',st=box.scrollTop;LN.msgs.forEach(function(m,i){h+=lnMsgHtml(m,LN.msgs[i-1]);});box.innerHTML=h;if(keep){box.scrollTop=st;}else{box.scrollTop=box.scrollHeight;LN.stuck=true;LN.pin=true;var n=$$('lnnew');if(n)n.hidden=true;}lnPaintAll();}
 function lnAdd(m){LN.msgs.push(m);if(LN.msgs.length>300)LN.msgs.shift();var box=$$('lnmsgs');if(!box)return;
  var near=box.scrollHeight-box.scrollTop-box.clientHeight<90,mine=m.name&&m.name.toLowerCase()===LN.name.toLowerCase(),d=document.createElement('div');
  d.innerHTML=lnMsgHtml(m,LN.msgs[LN.msgs.length-2]);while(d.firstChild)box.appendChild(d.firstChild);
@@ -2062,16 +2065,18 @@ function lnTypDraw(){var e=$$('lntyp');if(!e)return;var n=Object.keys(LN.typers)
 function lnCapReset(){LN.cf.tok='';try{if(LN.cf.tid!=null&&window.turnstile)turnstile.reset(LN.cf.tid);}catch(e){}}
 function lnJoinFail(t){LN.state='join';lnStop();LN.ws=null;lnCapReset();var b=$$('lnjoin'),c=$$('lnnewroom');if(b){b.disabled=false;b.textContent='Join room';}if(c){c.disabled=false;c.textContent='Create a new room';}shMsg('lnm1',t,'bad');}
 function lnOn(d){
- if(d.t==='welcome'){LN.tok=d.you.token;LN.name=d.you.name;LN.mode='join';LN.cf.tok='';LN.old=!!(d.v&&d.v>3);LN.idle=d.idle||[];LN.away=false;LN.cap=d.room.maxPeople||10;LN.max=d.room.maxBytes||LN.max;LN.end=Date.now()+(typeof d.room.endsIn==='number'?d.room.endsIn:7200000);LN.warned=false;LN.used=d.room.usedBytes||0;LN.members=d.members||[];LN.msgs=d.history||[];LN.tries=0;LN.fatal=0;LN.ended=false;LN.typers={};LN.cnt={};
+ if(d.t==='welcome'){LN.tok=d.you.token;LN.name=d.you.name;LN.host=d.host||'';LN.mode='join';LN.cf.tok='';LN.old=!!(d.v&&d.v>3);LN.idle=d.idle||[];LN.away=false;LN.cap=d.room.maxPeople||10;LN.max=d.room.maxBytes||LN.max;LN.end=Date.now()+(typeof d.room.endsIn==='number'?d.room.endsIn:7200000);LN.warned=false;LN.used=d.room.usedBytes||0;LN.members=d.members||[];LN.msgs=d.history||[];LN.tries=0;LN.fatal=0;LN.ended=false;LN.typers={};LN.cnt={};
   LN.msgs.forEach(function(m){if(m.k==='file'&&m.file)LN.cnt[m.file.id]=1;});lnSave();
   clearInterval(LN.ping);LN.ping=setInterval(lnBeat,20000);clearInterval(LN.tick);LN.tick=setInterval(lnTick,500);
   if(LN.state!=='chat'){LN.state='chat';lnChat();}else{lnBan('');lnHead();lnList();lnTypDraw();}
   if(LN.old){lnBan('Liner was updated while this page was open. Please reload the page to keep everything working.','warn','Reload');var rb=$$('lnretry');if(rb)rb.onclick=function(){location.reload();};}
  }else if(d.t==='msg'&&d.m){var m=d.m;if(m.k==='file'&&m.file&&!LN.cnt[m.file.id]){LN.cnt[m.file.id]=1;LN.used+=m.file.size;lnHead();}
   if(m.k==='text'&&LN.typers[m.name]){clearTimeout(LN.typers[m.name]);delete LN.typers[m.name];lnTypDraw();}lnAdd(m);
- }else if(d.t==='members'){LN.members=d.members||[];LN.idle=d.idle||[];lnHead();
+ }else if(d.t==='members'){var oh=LN.host;LN.members=d.members||[];LN.idle=d.idle||[];LN.host=d.host||'';lnHead();if(oh!==LN.host)lnList(true);
+ }else if(d.t==='del'){var di=-1;LN.msgs.forEach(function(m,i){if(m.id===d.id)di=i;});if(di>=0){var dm=LN.msgs.splice(di,1)[0];if(dm.k==='file'&&dm.file){var bc=LN.blobs[dm.file.id];if(bc&&bc.u){try{URL.revokeObjectURL(bc.u);}catch(e){}}delete LN.blobs[dm.file.id];lnVClose();}}if(typeof d.used==='number')LN.used=d.used;lnHead();lnList(true);
+ }else if(d.t==='kicked'){LN.fatal=4012;lnStop();lnBan('The host removed you from this room.','bad');lnLock(true);
  }else if(d.t==='typing'&&d.name){lnTyping(d.name);
- }else if(d.t==='err'){if(typeof d.code==='number'){LN.fatal=d.code;if(LN.state!=='chat')lnJoinFail(LNE[d.code]||LNE.net);else if(d.code===4004||d.code===4008){lnStop();lnBan('Your place in this room was released while you were away, or the room has ended. Press Leave to start again.','warn');lnLock(true);}else{lnStop();lnBan(LNE[d.code]||LNE.net,'bad','Try again');}}else if(d.code==='slow')toast('You are sending messages too fast. Please slow down a little.');
+ }else if(d.t==='err'){if(typeof d.code==='number'){LN.fatal=d.code;if(LN.state!=='chat')lnJoinFail(LNE[d.code]||LNE.net);else if(d.code===4004||d.code===4008){lnStop();lnBan('Your place in this room was released while you were away, or the room has ended. Press Leave to start again.','warn');lnLock(true);}else{lnStop();lnBan(LNE[d.code]||LNE.net,'bad','Try again');}}else if(d.code==='slow')toast('You are sending messages too fast. Please slow down a little.');else if(d.code==='perm')toast('Only the host can do that.');
  }else if(d.t==='closed'){LN.ended=true;lnStop();lnEnd();}}
 function lnBeat(){if(!LN.ws)return;if(Date.now()-LN.rx>55000){lnDrop();return;}try{if(LN.ws.readyState===1)LN.ws.send('ping');}catch(e){}}
 function lnDrop(){var w=LN.ws;LN.gen++;LN.ws=null;if(w){w.onopen=w.onmessage=w.onclose=w.onerror=null;try{w.close();}catch(e){}}lnDown(1006);}
@@ -2079,6 +2084,7 @@ function lnDown(code){
  if(LN.fatal)return;
  if(LN.state!=='chat'){lnJoinFail(LNE.net);return;}
  if(LN.ended||code===4006){lnEnd();return;}
+ if(code===4012){lnStop();lnBan('The host removed you from this room.','bad');lnLock(true);return;}
  if(code===4010){lnStop();lnBan('This room was opened somewhere else with the same name, so this window was disconnected.','warn','Reconnect here');return;}
  LN.tries++;if(LN.tries>12){lnBan('We lost the connection to the room.','bad','Reconnect');return;}
  var wait=Math.min(10000,800*Math.pow(2,LN.tries-1));lnBan('Connection lost. Reconnecting...','warn');clearTimeout(LN.rt);LN.rt=setTimeout(lnConnect,wait);}
@@ -2120,6 +2126,21 @@ function lnPump(){if(LN.busy||!LN.up.length)return;var it=LN.up.shift(),f=it.fil
   if(x.status===200&&j&&j.ok){LN.cnt[j.id]=1;LN.used=Math.max(LN.used,j.used||0);lnHead();end('');}
   else{var er=j&&j.error,msg=LNU[er]||LNU.size;if(er==='full'&&typeof j.left==='number')msg='"'+f.name+'" does not fit. This room has '+lnSz(j.left)+' of file space left.';end(msg);}};
  x.onerror=function(){end(LNU.net);};x.ontimeout=x.onerror;x.timeout=5*60*1000;x.send(f);}
+function lnMenuClose(){var m=$$('lnmenu');if(m)m.remove();document.removeEventListener('pointerdown',lnMenuOut,true);document.removeEventListener('keydown',lnMenuKey,true);window.removeEventListener('scroll',lnMenuClose,true);window.removeEventListener('resize',lnMenuClose);}
+function lnMenuOut(e){var m=$$('lnmenu');if(m&&!m.contains(e.target))lnMenuClose();}
+function lnMenuKey(e){if(e.key==='Escape'){e.stopPropagation();lnMenuClose();}}
+function lnMenu(anchor,items){lnMenuClose();if(!items.length)return;var m=document.createElement('div');m.id='lnmenu';m.className='lnr-menu';m.setAttribute('role','menu');
+ items.forEach(function(it){var b=document.createElement('button');b.type='button';b.setAttribute('role','menuitem');b.className='lnr-mi'+(it.danger?' danger':'');b.innerHTML=ico(it.icon,16,2.2)+'<span>'+esc(it.label)+'</span>';
+  b.onclick=function(e){e.stopPropagation();if(it.sure&&!b.getAttribute('data-sure')){b.setAttribute('data-sure','1');b.lastChild.textContent=it.sure;return;}lnMenuClose();it.run();};m.appendChild(b);});
+ document.body.appendChild(m);var r=anchor.getBoundingClientRect(),w=m.offsetWidth,h=m.offsetHeight,l=Math.min(innerWidth-w-8,Math.max(8,r.right-w)),t=r.bottom+4;if(t+h>innerHeight-8)t=Math.max(8,r.top-h-4);m.style.left=l+'px';m.style.top=t+'px';
+ document.addEventListener('pointerdown',lnMenuOut,true);document.addEventListener('keydown',lnMenuKey,true);setTimeout(function(){if($$('lnmenu')){window.addEventListener('scroll',lnMenuClose,true);window.addEventListener('resize',lnMenuClose);}},0);var f=m.querySelector('button');if(f)f.focus({preventScroll:true});}
+function lnSendJ(o){if(LN.ws&&LN.ws.readyState===1){try{LN.ws.send(JSON.stringify(o));return true;}catch(e){}}toast('Not connected right now. Please wait a moment.');return false;}
+function lnMsgMenu(btn){var id=parseInt(btn.getAttribute('data-mid'),10),m=null;LN.msgs.forEach(function(x){if(x.id===id)m=x;});if(!m||m.k==='sys')return;
+ var mine=m.name.toLowerCase()===LN.name.toLowerCase(),host=lnIsHost(),items=[];
+ if(m.k==='text')items.push({icon:'copy',label:'Copy message',run:function(){shCopy(m.text,'message');}});
+ if(mine||host)items.push({icon:'trash',label:'Delete message',sure:'Tap again to delete',danger:true,run:function(){lnSendJ({t:'del',id:id});}});
+ if(host&&!mine&&LN.members.some(function(n){return n.toLowerCase()===m.name.toLowerCase();}))items.push({icon:'x',label:'Remove '+m.name+' from room',sure:'Tap again to remove',danger:true,run:function(){lnSendJ({t:'kick',name:m.name});}});
+ lnMenu(btn,items);}
 function lnChat(){
  app.innerHTML=toolHd('liner')+
  '<section class="card lnr" id="lnbox">'+
@@ -2137,9 +2158,10 @@ function lnChat(){
  lnHead();lnList();lnTick();
  $$('lncc').onclick=function(){shCopy(LN.code,'code');};
  $$('lncl').onclick=function(){shCopy(PM?location.origin+U('liner')+'?c='+LN.code:location.href.split('#')[0]+'#/liner','link');};
+ $$('lnmem').onclick=function(e){var c=e.target.closest?e.target.closest('.kickable'):null;if(!c||!lnIsHost())return;var n=c.getAttribute('data-name');lnMenu(c,[{icon:'x',label:'Remove '+n+' from room',sure:'Tap again to remove',danger:true,run:function(){lnSendJ({t:'kick',name:n});}}]);};
  $$('lnbye').onclick=function(){lnForget();lnStop();lnFree();LN.state='join';lnPage(true);};
  var box=$$('lnmsgs');
- box.onclick=function(e){var t=e.target.closest?e.target.closest('.lnr-th,[data-save]'):null;if(!t)return;if(t.hasAttribute('data-save'))lnDl(t.getAttribute('data-save'),t);else if(t.classList.contains('ok'))lnView(t.getAttribute('data-fid'));};
+ box.onclick=function(e){var t=e.target.closest?e.target.closest('.lnr-th,[data-save],.lnr-mb'):null;if(!t)return;if(t.classList.contains('lnr-mb')){lnMsgMenu(t);return;}if(t.hasAttribute('data-save'))lnDl(t.getAttribute('data-save'),t);else if(t.classList.contains('ok'))lnView(t.getAttribute('data-fid'));};
  box.oncontextmenu=function(e){if(e.target.closest&&e.target.closest('.lnr-th'))e.preventDefault();};
  box.onscroll=function(){LN.pin=box.scrollHeight-box.scrollTop-box.clientHeight<60;if(box.scrollHeight-box.scrollTop-box.clientHeight<40){var n=$$('lnnew');if(n)n.hidden=true;}};
  $$('lnnew').onclick=function(){box.scrollTop=box.scrollHeight;this.hidden=true;};
