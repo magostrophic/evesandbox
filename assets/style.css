@@ -81,6 +81,7 @@ h1{font-size:clamp(2rem,6vw,3rem);line-height:1.08;margin:.2em 0;letter-spacing:
 .lnr-code{font:700 1.45rem/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;letter-spacing:.1em;word-break:break-all;user-select:all;-webkit-user-select:all}
 .lnr-cd{margin-top:3px;color:var(--mute);font-size:.84rem}.lnr-cd b{color:var(--ink);font-variant-numeric:tabular-nums}.lnr-cd.soon,.lnr-cd.soon b{color:#ff9500}
 .lnr-act{display:flex;gap:8px;flex-wrap:wrap}
+.lnr-act #lnbye{color:#ff3b30}.lnr-act #lnbye:hover{color:#ff3b30}
 .lnr-act .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;font-size:.88rem}
 .lnr-mem{display:flex;flex-wrap:wrap;gap:6px;align-items:center;color:var(--mute);font-size:.84rem}
 .lnr-c{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;background:var(--fill);color:var(--ink);font-weight:600;font-size:.82rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -131,14 +132,14 @@ video.lnr-emb{width:min(100%,320px)}
 .lnr-vth video{display:block;width:auto;height:auto;max-width:100%;max-height:260px;min-width:160px;min-height:90px;pointer-events:none;object-fit:contain}
 .lnr-vth:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .lnr-pb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.16);transition:background .15s}.lnr-vth:hover .lnr-pb{background:rgba(0,0,0,.3)}
-.lnr-pb svg{width:52px;height:52px;padding:14px 12px 14px 16px;box-sizing:border-box;border-radius:50%;background:rgba(0,0,0,.62);color:#fff;fill:#fff;stroke:none}
+.lnr-pb svg{width:52px;height:52px;padding:14px;box-sizing:border-box;border-radius:50%;background:rgba(0,0,0,.62);color:#fff;fill:#fff;stroke:none}
 .lnr-dur{position:absolute;right:8px;bottom:8px;padding:1px 8px;border-radius:99px;background:rgba(0,0,0,.65);color:#fff;font-size:.72rem;font-variant-numeric:tabular-nums}.lnr-dur:empty{display:none}
-.lnr-ep{margin:6px 0 2px}.lnr-ep .lnr-ld{padding:18px 4px;text-align:left}
+.lnr-en{margin:4px 0 2px;color:var(--mute);font-size:.8rem;font-style:italic}.lnr-ep{margin:6px 0 2px}.lnr-ep .lnr-ld{padding:18px 4px;text-align:left}
 .lnr-yt span svg{fill:#fff;stroke:none;padding:12px 10px 12px 14px;box-sizing:border-box}
 .lnvv{background:#000;overscroll-behavior:contain;touch-action:manipulation}
 .lnvv-v{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;outline:none;cursor:pointer}
-.lnvv-big{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border:0;border-radius:50%;background:rgba(20,20,22,.62);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0 0 0 4px;transition:opacity .2s,transform .15s;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.lnvv-big svg{fill:#fff;stroke:none}.lnvv-big:hover{transform:scale(1.06)}.lnvv-big:focus-visible{outline:2px solid #fff;outline-offset:3px}.lnvv.playing .lnvv-big{opacity:0;pointer-events:none}.lnvv-big[hidden]{display:none}
+.lnvv-big{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border:0;border-radius:50%;background:rgba(20,20,22,.62);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:opacity .2s,transform .15s;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.lnvv-big svg{fill:#fff;stroke:none}.lnvv-big svg.rep,.lnvv-b.fi svg.rep{fill:none;stroke:#fff}.lnvv-big:hover{transform:scale(1.06)}.lnvv-big:focus-visible{outline:2px solid #fff;outline-offset:3px}.lnvv.playing .lnvv-big{opacity:0;pointer-events:none}.lnvv-big[hidden]{display:none}
 .lnvv-bar{position:absolute;left:0;right:0;bottom:0;padding:34px max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:linear-gradient(transparent,rgba(0,0,0,.78));transition:opacity .25s}
 .lnvv.hide .lnvv-bar,.lnvv.hide .lnv-top{opacity:0;pointer-events:none}.lnvv.hide{cursor:none}.lnvv .lnv-top{transition:opacity .25s}
 .lnvv-seek{position:relative;height:26px;display:flex;align-items:center;cursor:pointer;touch-action:none;outline:none}
