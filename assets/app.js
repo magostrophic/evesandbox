@@ -1397,7 +1397,7 @@ function privacyPage(){nav('privacy');
  '<li><b>Deal or No Deal:</b> what you type about the item you want, your budget, and any prices you add are sent to an AI service so it can write its suggestions, and to a web search service that looks for matching product pages. They are not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Text to Speech:</b> the Speak as you type section runs on your device and sends nothing. When you make an audio file, the paragraph you wrote is sent to a speech service so it can create the audio. It is not stored by this website. Please do not type personal details.</li>'+
  '<li><b>Live Translate:</b> in Speak, your browser’s own speech service turns what you say into text. If that service cannot be used, short clips of your voice are sent to a speech service instead so they can be turned into text, and they are not stored by this website. In Screen, the picture of your screen never leaves your device; the words on it are read on your device. The words are then translated on your device when your browser can do that, or sent to a translation service so they can be translated. They are not stored by this website. Please do not share private personal details.</li>'+
- '<li><b>Liner:</b> the name you type, your messages and any files you add are sent to us and kept only while the room exists, so that other people in the room can see them. Every room has a 2 hour timer that starts when it is made, and when it ends the room and everything in it is deleted automatically. Anyone who has the room code can join and see the recent messages, so please do not share passwords or private personal details. When someone posts a link to a picture, GIF or video in a room, other people’s devices load it directly from the address in that link, so whoever runs that address can see that it was loaded. Anyone can turn these link previews off in the room.</li>'+
+ '<li><b>Liner:</b> the name you type, your messages and any files you add are sent to us and kept only while the room exists, so that other people in the room can see them. Every room has a 2 hour timer that starts when it is made, and when it ends the room and everything in it is deleted automatically. Anyone who has the room code can join and see the recent messages, so please do not share passwords or private personal details. When someone posts a link to a picture, GIF or short video in a room, our servers fetch it from that address so it can be shown to the room; the site behind the link sees our request, not the people in the room, and nothing fetched is kept after the room ends. Anyone can turn these link previews off for themselves.</li>'+
  '<li><b>Text and File Sharing:</b> the note and files you share are sent to us and kept in storage only until the time you pick, which is never more than 2 hours. Then they are deleted automatically, or sooner if you stop the share. Anyone who has the share’s code can open it until then. A security check is used before a share is made, and its provider may look at technical details of your browser to do this. Please do not share passwords or private personal details.</li>'+
  '<li><b>Community:</b> to post, reply or vote you sign in with an email address and password, or with an existing account, through a sign-in service. From it we receive your email address, a sign-in ID and, if you use an existing account, its name. We never see or store your password; the sign-in service keeps it. Your email address is never shown to others and is never put on your posts. The display name and username you choose, your profile picture, bio and links, and the posts, pictures, replies, votes and reports you make, are stored on our servers. Your display name, username, profile picture, bio, links, posts, pictures, replies, and the lists of who you follow and who follows you, are public, and anyone can see them, even without signing in, so please do not put personal details in them. Before a photo is uploaded, the page removes hidden details such as where it was taken from JPEG photos, but pictures in other formats are stored as they are. Your votes are private to you, and only the totals are shown, unless you turn on the setting that shows the posts you liked on your profile. The people you follow and the people who follow you are stored too, and those lists are public. You can delete your own posts and replies at any time, which also deletes a post’s replies and pictures. You can also delete your whole Community account yourself, at any time, from Settings in the Community (see “Deleting your Community account” below).</li>'+
  '<li><b>Links you open</b> take you to other websites with their own policies.</li>'+
@@ -1959,9 +1959,9 @@ function sharePage(){nav('share');
  shHealth();
 }
 /* ---------- Liner: chat rooms opened with a code (up to 10 people, 10 MB of files per room) ---------- */
-IC.lndots='<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>';IC.lnp='<path d="M15 18l-6-6 6-6"/>';IC.lnn='<path d="M9 18l6-6-6-6"/>';
+IC.lnpause='<rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/>';IC.lnvol='<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>';IC.lnmute='<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M22 9l-6 6M16 9l6 6"/>';IC.lnfs='<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>';IC.lnrep='<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>';IC.lndots='<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>';IC.lnp='<path d="M15 18l-6-6 6-6"/>';IC.lnn='<path d="M9 18l6-6-6-6"/>';
 IC.liner='<path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3 21l1.9-5.6A8.5 8.5 0 1 1 21 11.5z"/>';
-var LN={api:'',cfg:null,ws:null,state:'join',code:'',name:'',tok:'',members:[],msgs:[],used:0,max:10485760,cap:10,gen:0,tries:0,rt:null,ping:null,rx:0,fatal:0,ended:false,up:[],busy:false,typeAt:0,typers:{},cnt:{},blobs:{},idle:[],host:'',reply:0,emb:true,away:false,mode:'join',cf:{on:false,tok:'',tid:null},vclose:null,stuck:true,hooks:false};
+var LN={api:'',cfg:null,ws:null,state:'join',code:'',name:'',tok:'',members:[],msgs:[],used:0,max:10485760,cap:10,gen:0,tries:0,rt:null,ping:null,rx:0,fatal:0,ended:false,up:[],busy:false,typeAt:0,typers:{},cnt:{},blobs:{},idle:[],host:'',reply:0,emb:true,eb:{},es:{},io:null,away:false,mode:'join',cf:{on:false,tok:'',tid:null},vclose:null,stuck:true,hooks:false};
 var LNK='eve-sandbox:liner:last',LNN='eve-sandbox:liner:name';
 var LNE={4001:'That room is full. Rooms hold up to 10 people, so please try again in a little while.',4002:'Someone in that room already uses that name. Please pick a different one.',4003:'Names need 2 to 20 characters: letters, numbers, spaces, dots, dashes or underscores.',4004:'No room is open with that code. Check the code, or press Create a new room to start one.',4007:'That code is already in use by an open room. Please press Create a new room again.',4008:'The security check did not pass. Please try again.',4013:'The host of that room removed this name, so it cannot be used there. Please pick a different name.',net:'We could not join the room. Please check your connection and try again. If you tried many times, wait a few minutes first.'};
 var LNU={big:'That file is bigger than the room’s 10 MB limit.',full:'There is not enough file space left in this room for that file.',key:'You are not connected to the room right now. Please try again in a moment.',gone:'This room has ended.',rate:'That is a lot of uploads in a short time. Please wait a little and try again.',size:'The upload did not finish. Please try again.',net:'The upload did not finish. Please check your connection and try again.'};
@@ -1977,19 +1977,35 @@ var LNVID={mp4:'video/mp4',m4v:'video/mp4',webm:'video/webm',mov:'video/quicktim
 function lnExt(n){var i=String(n).lastIndexOf('.');return i>0?String(n).slice(i+1).toLowerCase():'';}
 function lnKind(n){var e=lnExt(n);return LNVID[e]?'vid':LNAUD[e]?'aud':'';}
 function lnMime(n){var e=lnExt(n);return LNVID[e]||LNAUD[e]||'application/octet-stream';}
-function lnMedia(k,u){return k==='vid'?'<video class="lnr-vid" controls playsinline preload="metadata" controlslist="nodownload noplaybackrate" disablepictureinpicture src="'+u+'"></video>':'<audio class="lnr-aud" controls preload="metadata" controlslist="nodownload noplaybackrate" src="'+u+'"></audio>';}
+function lnClock(t){t=Math.max(0,Math.floor(t||0));var h=Math.floor(t/3600),m=Math.floor(t%3600/60),x=t%60;return (h?h+':'+(m<10?'0':''):'')+m+':'+(x<10?'0':'')+x;}
+function lnThumb(u,attr){return '<button type="button" class="lnr-vth" '+attr+' aria-label="Play video"><video class="lnr-vthv" muted playsinline preload="metadata" tabindex="-1" src="'+u+'#t=0.001"></video><span class="lnr-pb">'+ico('play',26,2)+'</span><span class="lnr-dur"></span></button>';}
+function lnMedia(k,u,id){return k==='vid'?lnThumb(u,'data-vid="'+esc(id)+'"'):'<audio class="lnr-aud" controls preload="metadata" controlslist="nodownload noplaybackrate" src="'+u+'"></audio>';}
 function lnUrls(t){var out=[],re=/https?:\/\/[^\s<>"']+/g,m;while((m=re.exec(t))){var u=m[0],mm=/[.,;:!?)\]}]+$/.exec(u);if(mm)u=u.slice(0,u.length-mm[0].length);if(u.length>10&&out.indexOf(u)<0)out.push(u);}return out;}
-/* Pictures, GIFs and videos from links posted in the chat. Only direct file links, Giphy pages and YouTube links are shown; anything else stays a plain link. */
-function lnEmbed(u){var a;try{a=new URL(u);}catch(e){return '';}if(a.protocol!=='https:'&&a.protocol!=='http:')return '';
- var h=a.hostname.toLowerCase(),p=a.pathname,m,eu=esc(u),img=function(src){return '<img class="lnr-emb" loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="Picture from a link" src="'+esc(src)+'">';};
- if(/\.(gif|png|jpe?g|webp|avif|bmp)$/i.test(p))return img(u);
- if(/\.gifv$/i.test(p))return '<video class="lnr-emb" muted loop autoplay playsinline referrerpolicy="no-referrer" src="'+esc(u.replace(/\.gifv(?=$|\?|#)/i,'.mp4'))+'"></video>';
- if(/\.(mp4|webm|m4v|mov|ogv)$/i.test(p))return '<video class="lnr-emb" controls playsinline preload="metadata" referrerpolicy="no-referrer" src="'+eu+'"></video>';
- if(/(^|\.)giphy\.com$/.test(h)&&(m=/^\/(?:gifs|stickers)\/(?:.*-)?([A-Za-z0-9]+)\/?$/.exec(p)||/^\/embed\/([A-Za-z0-9]+)\/?$/.exec(p)))return img('https://media.giphy.com/media/'+m[1]+'/giphy.gif');
+/* Pictures, GIFs and clips from links posted in the chat. The Worker fetches them for the room (so the site behind the link never sees who is in it) and the page shows them from its own copy.
+   Direct picture and clip links, Giphy and Tenor links, and YouTube links (a thumbnail) are shown; anything else stays a plain link. */
+function lnEmbedSpec(u){var a;try{a=new URL(u);}catch(e){return null;}if(a.protocol!=='https:'&&a.protocol!=='http:')return null;
+ var h=a.hostname.toLowerCase(),p=a.pathname,m,site=/(^|\.)(tenor|giphy)\.com$/.test(h);
+ if(/\.gifv$/i.test(p))return {u:u.replace(/\.gifv(?=$|\?|#)/i,'.mp4'),k:'vid',loop:true};
+ if(/\.(mp4|webm)$/i.test(p))return {u:u,k:'vid',loop:site};
+ if(/\.(gif|png|jpe?g|webp|avif|bmp)$/i.test(p))return {u:u,k:'img'};
+ if(/(^|\.)giphy\.com$/.test(h)&&(m=/^\/(?:gifs|stickers)\/(?:.*-)?([A-Za-z0-9]+)\/?$/.exec(p)||/^\/embed\/([A-Za-z0-9]+)\/?$/.exec(p)))return {u:'https://media.giphy.com/media/'+m[1]+'/giphy.gif',k:'img'};
  var yid='';if(h==='youtu.be')yid=p.slice(1,12);else if(/(^|\.)youtube\.com$/.test(h)){yid=a.searchParams.get('v')||((m=/^\/(?:shorts|embed|live)\/([\w-]{11})/.exec(p))?m[1]:'');}
- if(/^[\w-]{11}$/.test(yid))return '<a class="lnr-yt lnr-emb" href="'+eu+'" target="_blank" rel="noopener noreferrer nofollow"><img loading="lazy" decoding="async" referrerpolicy="no-referrer" alt="YouTube video" src="https://i.ytimg.com/vi/'+yid+'/hqdefault.jpg"><span>'+ico('play',26,2)+'</span></a>';
- return '';}
-function lnEmbeds(t){if(!LN.emb)return '';var us=lnUrls(t),h='',n=0;for(var i=0;i<us.length&&n<2;i++){var e=lnEmbed(us[i]);if(e){h+=e;n++;}}return h;}
+ if(/^[\w-]{11}$/.test(yid))return {u:'https://i.ytimg.com/vi/'+yid+'/hqdefault.jpg',k:'yt',href:u};
+ if(site&&p.length>1)return {u:u,k:'img',loop:true};
+ return null;}
+function lnEmbedFetch(u){var c=LN.eb[u];if(c)return c.p;c=LN.eb[u]={};
+ c.p=fetch(LN.api+'/e/'+LN.code+'?u='+encodeURIComponent(u),{headers:{'X-Liner-Token':LN.tok}}).then(function(r){if(!r.ok)throw r.status;return r.blob();}).then(function(bl){c.t=bl.type;c.u=URL.createObjectURL(bl);return c;});
+ c.p.catch(function(){c.bad=true;});return c.p;}
+function lnEmbedHtml(sp,c){var vid=/^video\//.test(c.t);
+ if(sp.k==='yt')return '<a class="lnr-yt lnr-emb" href="'+esc(sp.href)+'" target="_blank" rel="noopener noreferrer nofollow"><img alt="YouTube video" decoding="async" draggable="false" src="'+c.u+'"><span>'+ico('play',26,2)+'</span></a>';
+ if(vid)return sp.loop?'<video class="lnr-emb lnr-gifv" muted loop autoplay playsinline src="'+c.u+'"></video>':lnThumb(c.u,'data-eu="'+esc(sp.u)+'"');
+ return '<img class="lnr-emb" alt="Picture from a link" decoding="async" draggable="false" src="'+c.u+'">';}
+function lnEmbeds(t){if(!LN.emb)return '';var us=lnUrls(t),h='',n=0;
+ for(var i=0;i<us.length&&n<2;i++){var sp=lnEmbedSpec(us[i]);if(!sp)continue;n++;LN.es[sp.u]=sp;var c=LN.eb[sp.u];
+  if(c&&c.bad)continue;h+=c&&c.u?lnEmbedHtml(sp,c):'<div class="lnr-ep" data-eu="'+esc(sp.u)+'"><span class="lnr-ld">Loading preview...</span></div>';}
+ return h;}
+function lnEmbLoad(e){var u=e.getAttribute('data-eu'),sp=LN.es[u];if(!sp){if(e.parentNode)e.parentNode.removeChild(e);return;}
+ lnEmbedFetch(u).then(function(c){if(!e.parentNode)return;e.outerHTML=lnEmbedHtml(sp,c);var box=$$('lnmsgs');if(LN.pin&&box)box.scrollTop=box.scrollHeight;},function(){if(e.parentNode)e.parentNode.removeChild(e);});}
 function lnSnip(o){return o.k==='file'&&o.file?(o.file.img?'Picture: ':'File: ')+o.file.name:String(o.text||'').replace(/\s+/g,' ').slice(0,140);}
 function lnWho(o){return o.name.toLowerCase()===LN.name.toLowerCase()?'You':o.name;}
 function lnQuote(m){if(!m.re)return '';var o=null;LN.msgs.forEach(function(x){if(x.id===m.re)o=x;});
@@ -2008,7 +2024,7 @@ function lnRead(){try{return JSON.parse(sessionStorage.getItem(LNK));}catch(e){r
 function lnSave(){try{sessionStorage.setItem(LNK,JSON.stringify({code:LN.code,name:LN.name,tok:LN.tok}));localStorage.setItem(LNN,LN.name);}catch(e){}}
 function lnForget(){try{sessionStorage.removeItem(LNK);}catch(e){}}
 function lnStop(){clearTimeout(LN.rt);clearInterval(LN.ping);clearInterval(LN.tick);LN.gen++;var w=LN.ws;LN.ws=null;if(w){w.onopen=w.onmessage=w.onclose=w.onerror=null;try{w.close(1000);}catch(e){}}}
-function lnFree(){lnVClose();lnMenuClose();for(var k in LN.blobs){if(LN.blobs[k]&&LN.blobs[k].u){try{URL.revokeObjectURL(LN.blobs[k].u);}catch(e){}}}LN.blobs={};}
+function lnFree(){lnVClose();lnMenuClose();if(LN.io){try{LN.io.disconnect();}catch(e){}LN.io=null;}for(var ek in LN.eb){if(LN.eb[ek]&&LN.eb[ek].u){try{URL.revokeObjectURL(LN.eb[ek].u);}catch(e){}}}LN.eb={};for(var k in LN.blobs){if(LN.blobs[k]&&LN.blobs[k].u){try{URL.revokeObjectURL(LN.blobs[k].u);}catch(e){}}}LN.blobs={};}
 function lnLeave(){if(LN.state==='chat'||LN.ws)lnStop();lnFree();LN.state='join';LN.up=[];LN.busy=false;}
 function lnEnd(){lnStop();LN.ended=true;lnBan('This room\u2019s 2 hours are up, so it was deleted with everything in it. You can start a new room any time.','warn');lnLock(true);var c=$$('lncd');if(c)c.textContent='0:00';}
 function lnTick(){var c=$$('lncd');if(!c){clearInterval(LN.tick);return;}var ms=LN.end-Date.now();if(ms<=0){lnEnd();return;}
@@ -2028,7 +2044,7 @@ function lnMsgHtml(m,prev){
  var grp=prev&&prev.k!=='sys'&&prev.name===m.name&&m.ts-prev.ts<300000&&!m.re,me=m.name.toLowerCase()===LN.name.toLowerCase(),b='';
  if(m.k==='file'&&m.file){var f=m.file,c=LN.blobs[f.id];
   if(f.img)b+='<button class="lnr-th'+(c&&c.u?' ok':'')+'" type="button" data-fid="'+esc(f.id)+'" aria-label="Open picture '+esc(f.name)+'">'+(c&&c.u?'<img class="lnr-img" alt="'+esc(f.name)+'" draggable="false" src="'+c.u+'">':'<span class="lnr-ld">Loading picture...</span>')+'</button>';
-  var kd=f.img?'':lnKind(f.name);if(kd)b+=c&&c.u?'<div class="lnr-md ok" data-fid="'+esc(f.id)+'" data-k="'+kd+'">'+lnMedia(kd,c.u)+'</div>':'<div class="lnr-md" data-fid="'+esc(f.id)+'" data-k="'+kd+'"><span class="lnr-ld">Loading '+(kd==='vid'?'video':'audio')+'...</span></div>';
+  var kd=f.img?'':lnKind(f.name);if(kd)b+=c&&c.u?'<div class="lnr-md ok" data-fid="'+esc(f.id)+'" data-k="'+kd+'">'+lnMedia(kd,c.u,f.id)+'</div>':'<div class="lnr-md" data-fid="'+esc(f.id)+'" data-k="'+kd+'"><span class="lnr-ld">Loading '+(kd==='vid'?'video':'audio')+'...</span></div>';
   b+='<div class="lnr-f"><span class="nm">'+esc(f.name)+'</span><span class="sz">'+lnSz(f.size)+'</span><button class="btn" type="button" data-save="'+esc(f.id)+'">'+ico('down',15,2.2)+'Save</button></div>';}
  else b=lnQuote(m)+'<div class="lnr-b">'+lnLink(m.text||'')+'</div>'+lnEmbeds(m.text||'');
  return '<div class="lnr-m'+(me?' me':'')+(grp?' grp':'')+'" data-m="'+m.id+'" style="--h:'+lnHue(m.name)+'">'+(grp?'':'<div class="lnr-h"><b>'+esc(m.name)+'</b>'+(me?'<span>You</span>':'')+(LN.host&&m.name.toLowerCase()===LN.host.toLowerCase()?'<em class="lnr-hb">Host</em>':'')+'<span>'+lnTime(m.ts)+'</span></div>')+b+'<button class="lnr-mb" type="button" data-mid="'+m.id+'" aria-label="Message options">'+ico('lndots',18,2.4)+'</button></div>';}
@@ -2042,10 +2058,69 @@ function lnPaintAll(){Array.prototype.forEach.call(document.querySelectorAll('.l
    Array.prototype.forEach.call(document.querySelectorAll('.lnr-th[data-fid="'+id+'"]'),function(t){t.innerHTML='<img class="lnr-img" alt="'+esc(f.name)+'" draggable="false" src="'+c.u+'">';t.classList.add('ok');});
    if(near&&box)box.scrollTop=box.scrollHeight;},function(){e.classList.add('bad');e.innerHTML='<span class="lnr-ld">This picture is not available.</span>';});});
  Array.prototype.forEach.call(document.querySelectorAll('.lnr-md:not(.ok):not(.bad)'),function(e){var id=e.getAttribute('data-fid'),f=lnFile(id),k=e.getAttribute('data-k');if(!f)return;
-  lnFetch(f).then(function(){var c=LN.blobs[id];if(!c||!c.u||e.classList.contains('ok'))return;e.classList.add('ok');e.innerHTML=lnMedia(k,c.u);},function(){e.classList.add('bad');e.innerHTML='<span class="lnr-ld">This file is not available here. You can still save it.</span>';});});}
+  lnFetch(f).then(function(){var c=LN.blobs[id];if(!c||!c.u||e.classList.contains('ok'))return;e.classList.add('ok');e.innerHTML=lnMedia(k,c.u,id);},function(){e.classList.add('bad');e.innerHTML='<span class="lnr-ld">This file is not available here. You can still save it.</span>';});});
+ Array.prototype.forEach.call(document.querySelectorAll('.lnr-ep:not(.go)'),function(e){e.classList.add('go');if(LN.io)LN.io.observe(e);else lnEmbLoad(e);});}
 function lnDl(id,btn){var f=lnFile(id);if(!f)return;var old=btn?btn.innerHTML:'';if(btn){btn.disabled=true;btn.textContent='Saving...';}
  lnFetch(f).then(function(bl){return saveBlob(f.img?bl:new Blob([bl],{type:'application/octet-stream'}),f.name);}).catch(function(){toast('That file is no longer available.');}).then(function(){if(btn){btn.disabled=false;btn.innerHTML=old;}});}
 function lnVClose(){if(LN.vclose)LN.vclose();}
+/* The video player: a full-screen viewer like the picture viewer, with its own controls (play, seek, time, volume, speed, full screen, save, close). */
+function lnVideo(o){
+ if($$('lnv'))return;var prevFocus=document.activeElement,hideT=0,drag=false,vol=1,SP=[0.5,1,1.25,1.5,2],si=1;
+ try{var sv=parseFloat(localStorage.getItem('eveLnVol'));if(sv>=0&&sv<=1)vol=sv;}catch(e){}
+ var root=document.createElement('div');root.id='lnv';root.className='lnv lnvv paused';root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','Video player');
+ root.innerHTML='<video class="lnvv-v" id="lnvvid" playsinline preload="auto"></video><div class="lnv-sp" id="lnvsp" aria-hidden="true"></div><p class="lnv-fail" id="lnvf" hidden>This video could not be played here.'+(o.dl?' You can still save it.':'')+'</p>'+
+ '<button class="lnvv-big" id="lnvbig" type="button" aria-label="Play">'+ico('play',34,2)+'</button>'+
+ '<div class="lnv-top"><span class="lnv-nm" id="lnvnm"></span>'+(o.dl?'<button class="lnv-b" id="lnvdl" type="button" aria-label="Download this video">'+ico('down',20,2.2)+'</button>':'')+'<button class="lnv-b" id="lnvx" type="button" aria-label="Close video">'+ico('x',22,2.2)+'</button></div>'+
+ '<div class="lnvv-bar" id="lnvbar"><div class="lnvv-seek" id="lnvseek" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="buf" id="lnvbuf"></i><i class="fill" id="lnvfill"></i><b class="knob" id="lnvknob"></b></div>'+
+ '<div class="lnvv-row"><button class="lnvv-b fi" id="lnvpp" type="button" aria-label="Play">'+ico('play',22,2)+'</button><span class="lnvv-t" id="lnvt">0:00 / 0:00</span><span class="lnvv-gap"></span>'+
+ '<span class="lnvv-vol"><button class="lnvv-b" id="lnvmu" type="button" aria-label="Mute">'+ico('lnvol',22,2)+'</button><input id="lnvvol" type="range" min="0" max="1" step="0.05" aria-label="Volume"></span>'+
+ '<button class="lnvv-b lnvv-sp" id="lnvspd" type="button" aria-label="Playback speed">1\u00d7</button><button class="lnvv-b" id="lnvfs" type="button" aria-label="Full screen">'+ico('lnfs',22,2)+'</button></div></div>';
+ document.body.appendChild(root);document.documentElement.classList.add('lnvlock');
+ function g(i){return root.querySelector('#'+i);}
+ var v=g('lnvvid'),sk=g('lnvseek'),fill=g('lnvfill'),buf=g('lnvbuf'),knob=g('lnvknob'),pp=g('lnvpp'),big=g('lnvbig'),tt=g('lnvt'),mu=g('lnvmu'),vr=g('lnvvol'),spd=g('lnvspd'),fs=g('lnvfs'),sp=g('lnvsp'),fl=g('lnvf');
+ g('lnvnm').textContent=o.name||'Video';v.src=o.src;v.volume=vol;vr.value=vol;
+ var fsOn=root.requestFullscreen||root.webkitRequestFullscreen,fsV=v.webkitEnterFullscreen;if(!fsOn&&!fsV)fs.hidden=true;
+ function dur(){return isFinite(v.duration)?v.duration:0;}
+ function paint(){var d=dur(),p=d?v.currentTime/d*100:0;fill.style.width=p+'%';knob.style.left=p+'%';sk.setAttribute('aria-valuenow',Math.round(p));sk.setAttribute('aria-valuetext',lnClock(v.currentTime)+' of '+lnClock(d));tt.textContent=lnClock(v.currentTime)+' / '+lnClock(d);
+  try{var b=v.buffered;buf.style.width=(d&&b.length?b.end(b.length-1)/d*100:0)+'%';}catch(e){}}
+ function state(){var pl=!v.paused&&!v.ended;root.classList.toggle('paused',!pl);root.classList.toggle('playing',pl);var lab=v.ended?'Replay':pl?'Pause':'Play';pp.innerHTML=ico(pl?'lnpause':v.ended?'lnrep':'play',22,2);pp.setAttribute('aria-label',lab);big.setAttribute('aria-label',lab);big.innerHTML=ico(v.ended?'lnrep':'play',34,2);if(pl)wake();else{clearTimeout(hideT);root.classList.remove('hide');}}
+ function wake(){root.classList.remove('hide');clearTimeout(hideT);if(!v.paused&&!drag)hideT=setTimeout(function(){if(!v.paused&&!drag&&!root.querySelector('.lnvv-bar:focus-within, .lnvv-bar:hover'))root.classList.add('hide');},2600);}
+ function toggle(){if(v.ended){v.currentTime=0;}if(v.paused){var pr=v.play();if(pr&&pr.catch)pr.catch(function(){state();});}else v.pause();}
+ function seekTo(x){var r=sk.getBoundingClientRect(),f=Math.min(1,Math.max(0,(x-r.left)/r.width));if(dur()){v.currentTime=f*dur();paint();}}
+ function volDraw(){mu.innerHTML=ico(v.muted||v.volume===0?'lnmute':'lnvol',22,2);mu.setAttribute('aria-label',v.muted||v.volume===0?'Unmute':'Mute');vr.value=v.muted?0:v.volume;}
+ function setVol(x){x=Math.min(1,Math.max(0,x));v.muted=false;v.volume=x;try{localStorage.setItem('eveLnVol',String(x));}catch(e){}volDraw();}
+ function fsToggle(){var el=document.fullscreenElement||document.webkitFullscreenElement;if(el){(document.exitFullscreen||document.webkitExitFullscreen).call(document);}else if(fsOn){try{(root.requestFullscreen||root.webkitRequestFullscreen).call(root);}catch(e){}}else if(fsV){try{v.webkitEnterFullscreen();}catch(e){}}}
+ function close(){clearTimeout(hideT);document.removeEventListener('keydown',onKey,true);try{v.pause();}catch(e){}v.removeAttribute('src');try{v.load();}catch(e){}var el=document.fullscreenElement||document.webkitFullscreenElement;if(el&&el===root){try{(document.exitFullscreen||document.webkitExitFullscreen).call(document);}catch(e){}}root.remove();document.documentElement.classList.remove('lnvlock');LN.vclose=null;if(prevFocus&&prevFocus.focus){try{prevFocus.focus({preventScroll:true});}catch(e){}}}
+ function onKey(e){wake();var k=e.key;if(e.target&&e.target.id==='lnvvol'&&(k==='ArrowLeft'||k==='ArrowRight'||k==='ArrowUp'||k==='ArrowDown'))return;
+  if(k==='Escape'){e.preventDefault();e.stopPropagation();close();}
+  else if(k===' '||k==='k'||k==='K'){if(e.target&&e.target.tagName==='BUTTON'&&k===' ')return;e.preventDefault();toggle();}
+  else if(k==='ArrowLeft'||k==='j'||k==='J'){e.preventDefault();v.currentTime=Math.max(0,v.currentTime-(k==='ArrowLeft'?5:10));paint();}
+  else if(k==='ArrowRight'||k==='l'||k==='L'){e.preventDefault();v.currentTime=Math.min(dur(),v.currentTime+(k==='ArrowRight'?5:10));paint();}
+  else if(k==='ArrowUp'){e.preventDefault();setVol((v.muted?0:v.volume)+0.1);}else if(k==='ArrowDown'){e.preventDefault();setVol((v.muted?0:v.volume)-0.1);}
+  else if(k==='m'||k==='M'){e.preventDefault();v.muted=!v.muted;volDraw();}
+  else if(k==='f'||k==='F'){e.preventDefault();fsToggle();}
+  else if(k==='Home'){e.preventDefault();v.currentTime=0;paint();}else if(k==='End'){e.preventDefault();v.currentTime=Math.max(0,dur()-0.1);paint();}
+  else if(k==='Tab'){var fs2=Array.prototype.filter.call(root.querySelectorAll('button,input,[tabindex="0"]'),function(b){return !b.hidden&&b.id!=='lnvbig';}),i=fs2.indexOf(document.activeElement);e.preventDefault();fs2[(i+(e.shiftKey?-1:1)+fs2.length)%fs2.length].focus();}}
+ v.addEventListener('timeupdate',paint);v.addEventListener('progress',paint);v.addEventListener('durationchange',paint);v.addEventListener('loadedmetadata',function(){sp.hidden=true;paint();});
+ v.addEventListener('play',state);v.addEventListener('pause',state);v.addEventListener('ended',state);v.addEventListener('volumechange',volDraw);
+ v.addEventListener('waiting',function(){sp.hidden=false;});v.addEventListener('playing',function(){sp.hidden=true;});v.addEventListener('canplay',function(){sp.hidden=true;});
+ v.addEventListener('error',function(){sp.hidden=true;fl.hidden=false;big.hidden=true;});
+ v.addEventListener('click',function(){toggle();});v.addEventListener('dblclick',function(e){e.preventDefault();fsToggle();});
+ big.onclick=toggle;pp.onclick=toggle;
+ mu.onclick=function(){v.muted=!v.muted;if(!v.muted&&v.volume===0)setVol(0.5);volDraw();};
+ vr.oninput=function(){setVol(parseFloat(vr.value));};
+ spd.onclick=function(){si=(si+1)%SP.length;v.playbackRate=SP[si];spd.textContent=SP[si]+'\u00d7';};
+ fs.onclick=fsToggle;
+ g('lnvx').onclick=close;var dl=g('lnvdl');if(dl)dl.onclick=o.dl;
+ sk.addEventListener('pointerdown',function(e){if(e.button)return;drag=true;sk.classList.add('drag');try{sk.setPointerCapture(e.pointerId);}catch(x){}seekTo(e.clientX);});
+ sk.addEventListener('pointermove',function(e){if(drag)seekTo(e.clientX);});
+ function up(){drag=false;sk.classList.remove('drag');wake();}sk.addEventListener('pointerup',up);sk.addEventListener('pointercancel',up);
+ root.addEventListener('pointermove',wake);root.addEventListener('pointerdown',wake);
+ document.addEventListener('keydown',onKey,true);LN.vclose=close;
+ volDraw();paint();state();sp.hidden=false;
+ var pr=v.play();if(pr&&pr.catch)pr.catch(function(){state();});
+ try{g('lnvx').focus({preventScroll:true});}catch(e){}
+}
 function lnView(id){
  if($$('lnv'))return;var list=[],i=-1;LN.msgs.forEach(function(m){if(m.k==='file'&&m.file&&m.file.img){if(m.file.id===id)i=list.length;list.push(m.file);}});if(i<0)return;
  var n=list.length,sc=1,tx=0,ty=0,tk=0,moved=false,pan=null,pinch=null,last=0,pts={},prevFocus=document.activeElement;
@@ -2187,6 +2262,8 @@ function lnChat(){
  '<p class="dl-note">Anyone who has this room code can join while there is space, so share it only with people you trust. Every room has a 2 hour timer. When it ends, the room and its files are deleted and cannot be brought back. Please do not share passwords or private details. See the <a href="#/terms" style="color:var(--brand)">Terms</a> and <a href="#/privacy" style="color:var(--brand)">Privacy</a> pages.</p>';
  fixLinks(app);
  LN.reply=0;try{LN.emb=localStorage.getItem('eveLnEmb')!=='0';}catch(e){}
+ if(LN.io){try{LN.io.disconnect();}catch(e){}LN.io=null;}
+ if(window.IntersectionObserver){LN.io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){LN.io.unobserve(en.target);lnEmbLoad(en.target);}});},{root:$$('lnmsgs'),rootMargin:'300px'});}
  lnHead();lnList();lnTick();
  var eb=$$('lnemb');function embDraw(){eb.textContent='Link previews: '+(LN.emb?'On':'Off');eb.setAttribute('aria-pressed',LN.emb?'true':'false');}embDraw();
  eb.onclick=function(){LN.emb=!LN.emb;try{localStorage.setItem('eveLnEmb',LN.emb?'1':'0');}catch(e){}embDraw();lnList(true);};
@@ -2195,11 +2272,11 @@ function lnChat(){
  $$('lnmem').onclick=function(e){var c=e.target.closest?e.target.closest('.kickable'):null;if(!c||!lnIsHost())return;var n=c.getAttribute('data-name');lnMenu(c,[{icon:'x',label:'Remove '+n+' from room',sure:'Tap again to remove',danger:true,run:function(){lnSendJ({t:'kick',name:n});}}]);};
  $$('lnbye').onclick=function(){lnForget();lnStop();lnFree();LN.state='join';lnPage(true);};
  var box=$$('lnmsgs');
- box.onclick=function(e){var t=e.target.closest?e.target.closest('.lnr-th,[data-save],.lnr-mb,.lnr-q[data-go]'):null;if(!t)return;if(t.hasAttribute('data-go')){var tg=box.querySelector('.lnr-m[data-m="'+t.getAttribute('data-go')+'"]');if(tg){LN.pin=false;box.scrollTop+=tg.getBoundingClientRect().top-box.getBoundingClientRect().top-Math.max(0,(box.clientHeight-tg.offsetHeight)/2);tg.classList.remove('flash');void tg.offsetWidth;tg.classList.add('flash');}return;}if(t.classList.contains('lnr-mb')){lnMsgMenu(t);return;}if(t.hasAttribute('data-save'))lnDl(t.getAttribute('data-save'),t);else if(t.classList.contains('ok'))lnView(t.getAttribute('data-fid'));};
- box.oncontextmenu=function(e){if(e.target.closest&&e.target.closest('.lnr-th,.lnr-vid,.lnr-aud'))e.preventDefault();};
+ box.onclick=function(e){var t=e.target.closest?e.target.closest('.lnr-th,[data-save],.lnr-mb,.lnr-q[data-go],.lnr-vth'):null;if(!t)return;if(t.classList.contains('lnr-vth')){var vf=t.getAttribute('data-vid'),ve=t.getAttribute('data-eu');if(vf){var ff=lnFile(vf),fc=LN.blobs[vf];if(ff&&fc&&fc.u)lnVideo({src:fc.u,name:ff.name,dl:function(){lnDl(vf,null);}});}else if(ve){var ec=LN.eb[ve];if(ec&&ec.u)lnVideo({src:ec.u,name:'Video from a link'});}return;}if(t.hasAttribute('data-go')){var tg=box.querySelector('.lnr-m[data-m="'+t.getAttribute('data-go')+'"]');if(tg){LN.pin=false;box.scrollTop+=tg.getBoundingClientRect().top-box.getBoundingClientRect().top-Math.max(0,(box.clientHeight-tg.offsetHeight)/2);tg.classList.remove('flash');void tg.offsetWidth;tg.classList.add('flash');}return;}if(t.classList.contains('lnr-mb')){lnMsgMenu(t);return;}if(t.hasAttribute('data-save'))lnDl(t.getAttribute('data-save'),t);else if(t.classList.contains('ok'))lnView(t.getAttribute('data-fid'));};
+ box.oncontextmenu=function(e){if(e.target.closest&&e.target.closest('.lnr-th,.lnr-vth,.lnr-aud'))e.preventDefault();};
  box.addEventListener('error',function(e){var x=e.target;if(x&&x.classList&&(x.classList.contains('lnr-emb')||(x.parentNode&&x.parentNode.classList&&x.parentNode.classList.contains('lnr-yt')))){var w=x.closest('.lnr-yt')||x;if(w.parentNode)w.parentNode.removeChild(w);}},true);
  box.addEventListener('load',function(e){if(LN.pin&&e.target&&e.target.classList&&e.target.classList.contains('lnr-emb'))box.scrollTop=box.scrollHeight;},true);
- box.addEventListener('loadedmetadata',function(){if(LN.pin)box.scrollTop=box.scrollHeight;},true);
+ box.addEventListener('loadedmetadata',function(e){var v=e.target;if(v&&v.classList&&v.classList.contains('lnr-vthv')){var d=v.parentNode&&v.parentNode.querySelector('.lnr-dur');if(d&&isFinite(v.duration))d.textContent=lnClock(v.duration);}if(LN.pin)box.scrollTop=box.scrollHeight;},true);
  box.onscroll=function(){LN.pin=box.scrollHeight-box.scrollTop-box.clientHeight<60;if(box.scrollHeight-box.scrollTop-box.clientHeight<40){var n=$$('lnnew');if(n)n.hidden=true;}};
  $$('lnnew').onclick=function(){box.scrollTop=box.scrollHeight;this.hidden=true;};
  var t=$$('lntx'),touch=false;try{touch=matchMedia('(hover:none)').matches;}catch(e){}
