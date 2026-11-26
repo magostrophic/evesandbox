@@ -1159,7 +1159,7 @@ var TL=[
  {r:'ide',c:'i8',ic:'code',n:'Eve IDE',d:'Write and run Python, C and Java programs, with input and output right on the page.'},
  {r:'convert',c:'i8',ic:'swap',n:'File Converter',d:'Turn pictures, PDFs, documents, spreadsheets and audio into another format, right on your device.'},
    {r:'image',c:'i2',ic:'image',n:'Image Tool',d:'Compress, resize, crop, enhance and cut out the background of images.'},
- {r:'liner',c:'i13',ic:'liner',n:'Liner',d:'Type a code to join a chat room, pick a name and talk with up to 10 people. Share files up to 10 MB per room. Every room has a 2 hour timer, then it is deleted on its own.'},
+ {r:'liner',c:'i13',ic:'liner',n:'Liner',d:'Open a chat room or join one with its code, pick a name and talk with up to 10 people. Share files up to 10 MB per room. Every room has a 2 hour timer, then it is deleted on its own.'},
  {r:'translate',c:'i12',ic:'globe',n:'Live Translate',d:'Speak in one language and read it in another as you talk, or share your screen and see it translated in real time.'},
  {r:'pdf',c:'i3',ic:'pdf',n:'PDF Tool',d:'Make, merge, split and compress PDFs, and add or remove passwords.'},
  {r:'qr',c:'i9',ic:'qr',n:'QR Code Generator',d:'Make a QR code for a link, text, Wi-Fi, email, phone number or contact card, and download it as PNG or SVG.'},
@@ -1961,9 +1961,9 @@ function sharePage(){nav('share');
 /* ---------- Liner: chat rooms opened with a code (up to 10 people, 10 MB of files per room) ---------- */
 IC.lnp='<path d="M15 18l-6-6 6-6"/>';IC.lnn='<path d="M9 18l6-6-6-6"/>';
 IC.liner='<path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3 21l1.9-5.6A8.5 8.5 0 1 1 21 11.5z"/>';
-var LN={api:'',cfg:null,ws:null,state:'join',code:'',name:'',tok:'',members:[],msgs:[],used:0,max:10485760,cap:10,gen:0,tries:0,rt:null,ping:null,rx:0,fatal:0,ended:false,up:[],busy:false,typeAt:0,typers:{},cnt:{},blobs:{},idle:[],away:false,vclose:null,stuck:true,hooks:false};
+var LN={api:'',cfg:null,ws:null,state:'join',code:'',name:'',tok:'',members:[],msgs:[],used:0,max:10485760,cap:10,gen:0,tries:0,rt:null,ping:null,rx:0,fatal:0,ended:false,up:[],busy:false,typeAt:0,typers:{},cnt:{},blobs:{},idle:[],away:false,mode:'join',cf:{on:false,tok:'',tid:null},vclose:null,stuck:true,hooks:false};
 var LNK='eve-sandbox:liner:last',LNN='eve-sandbox:liner:name';
-var LNE={4001:'That room is full. Rooms hold up to 10 people, so please try again in a little while.',4002:'Someone in that room already uses that name. Please pick a different one.',4003:'Names need 2 to 20 characters: letters, numbers, spaces, dots, dashes or underscores.',4004:'That room code is not valid.',net:'We could not join the room. Please check your connection and try again. If you tried many times, wait a few minutes first.'};
+var LNE={4001:'That room is full. Rooms hold up to 10 people, so please try again in a little while.',4002:'Someone in that room already uses that name. Please pick a different one.',4003:'Names need 2 to 20 characters: letters, numbers, spaces, dots, dashes or underscores.',4004:'No room is open with that code. Check the code, or press Create a new room to start one.',4007:'That code is already in use by an open room. Please press Create a new room again.',4008:'The security check did not pass. Please try again.',net:'We could not join the room. Please check your connection and try again. If you tried many times, wait a few minutes first.'};
 var LNU={big:'That file is bigger than the room’s 10 MB limit.',full:'There is not enough file space left in this room for that file.',key:'You are not connected to the room right now. Please try again in a moment.',gone:'This room has ended.',rate:'That is a lot of uploads in a short time. Please wait a little and try again.',size:'The upload did not finish. Please try again.',net:'The upload did not finish. Please check your connection and try again.'};
 var LNA='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 function lnApi(){var a=String(CFG.linerApi||'').replace(/\/+$/,'');if(a)return a;var m=/^(https?:\/\/)eve-ai(\.[^\/]+)$/.exec(String(CFG.aiApi||'').replace(/\/+$/,''));return m?m[1]+'eve-liner'+m[2]:'';}
@@ -2059,9 +2059,10 @@ function lnAdd(m){LN.msgs.push(m);if(LN.msgs.length>300)LN.msgs.shift();var box=
  LN.pin=near||mine;if(near||mine){box.scrollTop=box.scrollHeight;var n=$$('lnnew');if(n)n.hidden=true;}else{var n2=$$('lnnew');if(n2)n2.hidden=false;}}
 function lnTyping(name){var t=LN.typers;clearTimeout(t[name]);t[name]=setTimeout(function(){delete t[name];lnTypDraw();},3000);lnTypDraw();}
 function lnTypDraw(){var e=$$('lntyp');if(!e)return;var n=Object.keys(LN.typers);e.textContent=!n.length?'':n.length===1?n[0]+' is typing...':n.length===2?n[0]+' and '+n[1]+' are typing...':'Several people are typing...';}
-function lnJoinFail(t){LN.state='join';lnStop();LN.ws=null;var b=$$('lnjoin'),c=$$('lnnewroom');if(b){b.disabled=false;b.textContent='Join room';}if(c)c.disabled=false;shMsg('lnm1',t,'bad');}
+function lnCapReset(){LN.cf.tok='';try{if(LN.cf.tid!=null&&window.turnstile)turnstile.reset(LN.cf.tid);}catch(e){}}
+function lnJoinFail(t){LN.state='join';lnStop();LN.ws=null;lnCapReset();var b=$$('lnjoin'),c=$$('lnnewroom');if(b){b.disabled=false;b.textContent='Join room';}if(c){c.disabled=false;c.textContent='Create a new room';}shMsg('lnm1',t,'bad');}
 function lnOn(d){
- if(d.t==='welcome'){LN.tok=d.you.token;LN.name=d.you.name;LN.old=!!(d.v&&d.v>3);LN.idle=d.idle||[];LN.away=false;LN.cap=d.room.maxPeople||10;LN.max=d.room.maxBytes||LN.max;LN.end=Date.now()+(typeof d.room.endsIn==='number'?d.room.endsIn:7200000);LN.warned=false;LN.used=d.room.usedBytes||0;LN.members=d.members||[];LN.msgs=d.history||[];LN.tries=0;LN.fatal=0;LN.ended=false;LN.typers={};LN.cnt={};
+ if(d.t==='welcome'){LN.tok=d.you.token;LN.name=d.you.name;LN.mode='join';LN.cf.tok='';LN.old=!!(d.v&&d.v>3);LN.idle=d.idle||[];LN.away=false;LN.cap=d.room.maxPeople||10;LN.max=d.room.maxBytes||LN.max;LN.end=Date.now()+(typeof d.room.endsIn==='number'?d.room.endsIn:7200000);LN.warned=false;LN.used=d.room.usedBytes||0;LN.members=d.members||[];LN.msgs=d.history||[];LN.tries=0;LN.fatal=0;LN.ended=false;LN.typers={};LN.cnt={};
   LN.msgs.forEach(function(m){if(m.k==='file'&&m.file)LN.cnt[m.file.id]=1;});lnSave();
   clearInterval(LN.ping);LN.ping=setInterval(lnBeat,20000);clearInterval(LN.tick);LN.tick=setInterval(lnTick,500);
   if(LN.state!=='chat'){LN.state='chat';lnChat();}else{lnBan('');lnHead();lnList();lnTypDraw();}
@@ -2070,7 +2071,7 @@ function lnOn(d){
   if(m.k==='text'&&LN.typers[m.name]){clearTimeout(LN.typers[m.name]);delete LN.typers[m.name];lnTypDraw();}lnAdd(m);
  }else if(d.t==='members'){LN.members=d.members||[];LN.idle=d.idle||[];lnHead();
  }else if(d.t==='typing'&&d.name){lnTyping(d.name);
- }else if(d.t==='err'){if(typeof d.code==='number'){LN.fatal=d.code;if(LN.state!=='chat')lnJoinFail(LNE[d.code]||LNE.net);else{lnStop();lnBan(LNE[d.code]||LNE.net,'bad','Try again');}}else if(d.code==='slow')toast('You are sending messages too fast. Please slow down a little.');
+ }else if(d.t==='err'){if(typeof d.code==='number'){LN.fatal=d.code;if(LN.state!=='chat')lnJoinFail(LNE[d.code]||LNE.net);else if(d.code===4004||d.code===4008){lnStop();lnBan('Your place in this room was released while you were away, or the room has ended. Press Leave to start again.','warn');lnLock(true);}else{lnStop();lnBan(LNE[d.code]||LNE.net,'bad','Try again');}}else if(d.code==='slow')toast('You are sending messages too fast. Please slow down a little.');
  }else if(d.t==='closed'){LN.ended=true;lnStop();lnEnd();}}
 function lnBeat(){if(!LN.ws)return;if(Date.now()-LN.rx>55000){lnDrop();return;}try{if(LN.ws.readyState===1)LN.ws.send('ping');}catch(e){}}
 function lnDrop(){var w=LN.ws;LN.gen++;LN.ws=null;if(w){w.onopen=w.onmessage=w.onclose=w.onerror=null;try{w.close();}catch(e){}}lnDown(1006);}
@@ -2083,17 +2084,18 @@ function lnDown(code){
  var wait=Math.min(10000,800*Math.pow(2,LN.tries-1));lnBan('Connection lost. Reconnecting...','warn');clearTimeout(LN.rt);LN.rt=setTimeout(lnConnect,wait);}
 function lnConnect(){
  clearTimeout(LN.rt);var gen=++LN.gen,old=LN.ws;if(old){old.onopen=old.onmessage=old.onclose=old.onerror=null;try{old.close();}catch(e){}}
- var url=LN.api.replace(/^http/,'ws')+'/ws/'+LN.code+'?name='+encodeURIComponent(LN.name)+(LN.tok?'&token='+encodeURIComponent(LN.tok):''),w;
+ var first=LN.state!=='chat',url=LN.api.replace(/^http/,'ws')+'/ws/'+LN.code+'?name='+encodeURIComponent(LN.name)+'&mode='+(first?LN.mode:'join')+(LN.tok?'&token='+encodeURIComponent(LN.tok):'')+(first&&LN.cf.tok?'&cf='+encodeURIComponent(LN.cf.tok):''),w;
  try{w=new WebSocket(url);}catch(e){LN.ws=null;lnDown(1006);return;}
  LN.ws=w;LN.rx=Date.now();
  w.onmessage=function(e){if(gen!==LN.gen)return;LN.rx=Date.now();var d;try{d=JSON.parse(e.data);}catch(x){return;}lnOn(d);};
  w.onclose=function(e){if(gen!==LN.gen)return;LN.ws=null;lnDown(e&&e.code);};
  w.onerror=function(){};}
-function lnJoin(raw,nm){
+function lnJoin(raw,nm,mode){
  var code=lnNorm(raw),name=String(nm||'').replace(/\s+/g,' ').trim();
  if(!/^[A-Z0-9]{4,20}$/.test(code)){shMsg('lnm1','Room codes have 4 to 20 letters and numbers.','bad');return;}
  if(!lnNameOk(name)){shMsg('lnm1',LNE[4003],'bad');return;}
- shMsg('lnm1','');var b=$$('lnjoin'),c=$$('lnnewroom');b.disabled=true;c.disabled=true;b.textContent='Joining...';
+ if(LN.cf.on&&!LN.cf.tok){shMsg('lnm1','Please complete the security check first.','warn');return;}
+ shMsg('lnm1','');var b=$$('lnjoin'),c=$$('lnnewroom');b.disabled=true;c.disabled=true;if(mode==='create')c.textContent='Creating...';else b.textContent='Joining...';LN.mode=mode==='create'?'create':'join';
  var sv=lnRead();LN.code=code;LN.name=name;LN.tok=sv&&sv.code===code&&sv.name.toLowerCase()===name.toLowerCase()?sv.tok:'';LN.fatal=0;LN.tries=0;LN.state='join';
  lnConnect();}
 function lnLock(off){['lntx','lnsend','lnatt'].forEach(function(i){var e=$$(i);if(e)e.disabled=!!off;});}
@@ -2153,29 +2155,35 @@ function lnChat(){
   document.addEventListener('visibilitychange',function(){lnPresence(document.hidden);if(!document.hidden&&LN.state==='chat'&&LN.ws&&LN.ws.readyState===1){var rx0=LN.rx;try{LN.ws.send('ping');}catch(e){}setTimeout(function(){if(LN.state==='chat'&&LN.ws&&LN.rx===rx0&&!LN.fatal&&!LN.ended)lnDrop();},4000);}if(!document.hidden&&LN.state==='chat'&&!LN.fatal&&!LN.ended&&LN.ws&&LN.ws.readyState!==1&&LN.ws.readyState!==0){LN.tries=0;lnDrop();}});}}
 function lnPresence(away){if(LN.state!=='chat'||!LN.ws||LN.ws.readyState!==1)return;if(away===LN.away)return;LN.away=away;try{LN.ws.send(JSON.stringify({t:away?'away':'back'}));}catch(e){}}
 function lnHealth(){
- var off=function(){shMsg('lnst','Liner is getting ready. Please check back soon.','warn');['lnjoin','lnnewroom'].forEach(function(i){var b=$$(i);if(b)b.disabled=true;});};
+ var off=function(t){shMsg('lnst',t||'Liner is getting ready. Please check back soon.','warn');['lnjoin','lnnewroom'].forEach(function(i){var b=$$(i);if(b)b.disabled=true;});};
  if(!LN.api){off();return;}
  var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort();},9000);
- fetch(LN.api+'/health',{signal:ctl.signal}).then(function(r){return r.json();}).then(function(j){clearTimeout(tm);if(!j||!j.ok||!j.storage)throw 0;LN.cfg=j;if(j.maxPeople>0)LN.cap=j.maxPeople;if(j.maxRoomBytes>0)LN.max=j.maxRoomBytes;}).catch(function(){clearTimeout(tm);off();});}
+ fetch(LN.api+'/health',{signal:ctl.signal}).then(function(r){return r.json();}).then(function(j){clearTimeout(tm);if(!j||!j.ok||!j.storage)throw 0;LN.cfg=j;if(j.maxPeople>0)LN.cap=j.maxPeople;if(j.maxRoomBytes>0)LN.max=j.maxRoomBytes;
+  if(j.captcha){
+   if(!tsOn()){off('The security check is not set up yet, so Liner is paused. Please check back soon.');return;}
+   LN.cf.on=true;var h=$$('lncap');if(!h)return;h.style.display='';
+   tsLib().then(function(T){if(!$$('lncap'))return;LN.cf.tid=T.render($$('lncap'),{sitekey:CFG.turnstileKey,theme:'auto',callback:function(x){LN.cf.tok=x;},'expired-callback':function(){LN.cf.tok='';},'error-callback':function(){LN.cf.tok='';}});},
+    function(){shMsg('lnm1','The security check could not load. Please reload the page.','bad');});}
+ }).catch(function(){clearTimeout(tm);off();});}
 function lnPage(again){nav('liner');
  if(!again)lnLeave();else{LN.state='join';}
- LN.api=lnApi();LN.cfg=null;
+ LN.api=lnApi();LN.cfg=null;LN.cf={on:false,tok:'',tid:null};LN.mode='join';
  var q=PM&&/[?&]c=([A-Za-z0-9-]{1,24})/.exec(location.search),sv=lnRead(),nm='';try{nm=localStorage.getItem(LNN)||'';}catch(e){}
  var c0=q?lnNorm(q[1]):(sv&&sv.code&&!again?sv.code:''),n0=nm||(sv&&sv.name)||'';
  app.innerHTML=toolHd('liner')+
- '<p class="lead dl-lead">Type a code to join a chat room. Pick a name, talk with up to 10 people and share files up to 10 MB per room. Every room has a 2 hour timer, then it is deleted on its own.</p>'+
+ '<p class="lead dl-lead">Create a room, or type the code of one that is open to join it. Pick a name, talk with up to 10 people and share files up to 10 MB per room. Every room has a 2 hour timer, then it is deleted on its own.</p>'+
  '<div id="lnst"></div>'+
- '<section class="card dl-sec dl-f"><div class="dl-sh"><span class="dl-n">1</span><div><h2>Join a room</h2><span class="hint">Everyone who types the same code lands in the same room.</span></div></div>'+
+ '<section class="card dl-sec dl-f"><div class="dl-sh"><span class="dl-n">1</span><div><h2>Join a room</h2><span class="hint">Type the code of a room that is already open. To start a new room, press Create a new room.</span></div></div>'+
  '<div class="lnr-fm"><label class="qfl" for="lncodei">Room code<input type="text" id="lncodei" maxlength="24" placeholder="For example TEAM42" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" value="'+esc(c0)+'"></label>'+
  '<label class="qfl" for="lnname">Your name<input type="text" id="lnname" maxlength="20" placeholder="Shown next to your messages" autocomplete="nickname" value="'+esc(n0)+'"></label></div>'+
- '<div class="dl-cta"><button class="btn pri dl-big" id="lnjoin" type="button">Join room</button><button class="btn dl-big" id="lnnewroom" type="button">Create a new room</button></div><div id="lnm1"></div></section>'+
+ '<div id="lncap" style="display:none;margin-top:12px"></div><div class="dl-cta"><button class="btn pri dl-big" id="lnjoin" type="button">Join room</button><button class="btn dl-big" id="lnnewroom" type="button">Create a new room</button></div><div id="lnm1"></div></section>'+
  '<p class="dl-note">Anyone who has a room code can join while there is space (10 people at most). Share codes only with people you trust, and please do not share passwords, private details or anything you do not have the right to share. See the <a href="#/terms" style="color:var(--brand)">Terms</a> and <a href="#/privacy" style="color:var(--brand)">Privacy</a> pages.</p>';
  fixLinks(app);
  var ci=$$('lncodei'),ni=$$('lnname');
  ci.oninput=function(){ci.value=ci.value.toUpperCase().replace(/[^A-Z0-9-]/g,'');};
- var go=function(e){if(e.key==='Enter'){e.preventDefault();lnJoin(ci.value,ni.value);}};ci.onkeydown=go;ni.onkeydown=go;
- $$('lnjoin').onclick=function(){lnJoin(ci.value,ni.value);};
- $$('lnnewroom').onclick=function(){ci.value=lnGen();if(lnNameOk(ni.value.replace(/\s+/g,' ').trim()))lnJoin(ci.value,ni.value);else{shMsg('lnm1','Your new room code is '+ci.value+'. Now type your name and press Join room.','good');ni.focus();}};
+ var go=function(e){if(e.key==='Enter'){e.preventDefault();lnJoin(ci.value,ni.value,'join');}};ci.onkeydown=go;ni.onkeydown=go;
+ $$('lnjoin').onclick=function(){lnJoin(ci.value,ni.value,'join');};
+ $$('lnnewroom').onclick=function(){var nm=ni.value.replace(/\s+/g,' ').trim();if(!lnNameOk(nm)){shMsg('lnm1','Type your name first (2 to 20 characters), then press Create a new room.','warn');ni.focus();return;}ci.value=lnGen();lnJoin(ci.value,nm,'create');};
  lnHealth();
 }
 /* ---------- Deal or No Deal ---------- */
