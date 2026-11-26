@@ -1994,10 +1994,10 @@ function lnEmbedSpec(u){var a;try{a=new URL(u);}catch(e){return null;}if(a.proto
  if(site&&p.length>1)return {u:u,k:'img',loop:true};
  return null;}
 function lnEmbedFetch(u){var c=LN.eb[u];if(c)return c.p;c=LN.eb[u]={};
- c.p=fetch(LN.api+'/e/'+LN.code+'?u='+encodeURIComponent(u),{headers:{'X-Liner-Token':LN.tok}}).then(function(r){if(!r.ok)return r.json().catch(function(){return {};}).then(function(j){throw {s:r.status,j:j||{}};});return r.blob();}).then(function(bl){c.t=bl.type;c.u=URL.createObjectURL(bl);return c;});
+ c.p=fetch(LN.api+'/e/'+LN.code+'?u='+encodeURIComponent(u),{headers:{'X-Liner-Token':LN.tok}}).then(function(r){if(!r.ok)return r.json().catch(function(){return {};}).then(function(j){throw {s:r.status,j:j||{}};});return r.blob().catch(function(){throw {s:413,j:{}};});}).then(function(bl){c.t=bl.type;c.u=URL.createObjectURL(bl);return c;});
  c.p.catch(function(e){c.bad=true;c.why=lnWhy(e);});return c.p;}
 function lnWhy(e){var s=e&&e.s,j=(e&&e.j)||{};if(!s)return 'the Liner server could not be reached';
- if(s===404)return 'the Liner server needs its latest update';if(s===403)return 'not allowed';if(s===429)return 'too many previews, try again in a minute';if(s===413)return 'the file is over 8 MB';if(s===400)return 'that is not a valid link';
+ if(s===404)return 'the Liner server needs its latest update';if(s===403)return 'not allowed';if(s===429)return 'too many previews, try again in a minute';if(s===413)return 'the file is over 100 MB';if(s===400)return 'that is not a valid link';
  if(s===415)return 'the link does not lead to a picture or clip'+(j.ct?' (it returned '+j.ct+')':'');if(s===502)return 'that site did not give the picture'+(j.st?' (status '+j.st+')':'');return 'error '+s;}
 function lnEmbNote(c){return '<div class="lnr-en">Preview not available: '+esc(c.why||'unknown')+'</div>';}
 function lnEmbedHtml(sp,c){var vid=/^video\//.test(c.t);
