@@ -2181,7 +2181,7 @@ function lnOn(d){
   if(LN.state!=='chat'){LN.state='chat';lnChat();}else{lnBan('');lnHead();lnList();lnTypDraw();}
   if(LN.old){lnBan('Liner was updated while this page was open. Please reload the page to keep everything working.','warn','Reload');var rb=$$('lnretry');if(rb)rb.onclick=function(){location.reload();};}
  }else if(d.t==='msg'&&d.m){var m=d.m;if(m.k==='file'&&m.file&&!LN.cnt[m.file.id]){LN.cnt[m.file.id]=1;LN.used+=m.file.size;lnHead();}
-  if(m.k==='text'&&LN.typers[m.name]){clearTimeout(LN.typers[m.name]);delete LN.typers[m.name];lnTypDraw();}lnAdd(m);
+  if(m.k==='text'&&LN.typers[m.name]){clearTimeout(LN.typers[m.name]);delete LN.typers[m.name];lnTypDraw();}lnAdd(m);if(m.k!=='sys'&&m.name&&m.name.toLowerCase()!==LN.name.toLowerCase()&&(LN.away||document.hidden||!document.hasFocus()))lnBeep();
  }else if(d.t==='members'){var oh=LN.host;LN.members=d.members||[];LN.idle=d.idle||[];LN.host=d.host||'';lnHead();if(oh!==LN.host)lnList(true);
  }else if(d.t==='del'){var di=-1;LN.msgs.forEach(function(m,i){if(m.id===d.id)di=i;});if(di>=0){var dm=LN.msgs.splice(di,1)[0];if(dm.k==='file'&&dm.file){var bc=LN.blobs[dm.file.id];if(bc&&bc.u){try{URL.revokeObjectURL(bc.u);}catch(e){}}delete LN.blobs[dm.file.id];lnVClose();}}if(typeof d.used==='number')LN.used=d.used;lnHead();lnList(true);lnReplyDraw();
  }else if(d.t==='kicked'){LN.fatal=4012;lnStop();lnBan('The host removed you from this room.','bad');lnLock(true);
@@ -2206,7 +2206,7 @@ function lnConnect(){
  w.onmessage=function(e){if(gen!==LN.gen)return;LN.rx=Date.now();var d;try{d=JSON.parse(e.data);}catch(x){return;}lnOn(d);};
  w.onclose=function(e){if(gen!==LN.gen)return;LN.ws=null;lnDown(e&&e.code);};
  w.onerror=function(){};}
-function lnJoin(raw,nm,mode){
+function lnJoin(raw,nm,mode){lnAudio();
  var code=lnNorm(raw),name=String(nm||'').replace(/\s+/g,' ').trim();
  if(!/^[A-Z0-9]{4,20}$/.test(code)){shMsg('lnm1','Room codes have 4 to 20 letters and numbers.','bad');return;}
  if(!lnNameOk(name)){shMsg('lnm1',LNE[4003],'bad');return;}
@@ -2291,7 +2291,12 @@ function lnChat(){
  bx.ondragover=function(e){e.preventDefault();};bx.ondrop=function(e){e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files.length)lnFiles(e.dataTransfer.files);};
  if(!touch)t.focus();
  if(!LN.hooks){LN.hooks=true;window.addEventListener('pagehide',function(e){if(e&&e.persisted===false&&LN.state==='chat'&&LN.ws&&LN.ws.readyState===1){LN.away=true;try{LN.ws.send(JSON.stringify({t:'bye'}));}catch(x){}}else lnPresence(true);});window.addEventListener('pageshow',function(){lnPresence(false);});window.addEventListener('online',function(){if(LN.state==='chat'&&!LN.fatal&&!LN.ended&&(!LN.ws||LN.ws.readyState!==1)){LN.tries=0;lnConnect();}});
+  ['pointerdown','keydown','touchstart'].forEach(function(ev){document.addEventListener(ev,function(){if(LN.state==='chat')lnAudio();},{passive:true});});
   document.addEventListener('visibilitychange',function(){lnPresence(document.hidden);if(!document.hidden&&LN.state==='chat'&&LN.ws&&LN.ws.readyState===1){var rx0=LN.rx;try{LN.ws.send('ping');}catch(e){}setTimeout(function(){if(LN.state==='chat'&&LN.ws&&LN.rx===rx0&&!LN.fatal&&!LN.ended)lnDrop();},4000);}if(!document.hidden&&LN.state==='chat'&&!LN.fatal&&!LN.ended&&LN.ws&&LN.ws.readyState!==1&&LN.ws.readyState!==0){LN.tries=0;lnDrop();}});}}
+/* a soft, short beep for a new message while the person is away from the page (tab hidden or window not in front) */
+function lnAudio(){if(!LN.ac){try{var C=window.AudioContext||window.webkitAudioContext;if(C)LN.ac=new C();}catch(e){}}if(LN.ac&&LN.ac.state==='suspended'){try{LN.ac.resume();}catch(e){}}return LN.ac;}
+function lnBeep(){var now=Date.now();if(now-(LN.beepAt||0)<2500)return;var ac=LN.ac;if(!ac||ac.state!=='running')return;LN.beepAt=now;
+ try{var o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;o.type='sine';o.frequency.value=880;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.06,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.22);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.24);}catch(e){}}
 function lnPresence(away){if(LN.state!=='chat'||!LN.ws||LN.ws.readyState!==1)return;if(away===LN.away)return;LN.away=away;try{LN.ws.send(JSON.stringify({t:away?'away':'back'}));}catch(e){}}
 function lnHealth(){
  var off=function(t){shMsg('lnst',t||'Liner is getting ready. Please check back soon.','warn');['lnjoin','lnnewroom'].forEach(function(i){var b=$$(i);if(b)b.disabled=true;});};
