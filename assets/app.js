@@ -1959,7 +1959,7 @@ function sharePage(){nav('share');
  shHealth();
 }
 /* ---------- Liner: chat rooms opened with a code (up to 10 people, 10 MB of files per room) ---------- */
-IC.lnplay='<path d="M8 5.5v13L19 12z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>';IC.lnpause='<rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/>';IC.lnvol='<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>';IC.lnmute='<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M22 9l-6 6M16 9l6 6"/>';IC.lnfs='<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>';IC.lnrep='<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>';IC.lndots='<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>';IC.lnp='<path d="M15 18l-6-6 6-6"/>';IC.lnn='<path d="M9 18l6-6-6-6"/>';
+IC.lneye='<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>';IC.lneyeoff='<path d="M9.9 4.2A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-2.9 3.9M6.6 6.6C3.7 8.5 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4.4-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/>';IC.lnplay='<path d="M8 5.5v13L19 12z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>';IC.lnpause='<rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/>';IC.lnvol='<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>';IC.lnmute='<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M22 9l-6 6M16 9l6 6"/>';IC.lnfs='<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/>';IC.lnrep='<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>';IC.lndots='<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>';IC.lnp='<path d="M15 18l-6-6 6-6"/>';IC.lnn='<path d="M9 18l6-6-6-6"/>';
 IC.liner='<path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3 21l1.9-5.6A8.5 8.5 0 1 1 21 11.5z"/>';
 var LN={api:'',cfg:null,ws:null,state:'join',code:'',name:'',tok:'',members:[],msgs:[],used:0,max:10485760,cap:10,gen:0,tries:0,rt:null,ping:null,rx:0,fatal:0,ended:false,up:[],busy:false,typeAt:0,typers:{},cnt:{},blobs:{},idle:[],host:'',reply:0,emb:true,eb:{},es:{},io:null,away:false,mode:'join',cf:{on:false,tok:'',tid:null},vclose:null,stuck:true,hooks:false};
 var LNK='eve-sandbox:liner:last',LNN='eve-sandbox:liner:name';
@@ -1990,7 +1990,7 @@ function lnEmbedSpec(u){var a;try{a=new URL(u);}catch(e){return null;}if(a.proto
  if(/\.(gif|png|jpe?g|webp|avif|bmp)$/i.test(p))return {u:u,k:'img'};
  if(/(^|\.)giphy\.com$/.test(h)&&(m=/^\/(?:gifs|stickers)\/(?:.*-)?([A-Za-z0-9]+)\/?$/.exec(p)||/^\/embed\/([A-Za-z0-9]+)\/?$/.exec(p)))return {u:'https://media.giphy.com/media/'+m[1]+'/giphy.gif',k:'img'};
  var yid='';if(h==='youtu.be')yid=p.slice(1,12);else if(/(^|\.)youtube\.com$/.test(h)){yid=a.searchParams.get('v')||((m=/^\/(?:shorts|embed|live)\/([\w-]{11})/.exec(p))?m[1]:'');}
- if(/^[\w-]{11}$/.test(yid))return {u:'https://i.ytimg.com/vi/'+yid+'/hqdefault.jpg',k:'yt',href:u};
+ if(/^[\w-]{11}$/.test(yid))return {u:'https://i.ytimg.com/vi/'+yid+'/mqdefault.jpg',k:'yt',href:u};
  if(site&&p.length>1)return {u:u,k:'img',loop:true};
  return null;}
 function lnEmbedFetch(u){var c=LN.eb[u];if(c)return c.p;c=LN.eb[u]={};
@@ -2255,7 +2255,7 @@ function lnMsgMenu(btn){var id=parseInt(btn.getAttribute('data-mid'),10),m=null;
 function lnChat(){
  app.innerHTML=toolHd('liner')+
  '<section class="card lnr" id="lnbox">'+
- '<div class="lnr-top"><div><div class="lnr-lbl">Room code</div><div class="lnr-code" id="lncode">'+esc(LN.code)+'</div><div class="lnr-cd" id="lncdw">Room ends in <b id="lncd"></b></div></div>'+
+ '<div class="lnr-top"><div><div class="lnr-lbl">Room code</div><div class="lnr-cr"><div class="lnr-code" id="lncode"></div><button class="lnr-eye" id="lneye" type="button"></button></div><div class="lnr-cd" id="lncdw">Room ends in <b id="lncd"></b></div></div>'+
  '<div class="lnr-act"><button class="btn" id="lncc" type="button">'+ico('copy',15,2.2)+'Copy code</button><button class="btn" id="lncl" type="button">'+ico('link',15,2.2)+'Copy link</button><button class="btn" id="lnbye" type="button">Leave</button></div></div>'+
  '<div class="lnr-mem" id="lnmem"></div><div id="lnban"></div>'+
  '<div class="lnr-wrap"><div class="lnr-msgs" id="lnmsgs" role="log" aria-live="polite" aria-label="Messages"></div><button class="lnr-new" id="lnnew" type="button" hidden>New messages '+ico('dn',14,2.4)+'</button></div>'+
@@ -2267,6 +2267,8 @@ function lnChat(){
  '<p class="dl-note">Anyone who has this room code can join while there is space, so share it only with people you trust. Every room has a 2 hour timer. When it ends, the room and its files are deleted and cannot be brought back. Please do not share passwords or private details. See the <a href="#/terms" style="color:var(--brand)">Terms</a> and <a href="#/privacy" style="color:var(--brand)">Privacy</a> pages.</p>';
  fixLinks(app);
  LN.reply=0;LN.emb=true;
+ function codeDraw(){var c=$$('lncode'),b=$$('lneye');if(!c||!b)return;c.textContent=LN.hide?new Array(LN.code.length+1).join('\u2022'):LN.code;c.classList.toggle('hid',!!LN.hide);b.innerHTML=ico(LN.hide?'lneye':'lneyeoff',16,2)+'<span>'+(LN.hide?'Show code':'Hide code')+'</span>';b.setAttribute('aria-pressed',LN.hide?'true':'false');}
+ codeDraw();$$('lneye').onclick=function(){LN.hide=!LN.hide;codeDraw();};
  if(LN.io){try{LN.io.disconnect();}catch(e){}LN.io=null;}
  if(window.IntersectionObserver){LN.io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){LN.io.unobserve(en.target);lnEmbLoad(en.target);}});},{root:$$('lnmsgs'),rootMargin:'300px'});}
  lnHead();lnList();lnTick();
@@ -2296,7 +2298,7 @@ function lnChat(){
 /* a soft, short beep for a new message while the person is away from the page (tab hidden or window not in front) */
 function lnAudio(){if(!LN.ac){try{var C=window.AudioContext||window.webkitAudioContext;if(C)LN.ac=new C();}catch(e){}}if(LN.ac&&LN.ac.state==='suspended'){try{LN.ac.resume();}catch(e){}}return LN.ac;}
 function lnBeep(){var now=Date.now();if(now-(LN.beepAt||0)<2500)return;var ac=LN.ac;if(!ac||ac.state!=='running')return;LN.beepAt=now;
- try{var o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;o.type='sine';o.frequency.value=880;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.06,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.22);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.24);}catch(e){}}
+ try{var o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;o.type='sine';o.frequency.value=880;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.16,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.22);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+0.24);}catch(e){}}
 function lnPresence(away){if(LN.state!=='chat'||!LN.ws||LN.ws.readyState!==1)return;if(away===LN.away)return;LN.away=away;try{LN.ws.send(JSON.stringify({t:away?'away':'back'}));}catch(e){}}
 function lnHealth(){
  var off=function(t){shMsg('lnst',t||'Liner is getting ready. Please check back soon.','warn');['lnjoin','lnnewroom'].forEach(function(i){var b=$$(i);if(b)b.disabled=true;});};
