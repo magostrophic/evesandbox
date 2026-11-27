@@ -2089,13 +2089,14 @@ function lnVideo(o){
  if($$('lnv'))return;if(LN.au&&LN.au.el)try{LN.au.el.pause();}catch(e){}var prevFocus=document.activeElement,hideT=0,drag=false,vol=1,SP=[0.5,1,1.25,1.5,2],si=1;
  try{var sv=parseFloat(localStorage.getItem('eveLnVol'));if(sv>=0&&sv<=1)vol=sv;}catch(e){}
  var root=document.createElement('div');root.id='lnv';root.className='lnv lnvv paused';root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','Video player');
- root.innerHTML='<video class="lnvv-v" id="lnvvid" playsinline preload="auto"></video><div class="lnv-sp" id="lnvsp" aria-hidden="true"></div><p class="lnv-fail" id="lnvf" hidden>This video could not be played here.'+(o.dl?' You can still save it.':'')+'</p>'+
+ root.innerHTML='<video class="lnvv-v" id="lnvvid" playsinline preload="auto" disablepictureinpicture disableremoteplayback controlslist="nodownload noremoteplayback noplaybackrate" draggable="false"></video><div class="lnv-sp" id="lnvsp" aria-hidden="true"></div><p class="lnv-fail" id="lnvf" hidden>This video could not be played here.'+(o.dl?' You can still save it.':'')+'</p>'+
  '<button class="lnvv-big" id="lnvbig" type="button" aria-label="Play">'+ico('lnplay',34,2)+'</button>'+
  '<div class="lnv-top"><span class="lnv-nm" id="lnvnm"></span>'+(o.dl?'<button class="lnv-b" id="lnvdl" type="button" aria-label="Download this video">'+ico('down',20,2.2)+'</button>':'')+'<button class="lnv-b" id="lnvx" type="button" aria-label="Close video">'+ico('x',22,2.2)+'</button></div>'+
  '<div class="lnvv-bar" id="lnvbar"><div class="lnvv-seek" id="lnvseek" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="buf" id="lnvbuf"></i><i class="fill" id="lnvfill"></i><b class="knob" id="lnvknob"></b></div>'+
  '<div class="lnvv-row"><button class="lnvv-b fi" id="lnvpp" type="button" aria-label="Play">'+ico('lnplay',22,2)+'</button><span class="lnvv-t" id="lnvt">0:00 / 0:00</span><span class="lnvv-gap"></span>'+
  '<span class="lnvv-vol"><button class="lnvv-b" id="lnvmu" type="button" aria-label="Mute">'+ico('lnvol',22,2)+'</button><input id="lnvvol" type="range" min="0" max="1" step="0.05" aria-label="Volume"></span>'+
  '<button class="lnvv-b lnvv-sp" id="lnvspd" type="button" aria-label="Playback speed">1\u00d7</button><button class="lnvv-b" id="lnvfs" type="button" aria-label="Full screen">'+ico('lnfs',22,2)+'</button></div></div>';
+ root.addEventListener('contextmenu',function(e){e.preventDefault();e.stopPropagation();return false;},true);root.addEventListener('dragstart',function(e){e.preventDefault();});
  document.body.appendChild(root);document.documentElement.classList.add('lnvlock');
  function g(i){return root.querySelector('#'+i);}
  var v=g('lnvvid'),sk=g('lnvseek'),fill=g('lnvfill'),buf=g('lnvbuf'),knob=g('lnvknob'),pp=g('lnvpp'),big=g('lnvbig'),tt=g('lnvt'),mu=g('lnvmu'),vr=g('lnvvol'),spd=g('lnvspd'),fs=g('lnvfs'),sp=g('lnvsp'),fl=g('lnvf');
