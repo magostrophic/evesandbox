@@ -1979,6 +1979,7 @@ function lnKind(n){var e=lnExt(n);return LNVID[e]?'vid':LNAUD[e]?'aud':'';}
 function lnMime(n){var e=lnExt(n);return LNVID[e]||LNAUD[e]||'application/octet-stream';}
 function lnClock(t){t=Math.max(0,Math.floor(t||0));var h=Math.floor(t/3600),m=Math.floor(t%3600/60),x=t%60;return (h?h+':'+(m<10?'0':''):'')+m+':'+(x<10?'0':'')+x;}
 function lnThumb(u,attr){return '<button type="button" class="lnr-vth" '+attr+' aria-label="Play video"><video class="lnr-vthv" muted playsinline preload="metadata" tabindex="-1" src="'+u+'#t=0.001"></video><span class="lnr-pb">'+ico('lnplay',26,2)+'</span><span class="lnr-dur"></span></button>';}
+function lnNoMenu(e){if(document.getElementById('lnv')){e.preventDefault();e.stopPropagation();}}
 function lnAudHtml(id){var f=lnFile(id),nm=f?f.name:'Audio';
  return '<div class="lnr-ap" data-aid="'+esc(id)+'"><button class="ap-pp" type="button" data-ic="lnplay" aria-label="Play">'+lnIc('lnplay',20)+'</button><div class="ap-mid"><span class="ap-nm">'+esc(nm)+'</span><div class="ap-row"><div class="ap-sk" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="ap-fill"></i><b class="ap-knob"></b></div><span class="ap-t">0:00</span></div></div><button class="ap-sv" type="button" data-save="'+esc(id)+'" aria-label="Save '+esc(nm)+'">'+ico('down',18,2.2)+'</button></div>';}
 /* The music player: one shared audio element, so a song keeps playing while the chat redraws; every card is just a view of it. */
@@ -2089,7 +2090,7 @@ function lnVideo(o){
  if($$('lnv'))return;if(LN.au&&LN.au.el)try{LN.au.el.pause();}catch(e){}var prevFocus=document.activeElement,hideT=0,drag=false,vol=1,SP=[0.5,1,1.25,1.5,2],si=1;
  try{var sv=parseFloat(localStorage.getItem('eveLnVol'));if(sv>=0&&sv<=1)vol=sv;}catch(e){}
  var root=document.createElement('div');root.id='lnv';root.className='lnv lnvv paused';root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','Video player');
- root.innerHTML='<video class="lnvv-v" id="lnvvid" playsinline preload="auto" disablepictureinpicture disableremoteplayback controlslist="nodownload noremoteplayback noplaybackrate" draggable="false"></video><div class="lnv-sp" id="lnvsp" aria-hidden="true"></div><p class="lnv-fail" id="lnvf" hidden>This video could not be played here.'+(o.dl?' You can still save it.':'')+'</p>'+
+ root.innerHTML='<video class="lnvv-v" id="lnvvid" playsinline preload="auto" disablepictureinpicture disableremoteplayback controlslist="nodownload noremoteplayback noplaybackrate" draggable="false"></video><div class="lnvv-sh" id="lnvsh"></div><div class="lnv-sp" id="lnvsp" aria-hidden="true"></div><p class="lnv-fail" id="lnvf" hidden>This video could not be played here.'+(o.dl?' You can still save it.':'')+'</p>'+
  '<button class="lnvv-big" id="lnvbig" type="button" aria-label="Play">'+ico('lnplay',34,2)+'</button>'+
  '<div class="lnv-top"><span class="lnv-nm" id="lnvnm"></span>'+(o.dl?'<button class="lnv-b" id="lnvdl" type="button" aria-label="Download this video">'+ico('down',20,2.2)+'</button>':'')+'<button class="lnv-b" id="lnvx" type="button" aria-label="Close video">'+ico('x',22,2.2)+'</button></div>'+
  '<div class="lnvv-bar" id="lnvbar"><div class="lnvv-seek" id="lnvseek" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i class="buf" id="lnvbuf"></i><i class="fill" id="lnvfill"></i><b class="knob" id="lnvknob"></b></div>'+
@@ -2099,7 +2100,7 @@ function lnVideo(o){
  root.addEventListener('contextmenu',function(e){e.preventDefault();e.stopPropagation();return false;},true);root.addEventListener('dragstart',function(e){e.preventDefault();});
  document.body.appendChild(root);document.documentElement.classList.add('lnvlock');
  function g(i){return root.querySelector('#'+i);}
- var v=g('lnvvid'),sk=g('lnvseek'),fill=g('lnvfill'),buf=g('lnvbuf'),knob=g('lnvknob'),pp=g('lnvpp'),big=g('lnvbig'),tt=g('lnvt'),mu=g('lnvmu'),vr=g('lnvvol'),spd=g('lnvspd'),fs=g('lnvfs'),sp=g('lnvsp'),fl=g('lnvf');
+ var v=g('lnvvid'),sk=g('lnvseek'),fill=g('lnvfill'),buf=g('lnvbuf'),knob=g('lnvknob'),pp=g('lnvpp'),big=g('lnvbig'),tt=g('lnvt'),mu=g('lnvmu'),vr=g('lnvvol'),spd=g('lnvspd'),fs=g('lnvfs'),sp=g('lnvsp'),fl=g('lnvf'),sh=g('lnvsh');
  g('lnvnm').textContent=o.name||'Video';v.src=o.src;v.volume=vol;vr.value=vol;
  var fsOn=root.requestFullscreen||root.webkitRequestFullscreen,fsV=v.webkitEnterFullscreen;if(!fsOn&&!fsV)fs.hidden=true;
  function dur(){return isFinite(v.duration)?v.duration:0;}
@@ -2127,7 +2128,12 @@ function lnVideo(o){
  v.addEventListener('play',state);v.addEventListener('pause',state);v.addEventListener('ended',state);v.addEventListener('volumechange',volDraw);
  v.addEventListener('waiting',function(){sp.hidden=false;});v.addEventListener('playing',function(){sp.hidden=true;});v.addEventListener('canplay',function(){sp.hidden=true;});
  v.addEventListener('error',function(){sp.hidden=true;fl.hidden=false;big.hidden=true;});
- v.addEventListener('click',function(){toggle();});v.addEventListener('dblclick',function(e){e.preventDefault();fsToggle();});
+ sh.addEventListener('click',function(){toggle();});sh.addEventListener('dblclick',function(e){e.preventDefault();fsToggle();});
+ var tp=null;
+ root.addEventListener('touchstart',function(e){if(e.target.closest&&e.target.closest('button,input,a,[role="slider"]'))return;e.preventDefault();tp=(e.target===sh&&e.touches.length===1)?{t:Date.now(),x:e.touches[0].clientX,y:e.touches[0].clientY}:null;},{passive:false});
+ root.addEventListener('touchend',function(e){if(!tp)return;var c=e.changedTouches[0],q=tp;tp=null;if(e.target===sh&&Math.abs(c.clientX-q.x)+Math.abs(c.clientY-q.y)<12&&Date.now()-q.t<600){e.preventDefault();toggle();}},{passive:false});
+ root.addEventListener('touchcancel',function(){tp=null;});
+ window.addEventListener('contextmenu',lnNoMenu,true);
  big.onclick=toggle;pp.onclick=toggle;
  mu.onclick=function(){v.muted=!v.muted;if(!v.muted&&v.volume===0)setVol(0.5);volDraw();};
  vr.oninput=function(){setVol(parseFloat(vr.value));};
@@ -2176,9 +2182,11 @@ function lnView(id){
  function up(e){var p=pts[e.pointerId];if(!p)return;delete pts[e.pointerId];if(Object.keys(pts).length<2)pinch=null;
   if(!Object.keys(pts).length){pan=null;if(e.type==='pointerup'&&!moved){var now=Date.now();
     if(now-last<320){last=0;if(sc>1){sc=1;tx=0;ty=0;apply(true);}else zoomAt(2.6,e.clientX,e.clientY,true);return;}
-    last=now;if(p.t===st)close();}}}
+    last=now;var rc=img.getBoundingClientRect();if(p.t===st&&(e.clientX<rc.left||e.clientX>rc.right||e.clientY<rc.top||e.clientY>rc.bottom))close();}}}
  st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);
  root.addEventListener('contextmenu',function(e){e.preventDefault();});
+ root.addEventListener('touchstart',function(e){if(e.target.closest&&e.target.closest('button,input,a'))return;e.preventDefault();},{passive:false});
+ window.addEventListener('contextmenu',lnNoMenu,true);
  document.documentElement.classList.add('lnvlock');document.body.appendChild(root);document.addEventListener('keydown',onKey,true);window.addEventListener('resize',onRes);
  LN.vclose=close;show(i);root.querySelector('#lnvx').focus({preventScroll:true});}
 function lnList(keep){var box=$$('lnmsgs');if(!box)return;var h='',st=box.scrollTop;LN.msgs.forEach(function(m,i){h+=lnMsgHtml(m,LN.msgs[i-1]);});box.innerHTML=h;if(keep){box.scrollTop=st;}else{box.scrollTop=box.scrollHeight;LN.stuck=true;LN.pin=true;var n=$$('lnnew');if(n)n.hidden=true;}lnPaintAll();}
